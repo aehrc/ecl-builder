@@ -302,6 +302,7 @@ export class SctExpressionConstraintGrammar extends Parser {
   }
 
 
+  // @ts-ignore
   public boolean;
   msgaMode = false;
 
@@ -1050,6 +1051,7 @@ export class SctExpressionConstraintGrammar extends Parser {
       this.enterOuterAlt(_localctx, 1);
       {
         this.state = 298;
+        // @ts-ignore
         if (!(msgaMode)) {
           throw this.createFailedPredicateException("msgaMode");
         }
@@ -4308,6 +4310,7 @@ export class SctExpressionConstraintGrammar extends Parser {
   private function_sempred(_localctx: FunctionContext, predIndex: number): boolean {
     switch (predIndex) {
       case 0:
+        // @ts-ignore
         return msgaMode;
     }
     return true;
