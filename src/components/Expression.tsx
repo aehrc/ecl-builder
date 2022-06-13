@@ -4,11 +4,19 @@
  */
 
 import React from "react";
+import styled from "styled-components";
 
 interface Props {
+  className: string;
   text: string;
 }
 
-export default function Expression({ text }: Props) {
-  return <p>Hello, {text}!</p>;
+const StyledExpression = styled(Expression)`
+  font-family: sans-serif;
+`;
+
+function Expression({ className, text }: Props) {
+  return <p className={className}>Hello, {text}!</p>;
 }
+
+export default StyledExpression;
