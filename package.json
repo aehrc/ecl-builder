@@ -29,6 +29,8 @@
     "@storybook/react": "^6.5.8",
     "@storybook/testing-library": "^0.0.12",
     "@types/react": "^18.0.12",
+    "antlr4ts": "^0.5.0-alpha.4",
+    "antlr4ts-cli": "^0.5.0-alpha.4",
     "babel-loader": "^8.2.5",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
@@ -37,6 +39,5 @@
   "peerDependencies": {
     "react": "^18.1.0",
     "react-dom": "^18.1.0"
-  },
-  "dependencies": {}
+  }
 }
