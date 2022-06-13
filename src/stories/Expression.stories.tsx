@@ -15,4 +15,4 @@ export default {
 const Template: ComponentStory<typeof Expression> = (args) => <Expression {...args} />;
 
 export const Simple = Template.bind({});
-Simple.args = { text: "world" };
+Simple.args = { expression: "30404011000036106" };

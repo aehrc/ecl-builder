@@ -4,19 +4,13 @@
  */
 
 import React from "react";
-import styled from "styled-components";
+import { visitExpression } from "../ExpressionVisitor";
 
 interface Props {
-  className: string;
-  text: string;
+  expression: string;
+  onChange?: (expression: string) => unknown;
 }
 
-const StyledExpression = styled(Expression)`
-  font-family: sans-serif;
-`;
-
-function Expression({ className, text }: Props) {
-  return <p className={className}>Hello, {text}!</p>;
+export default function Expression({ expression, onChange }: Props) {
+  return visitExpression(expression, onChange);
 }
-
-export default StyledExpression;
