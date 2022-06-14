@@ -8,18 +8,14 @@ import { CharStreams, CommonTokenStream } from "antlr4ts";
 import { AbstractParseTreeVisitor, ParseTree } from "antlr4ts/tree";
 import React, { ReactNode } from "react";
 import SnomedId from "./components/SnomedId";
-import {
-  SctExpressionConstraintGrammar,
-  SnomedIdContext
-} from "./parser/SctExpressionConstraintGrammar";
-import {
-  SctExpressionConstraintGrammarVisitor
-} from "./parser/SctExpressionConstraintGrammarVisitor";
-import { SctExpressionConstraintLexer } from "./parser/SctExpressionConstraintLexer";
+import { ECLLexer } from "./parser/src/grammar/syntax/ECLLexer";
+import { ECLParser, SctidContext } from "./parser/src/grammar/syntax/ECLParser";
+import { ECLVisitor } from "./parser/src/grammar/syntax/ECLVisitor";
 
 export type VisualExpressionType = ReactNode;
 
-export default class ExpressionVisitor extends AbstractParseTreeVisitor<VisualExpressionType> implements SctExpressionConstraintGrammarVisitor<VisualExpressionType> {
+export default class ExpressionVisitor extends AbstractParseTreeVisitor<VisualExpressionType>
+  implements ECLVisitor<VisualExpressionType> {
 
   readonly expression: string;
   readonly onChange?: (expression: string) => unknown;
@@ -30,8 +26,8 @@ export default class ExpressionVisitor extends AbstractParseTreeVisitor<VisualEx
     this.onChange = onChange;
   }
 
-  visitSnomedId(ctx: SnomedIdContext): VisualExpressionType {
-    return <SnomedId expression={ctx.SCTID().text} />;
+  visitSctid(ctx: SctidContext): VisualExpressionType {
+    return <SnomedId expression={ctx.text} />;
   }
 
   protected defaultResult(): VisualExpressionType {
@@ -43,11 +39,11 @@ export default class ExpressionVisitor extends AbstractParseTreeVisitor<VisualEx
 }
 
 export function getExpressionContext(expression: string) {
-  const lexer = new SctExpressionConstraintLexer(CharStreams.fromString(expression)),
+  const input = CharStreams.fromString(expression),
+    lexer = new ECLLexer(input),
     tokens = new CommonTokenStream(lexer),
-    parser = new SctExpressionConstraintGrammar(tokens);
-
-  return parser.eQuery();
+    parser = new ECLParser(tokens);
+  return parser.expressionconstraint();
 }
 
 export function visitExpression(
