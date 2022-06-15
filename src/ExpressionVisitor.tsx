@@ -9,12 +9,17 @@ import { AbstractParseTreeVisitor, ParseTree } from "antlr4ts/tree";
 import React, { ReactNode } from "react";
 import SnomedId from "./components/SnomedId";
 import { ECLLexer } from "./parser/src/grammar/syntax/ECLLexer";
-import { ECLParser, SctidContext } from "./parser/src/grammar/syntax/ECLParser";
+import {
+  ECLParser,
+  SctidContext,
+  SubexpressionconstraintContext
+} from "./parser/src/grammar/syntax/ECLParser";
 import { ECLVisitor } from "./parser/src/grammar/syntax/ECLVisitor";
 
 export type VisualExpressionType = ReactNode;
 
-export default class ExpressionVisitor extends AbstractParseTreeVisitor<VisualExpressionType>
+class ExpressionVisitor
+  extends AbstractParseTreeVisitor<VisualExpressionType>
   implements ECLVisitor<VisualExpressionType> {
 
   readonly expression: string;
@@ -26,19 +31,33 @@ export default class ExpressionVisitor extends AbstractParseTreeVisitor<VisualEx
     this.onChange = onChange;
   }
 
+  protected aggregateResult(aggregate: VisualExpressionType, nextResult: VisualExpressionType): VisualExpressionType {
+    return nextResult ?? aggregate;
+  }
+
+  visitSubexpressionconstraint(ctx: SubexpressionconstraintContext): VisualExpressionType {
+    return <p>subexpression<p>{ctx.eclfocusconcept()?.accept(this)}</p></p>;
+  }
+
   visitSctid(ctx: SctidContext): VisualExpressionType {
     return <SnomedId expression={ctx.text} />;
   }
 
+  visitMws(): VisualExpressionType {
+    return undefined;
+  }
+
+  visitWs(): VisualExpressionType {
+    return undefined;
+  }
+
   protected defaultResult(): VisualExpressionType {
-    throw new Error(
-      "Encountered an expression that I don't know how to display"
-    );
+    return <p>default</p>;
   }
 
 }
 
-export function getExpressionContext(expression: string) {
+function getExpressionContext(expression: string) {
   const input = CharStreams.fromString(expression),
     lexer = new ECLLexer(input),
     tokens = new CommonTokenStream(lexer),
@@ -63,6 +82,5 @@ export function visitExpressionTree(
   onChange?: (expression: string) => unknown
 ) {
   const visitor = new ExpressionVisitor(expression, onChange);
-
   return <Box>{visitor.visit(tree)}</Box>;
 }

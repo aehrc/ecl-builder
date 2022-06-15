@@ -1,4 +1,5 @@
 // @ts-nocheck
+// noinspection SpellCheckingInspection,ExceptionCaughtLocallyJS,JSUnusedLocalSymbols
 // Generated from src/grammar/syntax/ECL.g4 by ANTLR 4.9.0-SNAPSHOT
 
 
