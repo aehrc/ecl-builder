@@ -32,6 +32,9 @@ export default function ExpressionBuilder({
 
   function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     setExpression(event.target.value);
+    if (onChange) {
+      onChange(event.target.value);
+    }
   }
 
   return (
