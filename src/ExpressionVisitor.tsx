@@ -6,7 +6,7 @@
 import { Box, Stack } from "@mui/material";
 import antlr4 from "antlr4";
 import React, { ReactNode } from "react";
-import ConceptReference from "./components/ConceptReference";
+import ConceptReference from "./components/ecl/ConceptReference";
 import ECLLexer from "./parser/src/grammar/syntax/ECLLexer";
 import ECLParser from "./parser/src/grammar/syntax/ECLParser";
 import ECLVisitor from "./parser/src/grammar/syntax/ECLVisitor";
@@ -15,9 +15,9 @@ export type VisualExpressionType = ReactNode;
 
 class ExpressionVisitor extends ECLVisitor {
   readonly expression: string;
-  readonly onChange?: (expression: string) => unknown;
+  readonly onChange: (expression: string) => unknown;
 
-  constructor(expression: string, onChange?: (expression: string) => unknown) {
+  constructor(expression: string, onChange: (expression: string) => unknown) {
     super();
     this.expression = expression;
     this.onChange = onChange;
@@ -34,8 +34,10 @@ class ExpressionVisitor extends ECLVisitor {
   visitEclconceptreference(ctx: any) {
     return (
       <ConceptReference
-        conceptId={ctx.conceptid().getText()}
-        term={ctx.term().getText()}
+        concept={{
+          id: ctx.conceptid().getText(),
+          display: ctx.term().getText(),
+        }}
       />
     );
   }
@@ -55,7 +57,7 @@ function getExpressionContext(expression: string) {
 
 export function visitExpression(
   expression: string,
-  onChange?: (expression: string) => unknown
+  onChange: (expression: string) => unknown
 ) {
   return visitExpressionTree(
     expression,
@@ -67,7 +69,7 @@ export function visitExpression(
 export function visitExpressionTree(
   expression: string,
   tree: any,
-  onChange?: (expression: string) => unknown
+  onChange: (expression: string) => unknown
 ) {
   const visitor = new ExpressionVisitor(expression, onChange);
   return <Box>{visitor.visit(tree)}</Box>;

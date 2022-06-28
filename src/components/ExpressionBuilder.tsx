@@ -9,12 +9,12 @@ import {
   CssBaseline,
   Tab,
   Tabs,
-  TextField,
   ThemeProvider,
 } from "@mui/material";
 import React, { useState } from "react";
-import { visitExpression } from "../ExpressionVisitor";
+import CodeEditor from "./CodeEditor";
 import TabPanel from "./TabPanel";
+import VisualBuilder from "./VisualBuilder";
 
 interface Props {
   expression: string;
@@ -30,10 +30,10 @@ export default function ExpressionBuilder({
   const [tab, setTab] = useState("visual"),
     [expression, setExpression] = useState(initialExpression);
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    setExpression(event.target.value);
+  function handleChange(newExpression: string) {
+    setExpression(newExpression);
     if (onChange) {
-      onChange(event.target.value);
+      onChange(newExpression);
     }
   }
 
@@ -45,15 +45,10 @@ export default function ExpressionBuilder({
         <Tab label="Code" value="code" icon={<Code />} />
       </Tabs>
       <TabPanel id="visual" selectedId={tab}>
-        {visitExpression(expression, onChange)}
+        <VisualBuilder expression={expression} onChange={handleChange} />
       </TabPanel>
       <TabPanel id="code" selectedId={tab}>
-        <TextField
-          value={expression}
-          multiline
-          fullWidth
-          onChange={handleChange}
-        />
+        <CodeEditor expression={expression} onChange={handleChange} />
       </TabPanel>
     </ThemeProvider>
   );

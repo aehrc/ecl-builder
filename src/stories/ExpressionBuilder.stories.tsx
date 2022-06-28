@@ -10,7 +10,7 @@ import ExpressionBuilder from "../components/ExpressionBuilder";
 // Load each of the text examples into an object, with the file name as the key and the contents as
 // the value.
 const examples = require.context("../grammar/examples", true, /\.txt$/);
-const stories = storiesOf("SI Examples", module);
+const stories = storiesOf("ExpressionBuilder", module);
 
 // Sort the examples, based on the assumption that they use a dotted numbered prefix.
 const sortedKeys = examples.keys().sort((a, b) => {
