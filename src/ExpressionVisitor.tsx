@@ -3,10 +3,10 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import antlr4 from "antlr4";
 import React, { ReactNode } from "react";
-import SnomedId from "./components/SnomedId";
+import ConceptReference from "./components/ConceptReference";
 import ECLLexer from "./parser/src/grammar/syntax/ECLLexer";
 import ECLParser from "./parser/src/grammar/syntax/ECLParser";
 import ECLVisitor from "./parser/src/grammar/syntax/ECLVisitor";
@@ -14,7 +14,6 @@ import ECLVisitor from "./parser/src/grammar/syntax/ECLVisitor";
 export type VisualExpressionType = ReactNode;
 
 class ExpressionVisitor extends ECLVisitor {
-
   readonly expression: string;
   readonly onChange?: (expression: string) => unknown;
 
@@ -24,15 +23,26 @@ class ExpressionVisitor extends ECLVisitor {
     this.onChange = onChange;
   }
 
-  visitEclconceptreference(ctx: any) {
-    return <SnomedId expression={ctx.conceptid().sctid().getText()} />;
+  visitExpressionconstraint(ctx: any) {
+    return (
+      <Box>
+        <Stack spacing={2}>{this.visitChildren(ctx)}</Stack>
+      </Box>
+    );
   }
 
-  // noinspection JSUnusedGlobalSymbols
+  visitEclconceptreference(ctx: any) {
+    return (
+      <ConceptReference
+        conceptId={ctx.conceptid().getText()}
+        term={ctx.term().getText()}
+      />
+    );
+  }
+
   protected defaultResult(): VisualExpressionType {
     throw new Error("Fell through to default result");
   }
-
 }
 
 function getExpressionContext(expression: string) {
