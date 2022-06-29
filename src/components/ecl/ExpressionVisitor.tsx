@@ -6,13 +6,20 @@
 import { Box, Stack } from "@mui/material";
 import antlr4 from "antlr4";
 import React, { ReactNode } from "react";
-import ConceptReference from "./components/ecl/ConceptReference";
-import ECLLexer from "./parser/src/grammar/syntax/ECLLexer";
-import ECLParser from "./parser/src/grammar/syntax/ECLParser";
-import ECLVisitor from "./parser/src/grammar/syntax/ECLVisitor";
+import * as uuid from "uuid";
+import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
+import ECLParser from "../../parser/src/grammar/syntax/ECLParser";
+import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
+import ConceptReference from "./ConceptReference";
 
 export type VisualExpressionType = ReactNode;
 
+/**
+ * This component implements an ANTLR visitor, delegating out to other
+ * components to render the supported elements of the grammar.
+ *
+ * @author John Grimes
+ */
 class ExpressionVisitor extends ECLVisitor {
   readonly expression: string;
   readonly onChange: (expression: string) => unknown;
@@ -34,10 +41,12 @@ class ExpressionVisitor extends ECLVisitor {
   visitEclconceptreference(ctx: any) {
     return (
       <ConceptReference
+        key={uuid.v4()}
         concept={{
           id: ctx.conceptid().getText(),
           display: ctx.term().getText(),
         }}
+        onChange={this.onChange}
       />
     );
   }

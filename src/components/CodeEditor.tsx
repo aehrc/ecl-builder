@@ -11,6 +11,11 @@ interface Props {
   onChange: (expression: string) => unknown;
 }
 
+/**
+ * An editor for manipulating the expression in its raw ECL form.
+ *
+ * @author John Grimes
+ */
 export default function CodeEditor({ expression, onChange }: Props) {
   return (
     <TextField

@@ -12,6 +12,11 @@ interface Props {
   children: ReactNode;
 }
 
+/**
+ * A container for a tab panel, used at the top-level of the builder.
+ *
+ * @author John Grimes
+ */
 export default function TabPanel({ id, selectedId, children }: Props) {
   const selected = selectedId === id;
 
@@ -21,7 +26,7 @@ export default function TabPanel({ id, selectedId, children }: Props) {
       hidden={!selected}
       id={`tabpanel-${id}`}
       aria-labelledby={`tab-${id}`}
-      sx={{ py: 2 }}
+      sx={{ py: 3 }}
     >
       {selected && children}
     </Box>
