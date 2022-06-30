@@ -11,6 +11,9 @@ import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser from "../../parser/src/grammar/syntax/ECLParser";
 import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
 import ConceptReference from "./ConceptReference";
+import ConstraintOperator, {
+  operatorToConstraintName,
+} from "./ConstraintOperator";
 
 export type VisualExpressionType = ReactNode;
 
@@ -40,11 +43,13 @@ class ExpressionVisitor extends ECLVisitor {
     return super.visitChildren(ctx);
   }
 
-  handleChange(ctx: ParserRuleContext, expression: string): void {
+  /**
+   * Uses the parser rule context to identify the range of characters within the expression that
+   * have changed, and then substitutes those characters with the expression reported by the
+   * component.
+   */
+  handleUpdate(ctx: ParserRuleContext, expression: string): void {
     if (this.onChange) {
-      // This code uses the parser rule context to identify the range of characters within the
-      // expression that have changed, and then substitutes those characters with the expression
-      // reported by the component.
       const start = ctx.start.start,
         stop = ctx.stop?.stop;
       if (stop !== undefined) {
@@ -57,11 +62,47 @@ class ExpressionVisitor extends ECLVisitor {
     }
   }
 
+  /**
+   * Prepends a new expression to the start of the existing expression, separating it with an
+   * optionally configurable delimiter.
+   */
+  handlePrependingChange(expression: string, delimiter: string = " "): void {
+    if (this.onChange) {
+      const newExpression = expression + delimiter + this.expression;
+      this.onChange(newExpression);
+    }
+  }
+
   visitExpressionconstraint(ctx: any): VisualExpressionType {
     return (
       <Box key={uuid.v4()}>
         <Stack spacing={2}>{this.visitChildren(ctx)}</Stack>
       </Box>
+    );
+  }
+
+  visitSubexpressionconstraint(ctx: any): VisualExpressionType {
+    const constraint = ctx.constraintoperator();
+    return (
+      <Stack key={uuid.v4()} direction="row" spacing={1}>
+        {constraint ? null : (
+          <ConstraintOperator
+            key={uuid.v4()}
+            onChange={(e) => this.handlePrependingChange(e)}
+          />
+        )}
+        {this.visitChildren(ctx)}
+      </Stack>
+    );
+  }
+
+  visitConstraintoperator(ctx: any): VisualExpressionType {
+    return (
+      <ConstraintOperator
+        key={uuid.v4()}
+        constraint={operatorToConstraintName[ctx.getText()]}
+        onChange={(e) => this.handleUpdate(ctx, e)}
+      />
     );
   }
 
@@ -73,7 +114,7 @@ class ExpressionVisitor extends ECLVisitor {
           id: ctx.conceptid().getText(),
           display: ctx.term().getText(),
         }}
-        onChange={(e) => this.handleChange(ctx, e)}
+        onChange={(e) => this.handleUpdate(ctx, e)}
       />
     );
   }
