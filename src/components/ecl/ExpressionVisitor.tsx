@@ -4,7 +4,7 @@
  */
 
 import { Box, Stack } from "@mui/material";
-import antlr4 from "antlr4";
+import antlr4, { ParserRuleContext } from "antlr4";
 import React, { ReactNode } from "react";
 import * as uuid from "uuid";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
@@ -30,15 +30,42 @@ class ExpressionVisitor extends ECLVisitor {
     this.onChange = onChange;
   }
 
-  visitExpressionconstraint(ctx: any) {
+  visit(ctx: any): VisualExpressionType {
+    // @ts-ignore
+    return super.visit(ctx);
+  }
+
+  visitChildren(ctx: any): VisualExpressionType {
+    // @ts-ignore
+    return super.visitChildren(ctx);
+  }
+
+  handleChange(ctx: ParserRuleContext, expression: string): void {
+    if (this.onChange) {
+      // This code uses the parser rule context to identify the range of characters within the
+      // expression that have changed, and then substitutes those characters with the expression
+      // reported by the component.
+      const start = ctx.start.start,
+        stop = ctx.stop?.stop;
+      if (stop !== undefined) {
+        const newExpression =
+          this.expression.slice(0, start) +
+          expression +
+          this.expression.slice(stop + 1);
+        this.onChange(newExpression);
+      }
+    }
+  }
+
+  visitExpressionconstraint(ctx: any): VisualExpressionType {
     return (
-      <Box>
+      <Box key={uuid.v4()}>
         <Stack spacing={2}>{this.visitChildren(ctx)}</Stack>
       </Box>
     );
   }
 
-  visitEclconceptreference(ctx: any) {
+  visitEclconceptreference(ctx: any): VisualExpressionType {
     return (
       <ConceptReference
         key={uuid.v4()}
@@ -46,7 +73,7 @@ class ExpressionVisitor extends ECLVisitor {
           id: ctx.conceptid().getText(),
           display: ctx.term().getText(),
         }}
-        onChange={this.onChange}
+        onChange={(e) => this.handleChange(ctx, e)}
       />
     );
   }
