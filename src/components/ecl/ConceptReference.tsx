@@ -48,11 +48,11 @@ export default function ConceptReference({
     event: SyntheticEvent,
     newConcept: Concept | null
   ) {
+    setSelectedConcept(newConcept ?? undefined);
     // Selection of a result sends a notification to the parent component, which
     // will update the overall expression being built.
     if (newConcept) {
       setSearchQuery(newConcept.display || newConcept.id);
-      setSelectedConcept(newConcept);
       onChange(buildExpression(newConcept));
     }
   }
@@ -71,7 +71,7 @@ export default function ConceptReference({
         />
       )}
       options={concepts || []}
-      value={selectedConcept}
+      value={selectedConcept ?? null}
       getOptionLabel={(concept) => concept.display || concept.id}
       isOptionEqualToValue={(a, b) => a.id === b.id}
       onInputChange={handleInputChange}
