@@ -73,6 +73,15 @@ class ExpressionVisitor extends ECLVisitor {
     }
   }
 
+  /**
+   * Replaces the entire expression.
+   */
+  handleReplace(expression: string): void {
+    if (this.onChange) {
+      this.onChange(expression);
+    }
+  }
+
   visitExpressionconstraint(ctx: any): VisualExpressionType {
     return (
       <Box
@@ -158,6 +167,15 @@ export function visitExpressionTree(
   tree: any,
   onChange: (expression: string) => unknown
 ) {
-  const visitor = new ExpressionVisitor(expression, onChange);
-  return <Box>{visitor.visit(tree)}</Box>;
+  const visitor = new ExpressionVisitor(expression.trim(), onChange);
+  if (expression.trim().length === 0) {
+    return (
+      <ConceptReference
+        key={uuid.v4()}
+        onChange={(e) => visitor.handleReplace(e)}
+      />
+    );
+  } else {
+    return visitor.visit(tree);
+  }
 }

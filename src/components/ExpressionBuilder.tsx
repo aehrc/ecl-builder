@@ -15,7 +15,7 @@ import VisualBuilder from "./VisualBuilder";
 
 export interface ExpressionBuilderProps {
   // The current expression being built.
-  expression: string;
+  expression?: string;
   // Invoked when the expression is updated.
   onChange?: (expression: string) => unknown;
   // A set of options that control the behaviour of the component.
@@ -74,10 +74,13 @@ export default function ExpressionBuilder({
             />
           </Tabs>
           <TabPanel id="visual" key="visual" selectedId={tab}>
-            <VisualBuilder expression={expression} onChange={handleChange} />
+            <VisualBuilder
+              expression={expression ?? ""}
+              onChange={handleChange}
+            />
           </TabPanel>
           <TabPanel id="code" key="code" selectedId={tab}>
-            <CodeEditor expression={expression} onChange={handleChange} />
+            <CodeEditor expression={expression ?? ""} onChange={handleChange} />
           </TabPanel>
         </OptionsContext.Provider>
       </QueryClientProvider>

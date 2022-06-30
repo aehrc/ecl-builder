@@ -3,6 +3,8 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
+import { Box } from "@mui/material";
+import React from "react";
 import { visitExpression } from "./ecl/ExpressionVisitor";
 
 interface Props {
@@ -16,5 +18,5 @@ interface Props {
  * @author John Grimes
  */
 export default function VisualBuilder({ expression, onChange }: Props) {
-  return visitExpression(expression, onChange);
+  return <Box>{visitExpression(expression, onChange)}</Box>;
 }

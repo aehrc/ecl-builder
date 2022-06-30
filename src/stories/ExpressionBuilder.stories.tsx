@@ -41,6 +41,8 @@ const sortedKeys = examples.keys().sort((a, b) => {
   return comparison;
 });
 
+stories.add("Blank", () => <ExpressionBuilder />);
+
 for (const name of sortedKeys) {
   // The name of the story will be the filename of the example, minus the extension.
   const displayName = name
