@@ -58,11 +58,7 @@ export default function ConstraintOperator({
   }
 
   return (
-    <Select
-      label="Include"
-      value={selectedConstraint}
-      onChange={handleSelectConstraint}
-    >
+    <Select value={selectedConstraint} onChange={handleSelectConstraint}>
       <MenuItem value="self">only</MenuItem>
       <MenuItem value="childof">children of</MenuItem>
       <MenuItem value="childorselfof">self and children of</MenuItem>

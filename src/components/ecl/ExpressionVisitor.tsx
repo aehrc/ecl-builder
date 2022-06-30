@@ -66,7 +66,7 @@ class ExpressionVisitor extends ECLVisitor {
    * Prepends a new expression to the start of the existing expression, separating it with an
    * optionally configurable delimiter.
    */
-  handlePrependingChange(expression: string, delimiter: string = " "): void {
+  handlePrepend(expression: string, delimiter: string = " "): void {
     if (this.onChange) {
       const newExpression = expression + delimiter + this.expression;
       this.onChange(newExpression);
@@ -75,7 +75,11 @@ class ExpressionVisitor extends ECLVisitor {
 
   visitExpressionconstraint(ctx: any): VisualExpressionType {
     return (
-      <Box key={uuid.v4()}>
+      <Box
+        key={uuid.v4()}
+        className="ECL-expressionConstraint"
+        sx={{ flexGrow: 1 }}
+      >
         <Stack spacing={2}>{this.visitChildren(ctx)}</Stack>
       </Box>
     );
@@ -84,11 +88,17 @@ class ExpressionVisitor extends ECLVisitor {
   visitSubexpressionconstraint(ctx: any): VisualExpressionType {
     const constraint = ctx.constraintoperator();
     return (
-      <Stack key={uuid.v4()} direction="row" spacing={1}>
+      <Stack
+        key={uuid.v4()}
+        direction="row"
+        spacing={1}
+        className="ECL-subExpression"
+        alignItems="flex-start"
+      >
         {constraint ? null : (
           <ConstraintOperator
             key={uuid.v4()}
-            onChange={(e) => this.handlePrependingChange(e)}
+            onChange={(e) => this.handlePrepend(e)}
           />
         )}
         {this.visitChildren(ctx)}

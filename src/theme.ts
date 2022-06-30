@@ -20,5 +20,10 @@ export const theme = createTheme({
         sx: { minHeight: 0 },
       },
     },
+    MuiInputLabel: {
+      defaultProps: {
+        disableAnimation: true,
+      },
+    },
   },
 });
