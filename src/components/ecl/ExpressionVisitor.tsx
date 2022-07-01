@@ -14,6 +14,7 @@ import ConstraintOperator, {
   operatorToConstraintName,
 } from "./ConstraintOperator";
 import ExpressionConstraint from "./ExpressionConstraint";
+import LogicStatement from "./LogicStatement";
 import SubExpression from "./SubExpression";
 
 export type VisualExpressionType = ReactNode;
@@ -87,6 +88,26 @@ class ExpressionVisitor extends ECLVisitor {
         }}
         onChange={(e) => this.handleUpdate(ctx, e)}
       />
+    );
+  }
+
+  /**
+   * conjunctionexpressionconstraint : subexpressionconstraint (ws conjunction ws
+   * subexpressionconstraint)+;
+   */
+  visitConjunctionexpressionconstraint(ctx: any): VisualExpressionType {
+    return (
+      <LogicStatement type="conjunction">
+        {this.visitChildren(ctx)}
+      </LogicStatement>
+    );
+  }
+
+  visitDisjunctionexpressionconstraint(ctx: any): VisualExpressionType {
+    return (
+      <LogicStatement type="disjunction">
+        {this.visitChildren(ctx)}
+      </LogicStatement>
     );
   }
 

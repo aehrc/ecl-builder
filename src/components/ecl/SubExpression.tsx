@@ -5,7 +5,6 @@
 
 import { Stack } from "@mui/material";
 import React, { PropsWithChildren } from "react";
-import * as uuid from "uuid";
 import ConstraintOperator from "./ConstraintOperator";
 
 export interface SubExpressionProps extends PropsWithChildren {
@@ -21,13 +20,10 @@ export default function SubExpression({
   return (
     <Stack
       direction="row"
-      spacing={1}
       className="ECL-subExpression"
       alignItems="flex-start"
     >
-      {constraint ? null : (
-        <ConstraintOperator key={uuid.v4()} onChange={onChange} />
-      )}
+      {constraint ? null : <ConstraintOperator onChange={onChange} />}
       {children}
     </Stack>
   );

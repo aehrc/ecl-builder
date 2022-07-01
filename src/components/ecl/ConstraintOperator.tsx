@@ -3,7 +3,13 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import {
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Stack,
+  useTheme,
+} from "@mui/material";
 import React, { useState } from "react";
 
 export interface ConstraintOperatorProps {
@@ -40,9 +46,10 @@ export default function ConstraintOperator({
   constraint,
   onChange,
 }: ConstraintOperatorProps) {
-  const [selectedConstraint, setSelectedConstraint] = useState<ConstraintType>(
-    constraint || "self"
-  );
+  const theme = useTheme(),
+    [selectedConstraint, setSelectedConstraint] = useState<ConstraintType>(
+      constraint || "self"
+    );
 
   function handleSelectConstraint(
     event: SelectChangeEvent<ConstraintType>
@@ -58,16 +65,33 @@ export default function ConstraintOperator({
   }
 
   return (
-    <Select value={selectedConstraint} onChange={handleSelectConstraint}>
-      <MenuItem value="self">only</MenuItem>
-      <MenuItem value="childof">children of</MenuItem>
-      <MenuItem value="childorselfof">self and children of</MenuItem>
-      <MenuItem value="descendantorselfof">self and descendants of</MenuItem>
-      <MenuItem value="descendantof">descendants of</MenuItem>
-      <MenuItem value="parentof">parents of</MenuItem>
-      <MenuItem value="parentorselfof">self and parents of</MenuItem>
-      <MenuItem value="ancestororselfof">self and ancestors of</MenuItem>
-      <MenuItem value="ancestorof">ancestors of</MenuItem>
-    </Select>
+    <Stack direction="row">
+      <Select value={selectedConstraint} onChange={handleSelectConstraint}>
+        <MenuItem value="self">only</MenuItem>
+        <MenuItem value="childof">children of</MenuItem>
+        <MenuItem value="childorselfof">self and children of</MenuItem>
+        <MenuItem value="descendantorselfof">self and descendants of</MenuItem>
+        <MenuItem value="descendantof">descendants of</MenuItem>
+        <MenuItem value="parentof">parents of</MenuItem>
+        <MenuItem value="parentorselfof">self and parents of</MenuItem>
+        <MenuItem value="ancestororselfof">self and ancestors of</MenuItem>
+        <MenuItem value="ancestorof">ancestors of</MenuItem>
+      </Select>
+      <svg
+        width={theme.spacing(2)}
+        height="56"
+        viewBox={`0 0 ${theme.spacing(2)} 56`}
+      >
+        <line
+          x1="0"
+          y1="28"
+          x2="100"
+          y2="28"
+          stroke="black"
+          strokeWidth="1"
+          strokeDasharray="3"
+        />
+      </svg>
+    </Stack>
   );
 }
