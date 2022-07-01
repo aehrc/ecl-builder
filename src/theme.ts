@@ -5,7 +5,8 @@
 
 import { createTheme } from "@mui/material";
 
-export const theme = createTheme({
+let baseTheme = createTheme();
+export const theme = createTheme(baseTheme, {
   components: {
     MuiTabs: {
       defaultProps: {
@@ -20,10 +21,22 @@ export const theme = createTheme({
         sx: { minHeight: 0 },
       },
     },
+    MuiOutlinedInput: {
+      styleOverrides: {
+        root: {
+          backgroundColor: baseTheme.palette.background.paper,
+        },
+      },
+    },
     MuiInputLabel: {
       defaultProps: {
         disableAnimation: true,
       },
+      // styleOverrides: {
+      //   root: {
+      //     backgroundColor: baseTheme.palette.background.paper,
+      //   },
+      // },
     },
   },
 });

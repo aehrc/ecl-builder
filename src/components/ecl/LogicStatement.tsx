@@ -16,7 +16,7 @@ export default function LogicStatement({
 }: LogicStatementProps) {
   return (
     <Stack
-      className={`ECL-logicStatement-${type}`}
+      className={`ECL-logicStatement`}
       spacing={2}
       sx={{
         p: 2,
@@ -25,6 +25,10 @@ export default function LogicStatement({
         borderStyle: "dashed",
         borderRadius: 1,
         mt: "18px",
+        backgroundColor: "grey.100",
+        ".ECL-logicStatement &": {
+          backgroundColor: "background.default",
+        },
       }}
     >
       <Stack
