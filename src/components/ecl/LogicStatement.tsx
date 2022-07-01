@@ -3,20 +3,35 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { MenuItem, Select, Stack } from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
 import React, { PropsWithChildren } from "react";
 
+export type LogicStatementType = "conjunction" | "disjunction";
+
 export interface LogicStatementProps extends PropsWithChildren {
-  type: "conjunction" | "disjunction";
+  type: LogicStatementType;
+  onChangeType: (type: LogicStatementType) => unknown;
 }
+
+export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
+  {
+    // These have a space after them due to the "mws" in the parser rule.
+    conjunction: "AND ",
+    disjunction: "OR ",
+  };
 
 export default function LogicStatement({
   type,
+  onChangeType,
   children,
 }: LogicStatementProps) {
+  function handleSelectType(event: SelectChangeEvent<LogicStatementType>) {
+    onChangeType(event.target.value as LogicStatementType);
+  }
+
   return (
     <Stack
-      className={`ECL-logicStatement`}
+      className="expression-grouping"
       spacing={2}
       sx={{
         p: 2,
@@ -26,7 +41,7 @@ export default function LogicStatement({
         borderRadius: 1,
         mt: "18px",
         backgroundColor: "grey.100",
-        ".ECL-logicStatement &": {
+        ".expression-grouping &": {
           backgroundColor: "background.default",
         },
       }}
@@ -35,7 +50,11 @@ export default function LogicStatement({
         direction="row"
         sx={{ position: "relative", top: -35, marginBottom: "-30px" }}
       >
-        <Select value={type} sx={{ backgroundColor: "background.default" }}>
+        <Select
+          value={type}
+          onChange={handleSelectType}
+          sx={{ backgroundColor: "background.default" }}
+        >
           <MenuItem value="conjunction">
             matching all of these conditions
           </MenuItem>

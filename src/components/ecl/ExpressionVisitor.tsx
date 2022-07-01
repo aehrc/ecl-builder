@@ -14,10 +14,18 @@ import ConstraintOperator, {
   operatorToConstraintName,
 } from "./ConstraintOperator";
 import ExpressionConstraint from "./ExpressionConstraint";
-import LogicStatement from "./LogicStatement";
+import LogicStatement, {
+  LogicStatementType,
+  logicStatementTypeToOperator,
+} from "./LogicStatement";
 import SubExpression from "./SubExpression";
 
 export type VisualExpressionType = ReactNode;
+
+export interface ChangeReporterProps {
+  // Invoked when expression is updated.
+  onChange: (expression: string) => unknown;
+}
 
 /**
  * This component implements an ANTLR visitor, delegating out to other
@@ -97,7 +105,12 @@ class ExpressionVisitor extends ECLVisitor {
    */
   visitConjunctionexpressionconstraint(ctx: any): VisualExpressionType {
     return (
-      <LogicStatement type="conjunction">
+      <LogicStatement
+        onChangeType={(type) =>
+          this.handleChangeLogicStatementTypes(ctx.conjunction(), type)
+        }
+        type="conjunction"
+      >
         {this.visitChildren(ctx)}
       </LogicStatement>
     );
@@ -105,10 +118,25 @@ class ExpressionVisitor extends ECLVisitor {
 
   visitDisjunctionexpressionconstraint(ctx: any): VisualExpressionType {
     return (
-      <LogicStatement type="disjunction">
+      <LogicStatement
+        onChangeType={(type) =>
+          this.handleChangeLogicStatementTypes(ctx.disjunction(), type)
+        }
+        type="disjunction"
+      >
         {this.visitChildren(ctx)}
       </LogicStatement>
     );
+  }
+
+  /**
+   * Changes a set of logic statements to a new type.
+   */
+  handleChangeLogicStatementTypes(
+    ctxs: ParserRuleContext[],
+    type: LogicStatementType
+  ) {
+    this.handleUpdates(ctxs, logicStatementTypeToOperator[type]);
   }
 
   /**
@@ -117,16 +145,25 @@ class ExpressionVisitor extends ECLVisitor {
    * component.
    */
   handleUpdate(ctx: ParserRuleContext, expression: string): void {
+    this.handleUpdates([ctx], expression);
+  }
+
+  /**
+   * Performs the same function as `handleUpdate`, except that it can replace multiple
+   * subexpressions with the same new expression.
+   */
+  handleUpdates(ctxs: ParserRuleContext[], expression: string): void {
     if (this.onChange) {
-      const start = ctx.start.start,
-        stop = ctx.stop?.stop;
-      if (stop !== undefined) {
-        const newExpression =
-          this.expression.slice(0, start) +
-          expression +
-          this.expression.slice(stop + 1);
-        this.onChange(newExpression);
-      }
+      const newExpression = ctxs.reduce((acc, ctx) => {
+        const start = ctx.start.start,
+          stop = ctx.stop?.stop;
+        if (stop !== undefined) {
+          return acc.slice(0, start) + expression + acc.slice(stop + 1);
+        } else {
+          return acc;
+        }
+      }, this.expression);
+      this.onChange(newExpression);
     }
   }
 

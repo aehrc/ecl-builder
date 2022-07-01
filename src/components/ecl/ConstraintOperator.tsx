@@ -11,12 +11,11 @@ import {
   useTheme,
 } from "@mui/material";
 import React, { useState } from "react";
+import { ChangeReporterProps } from "./ExpressionVisitor";
 
-export interface ConstraintOperatorProps {
+export interface ConstraintOperatorProps extends ChangeReporterProps {
   // The currently selected constraint type.
   constraint?: ConstraintType;
-  // Invoked when expression is updated.
-  onChange: (expression: string) => unknown;
 }
 
 export const constraintNameToOperator = {
@@ -30,7 +29,7 @@ export const constraintNameToOperator = {
   ancestororselfof: ">>",
   ancestorof: ">",
 };
-export const operatorToConstraintName: { [operator: string]: ConstraintType } =
+export const operatorToConstraintName: Record<string, ConstraintType> =
   Object.fromEntries(
     Object.entries(constraintNameToOperator)
       .filter((entry) => entry[1] !== null)

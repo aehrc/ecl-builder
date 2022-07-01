@@ -6,10 +6,13 @@
 import { Stack } from "@mui/material";
 import React, { PropsWithChildren } from "react";
 import ConstraintOperator from "./ConstraintOperator";
+import { ChangeReporterProps } from "./ExpressionVisitor";
 
-export interface SubExpressionProps extends PropsWithChildren {
+export interface SubExpressionProps
+  extends PropsWithChildren,
+    ChangeReporterProps {
+  // The currently selected constraint type.
   constraint?: any;
-  onChange: (expression: string) => unknown;
 }
 
 export default function SubExpression({

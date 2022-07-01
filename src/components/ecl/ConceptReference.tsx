@@ -7,12 +7,11 @@ import { Autocomplete, ListItem, ListItemText, TextField } from "@mui/material";
 import React, { SyntheticEvent, useContext, useState } from "react";
 import useConceptSearch, { Concept } from "../../hooks/useConceptSearch";
 import { OptionsContext } from "../ExpressionBuilder";
+import { ChangeReporterProps } from "./ExpressionVisitor";
 
-export interface ConceptReferenceProps {
+export interface ConceptReferenceProps extends ChangeReporterProps {
   // The currently selected concept.
   concept?: Concept;
-  // Invoked when expression is updated.
-  onChange: (expression: string) => unknown;
 }
 
 /**
