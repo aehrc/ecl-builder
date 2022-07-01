@@ -166,7 +166,7 @@ class ExpressionVisitor extends ECLVisitor {
           // If the suffix starts with whitespace, replace it with a single space.
           let suffix = acc.slice(stop + 1);
           if (/\s/.test(suffix[0])) {
-            prefix = " " + prefix.trimStart();
+            suffix = " " + suffix.trimStart();
           }
           return prefix + expression + suffix;
         } else {
