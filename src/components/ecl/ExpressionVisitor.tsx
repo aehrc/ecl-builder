@@ -3,9 +3,8 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Box, Stack } from "@mui/material";
 import antlr4, { ParserRuleContext } from "antlr4";
-import React, { ReactNode } from "react";
+import React, { cloneElement, isValidElement, ReactNode } from "react";
 import * as uuid from "uuid";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser from "../../parser/src/grammar/syntax/ECLParser";
@@ -14,6 +13,8 @@ import ConceptReference from "./ConceptReference";
 import ConstraintOperator, {
   operatorToConstraintName,
 } from "./ConstraintOperator";
+import ExpressionConstraint from "./ExpressionConstraint";
+import SubExpression from "./SubExpression";
 
 export type VisualExpressionType = ReactNode;
 
@@ -33,14 +34,60 @@ class ExpressionVisitor extends ECLVisitor {
     this.onChange = onChange;
   }
 
-  visit(ctx: any): VisualExpressionType {
-    // @ts-ignore
-    return super.visit(ctx);
+  /**
+   * expressionconstraint : ws ( refinedexpressionconstraint | compoundexpressionconstraint |
+   * dottedexpressionconstraint | subexpressionconstraint ) ws;
+   */
+  visitExpressionconstraint(ctx: any): VisualExpressionType {
+    return (
+      <ExpressionConstraint>{this.visitChildren(ctx)}</ExpressionConstraint>
+    );
   }
 
-  visitChildren(ctx: any): VisualExpressionType {
-    // @ts-ignore
-    return super.visitChildren(ctx);
+  /**
+   * subexpressionconstraint: (constraintoperator ws)? ( ( (memberof ws)? (eclfocusconcept |
+   * (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) (ws memberfilterconstraint)*) |
+   * (eclfocusconcept | (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) ) (ws
+   * (descriptionfilterconstraint | conceptfilterconstraint))* (ws historysupplement)?;
+   */
+  visitSubexpressionconstraint(ctx: any): VisualExpressionType {
+    return (
+      <SubExpression
+        constraint={ctx.constraintoperator()}
+        onChange={(e) => this.handlePrepend(e)}
+      >
+        {this.visitChildren(ctx)}
+      </SubExpression>
+    );
+  }
+
+  /**
+   * constraintoperator : childof | childorselfof | descendantorselfof | descendantof | parentof |
+   * parentorselfof | ancestororselfof | ancestorof;
+   */
+  visitConstraintoperator(ctx: any): VisualExpressionType {
+    return (
+      <ConstraintOperator
+        constraint={operatorToConstraintName[ctx.getText()]}
+        onChange={(e) => this.handleUpdate(ctx, e)}
+      />
+    );
+  }
+
+  /**
+   * constraintoperator : childof | childorselfof | descendantorselfof | descendantof | parentof |
+   * parentorselfof | ancestororselfof | ancestorof;
+   */
+  visitEclconceptreference(ctx: any): VisualExpressionType {
+    return (
+      <ConceptReference
+        concept={{
+          id: ctx.conceptid().getText(),
+          display: ctx.term().getText(),
+        }}
+        onChange={(e) => this.handleUpdate(ctx, e)}
+      />
+    );
   }
 
   /**
@@ -82,64 +129,30 @@ class ExpressionVisitor extends ECLVisitor {
     }
   }
 
-  visitExpressionconstraint(ctx: any): VisualExpressionType {
-    return (
-      <Box
-        key={uuid.v4()}
-        className="ECL-expressionConstraint"
-        sx={{ flexGrow: 1 }}
-      >
-        <Stack spacing={2}>{this.visitChildren(ctx)}</Stack>
-      </Box>
-    );
+  visit(ctx: any): VisualExpressionType {
+    // @ts-ignore
+    return super.visit(ctx);
   }
 
-  visitSubexpressionconstraint(ctx: any): VisualExpressionType {
-    const constraint = ctx.constraintoperator();
-    return (
-      <Stack
-        key={uuid.v4()}
-        direction="row"
-        spacing={1}
-        className="ECL-subExpression"
-        alignItems="flex-start"
-      >
-        {constraint ? null : (
-          <ConstraintOperator
-            key={uuid.v4()}
-            onChange={(e) => this.handlePrepend(e)}
-          />
-        )}
-        {this.visitChildren(ctx)}
-      </Stack>
-    );
-  }
-
-  visitConstraintoperator(ctx: any): VisualExpressionType {
-    return (
-      <ConstraintOperator
-        key={uuid.v4()}
-        constraint={operatorToConstraintName[ctx.getText()]}
-        onChange={(e) => this.handleUpdate(ctx, e)}
-      />
-    );
-  }
-
-  visitEclconceptreference(ctx: any): VisualExpressionType {
-    return (
-      <ConceptReference
-        key={uuid.v4()}
-        concept={{
-          id: ctx.conceptid().getText(),
-          display: ctx.term().getText(),
-        }}
-        onChange={(e) => this.handleUpdate(ctx, e)}
-      />
-    );
+  visitChildren(ctx: any): VisualExpressionType {
+    // @ts-ignore
+    const children = super.visitChildren(ctx);
+    if (Array.isArray(children)) {
+      // This adds a unique key to each child element, to satisfy the requirement of React that all
+      // elements in a list must have a unique key prop.
+      // See: https://reactjs.org/docs/lists-and-keys.html#keys
+      return children.map((child: VisualExpressionType) =>
+        isValidElement(child) ? cloneElement(child, { key: uuid.v4() }) : child
+      );
+    } else {
+      return children;
+    }
   }
 
   protected defaultResult(): VisualExpressionType {
-    throw new Error("Fell through to default result");
+    throw new Error(
+      "ExpressionVisitor: visitation fell through to default result"
+    );
   }
 }
 
