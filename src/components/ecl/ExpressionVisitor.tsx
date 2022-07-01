@@ -158,7 +158,17 @@ class ExpressionVisitor extends ECLVisitor {
         const start = ctx.start.start,
           stop = ctx.stop?.stop;
         if (stop !== undefined) {
-          return acc.slice(0, start) + expression + acc.slice(stop + 1);
+          // If the prefix ends with whitespace, replace it with a single space.
+          let prefix = acc.slice(0, start);
+          if (/\s/.test(prefix[prefix.length - 1])) {
+            prefix = prefix.trimEnd() + " ";
+          }
+          // If the suffix starts with whitespace, replace it with a single space.
+          let suffix = acc.slice(stop + 1);
+          if (/\s/.test(suffix[0])) {
+            prefix = " " + prefix.trimStart();
+          }
+          return prefix + expression + suffix;
         } else {
           return acc;
         }
