@@ -121,34 +121,32 @@ class ExpressionVisitor extends ECLVisitor {
    * subexpressionconstraint)+;
    */
   visitConjunctionexpressionconstraint(ctx: any): VisualExpressionType {
-    return (
-      <AddCondition
-        onChange={(e) => this.handleAppend(ctx, e, { parenthesize: true })}
-      >
-        <LogicStatement
-          onChangeType={(type) =>
-            this.handleChangeLogicStatementTypes(ctx.conjunction(), type)
-          }
-          onAddCondition={(e) => this.handleAppend(ctx, e)}
-          type="conjunction"
-        >
-          {this.visitChildren(ctx)}
-        </LogicStatement>
-      </AddCondition>
-    );
+    return this.visitLogicStatement(ctx, ctx.conjunction(), "conjunction");
   }
 
+  /**
+   * disjunctionexpressionconstraint : subexpressionconstraint (ws disjunction ws
+   * subexpressionconstraint)+;
+   */
   visitDisjunctionexpressionconstraint(ctx: any): VisualExpressionType {
+    return this.visitLogicStatement(ctx, ctx.disjunction(), "disjunction");
+  }
+
+  private visitLogicStatement(
+    ctx: any,
+    operatorCtx: ParserRuleContext[],
+    type: LogicStatementType
+  ) {
     return (
       <AddCondition
         onChange={(e) => this.handleAppend(ctx, e, { parenthesize: true })}
       >
         <LogicStatement
           onChangeType={(type) =>
-            this.handleChangeLogicStatementTypes(ctx.disjunction(), type)
+            this.handleChangeLogicStatementTypes(operatorCtx, type)
           }
-          type="disjunction"
           onAddCondition={(e) => this.handleAppend(ctx, e)}
+          type={type}
         >
           {this.visitChildren(ctx)}
         </LogicStatement>
