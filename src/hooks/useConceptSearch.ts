@@ -61,8 +61,7 @@ function buildExpandParams(editionUri: string, query: string): URLSearchParams {
   const searchParams = new URLSearchParams();
   searchParams.set("url", `${editionUri}?fhir_vs`);
   searchParams.set("filter", query);
-  // Designations are included, so that we can get the semantic tag from the
-  // FSN.
+  // Designations are included, so that we can get the semantic tag from the FSN.
   searchParams.set("includeDesignations", "true");
   // This is used to trim down the response to just what we need.
   // See: https://www.hl7.org/fhir/search.html#elements

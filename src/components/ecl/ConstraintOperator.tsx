@@ -40,6 +40,8 @@ type ConstraintType = keyof typeof constraintNameToOperator;
 
 /**
  * Represents a constraint operator, that modifies the scope of a subexpression.
+ *
+ * @author John Grimes
  */
 export default function ConstraintOperator({
   constraint,
@@ -64,7 +66,7 @@ export default function ConstraintOperator({
   }
 
   return (
-    <Stack direction="row">
+    <Stack className="constraint-operator" direction="row">
       <Select value={selectedConstraint} onChange={handleSelectConstraint}>
         <MenuItem value="self">only</MenuItem>
         <MenuItem value="childof">children of</MenuItem>

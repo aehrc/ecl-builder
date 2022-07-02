@@ -62,6 +62,7 @@ export default function ConceptReference({
 
   return (
     <Autocomplete
+      className="concept-reference"
       sx={{ flexGrow: 1 }}
       renderInput={(params) => (
         <TextField

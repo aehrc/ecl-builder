@@ -15,6 +15,12 @@ export interface SubExpressionProps
   constraint?: any;
 }
 
+/**
+ * A component for rendering a sub-expression, which is basically a concept plus constraints,
+ * additions and refinements.
+ *
+ * @author John Grimes
+ */
 export default function SubExpression({
   constraint,
   onChange,
@@ -22,9 +28,11 @@ export default function SubExpression({
 }: SubExpressionProps) {
   return (
     <Stack
+      className="sub-expression"
       direction="row"
-      className="ECL-subExpression"
       alignItems="flex-start"
+      alignSelf="stretch"
+      flexGrow={1}
     >
       {constraint ? null : <ConstraintOperator onChange={onChange} />}
       {children}

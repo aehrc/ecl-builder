@@ -9,6 +9,7 @@ import * as uuid from "uuid";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser from "../../parser/src/grammar/syntax/ECLParser";
 import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
+import AddCondition from "./AddCondition";
 import ConceptReference from "./ConceptReference";
 import ConstraintOperator, {
   operatorToConstraintName,
@@ -22,14 +23,23 @@ import SubExpression from "./SubExpression";
 
 export type VisualExpressionType = ReactNode;
 
+export type ChangeHandler = (expression: string) => unknown;
+
 export interface ChangeReporterProps {
   // Invoked when expression is updated.
-  onChange: (expression: string) => unknown;
+  onChange: ChangeHandler;
+}
+
+interface SupplementOptions {
+  // A string to use as a delimiter between the original expression and the supplement.
+  delimiter?: string;
+  // Set this to true to parenthesize the original expression.
+  parenthesize?: boolean;
 }
 
 /**
- * This component implements an ANTLR visitor, delegating out to other
- * components to render the supported elements of the grammar.
+ * This component implements an ANTLR visitor, delegating out to other components to render the
+ * supported elements of the grammar.
  *
  * @author John Grimes
  */
@@ -48,8 +58,15 @@ class ExpressionVisitor extends ECLVisitor {
    * dottedexpressionconstraint | subexpressionconstraint ) ws;
    */
   visitExpressionconstraint(ctx: any): VisualExpressionType {
-    return (
+    const expression = (
       <ExpressionConstraint>{this.visitChildren(ctx)}</ExpressionConstraint>
+    );
+    return ctx.compoundexpressionconstraint() ? (
+      expression
+    ) : (
+      <AddCondition onChange={(e) => this.handleAppend(ctx, e)}>
+        {expression}
+      </AddCondition>
     );
   }
 
@@ -63,7 +80,7 @@ class ExpressionVisitor extends ECLVisitor {
     return (
       <SubExpression
         constraint={ctx.constraintoperator()}
-        onChange={(e) => this.handlePrepend(e)}
+        onChange={(e) => this.handlePrepend(ctx, e)}
       >
         {this.visitChildren(ctx)}
       </SubExpression>
@@ -105,27 +122,37 @@ class ExpressionVisitor extends ECLVisitor {
    */
   visitConjunctionexpressionconstraint(ctx: any): VisualExpressionType {
     return (
-      <LogicStatement
-        onChangeType={(type) =>
-          this.handleChangeLogicStatementTypes(ctx.conjunction(), type)
-        }
-        type="conjunction"
+      <AddCondition
+        onChange={(e) => this.handleAppend(ctx, e, { parenthesize: true })}
       >
-        {this.visitChildren(ctx)}
-      </LogicStatement>
+        <LogicStatement
+          onChangeType={(type) =>
+            this.handleChangeLogicStatementTypes(ctx.conjunction(), type)
+          }
+          onAddCondition={(e) => this.handleAppend(ctx, e)}
+          type="conjunction"
+        >
+          {this.visitChildren(ctx)}
+        </LogicStatement>
+      </AddCondition>
     );
   }
 
   visitDisjunctionexpressionconstraint(ctx: any): VisualExpressionType {
     return (
-      <LogicStatement
-        onChangeType={(type) =>
-          this.handleChangeLogicStatementTypes(ctx.disjunction(), type)
-        }
-        type="disjunction"
+      <AddCondition
+        onChange={(e) => this.handleAppend(ctx, e, { parenthesize: true })}
       >
-        {this.visitChildren(ctx)}
-      </LogicStatement>
+        <LogicStatement
+          onChangeType={(type) =>
+            this.handleChangeLogicStatementTypes(ctx.disjunction(), type)
+          }
+          type="disjunction"
+          onAddCondition={(e) => this.handleAppend(ctx, e)}
+        >
+          {this.visitChildren(ctx)}
+        </LogicStatement>
+      </AddCondition>
     );
   }
 
@@ -181,11 +208,34 @@ class ExpressionVisitor extends ECLVisitor {
    * Prepends a new expression to the start of the existing expression, separating it with an
    * optionally configurable delimiter.
    */
-  handlePrepend(expression: string, delimiter: string = " "): void {
-    if (this.onChange) {
-      const newExpression = expression + delimiter + this.expression;
-      this.onChange(newExpression);
-    }
+  handlePrepend(
+    ctx: ParserRuleContext,
+    expression: string,
+    { delimiter = " ", parenthesize = false }: SupplementOptions = {}
+  ): void {
+    const suffix = /\s/.test(delimiter)
+        ? ctx.getText().trimStart()
+        : ctx.getText(),
+      parenthesizedSuffix = parenthesize ? `(${suffix})` : suffix,
+      newExpression = expression + delimiter + parenthesizedSuffix;
+    this.handleUpdate(ctx, newExpression);
+  }
+
+  /**
+   * Appends a new expression to the end of the existing expression, separating it with an
+   * optionally configurable delimiter.
+   */
+  handleAppend(
+    ctx: ParserRuleContext,
+    expression: string,
+    { delimiter = " ", parenthesize = false }: SupplementOptions = {}
+  ): void {
+    const prefix = /\s/.test(delimiter)
+        ? ctx.getText().trimEnd()
+        : ctx.getText(),
+      parenthesizedPrefix = parenthesize ? `(${prefix})` : prefix,
+      newExpression = parenthesizedPrefix + delimiter + expression;
+    this.handleUpdate(ctx, newExpression);
   }
 
   /**
@@ -249,13 +299,10 @@ export function visitExpressionTree(
   onChange: (expression: string) => unknown
 ) {
   const visitor = new ExpressionVisitor(expression.trim(), onChange);
+  // If there is nothing but whitespace in the expression, we render a blank concept reference
+  // component to bootstrap the build.
   if (expression.trim().length === 0) {
-    return (
-      <ConceptReference
-        key={uuid.v4()}
-        onChange={(e) => visitor.handleReplace(e)}
-      />
-    );
+    return <ConceptReference onChange={(e) => visitor.handleReplace(e)} />;
   } else {
     return visitor.visit(tree);
   }

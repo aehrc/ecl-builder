@@ -3,13 +3,23 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Box, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 import React, { PropsWithChildren } from "react";
 
+/**
+ * Represents the top-level of an ECL expression.
+ *
+ * @author John Grimes
+ */
 export default function ExpressionConstraint({ children }: PropsWithChildren) {
   return (
-    <Box className="ECL-expressionConstraint" sx={{ flexGrow: 1 }}>
-      <Stack spacing={2}>{children}</Stack>
-    </Box>
+    <Stack
+      className="expression-constraint"
+      spacing={2}
+      flexGrow={1}
+      alignSelf="stretch"
+    >
+      {children}
+    </Stack>
   );
 }
