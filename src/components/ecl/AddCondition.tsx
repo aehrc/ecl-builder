@@ -8,6 +8,7 @@ import { Button, Stack } from "@mui/material";
 import React, { PropsWithChildren, useState } from "react";
 import ConceptReference from "./ConceptReference";
 import { ChangeReporterProps } from "./ExpressionVisitor";
+import LogicOperator from "./LogicOperator";
 import {
   LogicStatementType,
   logicStatementTypeToOperator,
@@ -41,7 +42,10 @@ export default function AddCondition({
     <Stack spacing={2} flexGrow={1}>
       {children}
       {addMode ? (
-        <ConceptReference onChange={handleChange} />
+        <>
+          <LogicOperator type={logicStatementType} />
+          <ConceptReference onChange={handleChange} />
+        </>
       ) : (
         <Button
           startIcon={<Add />}

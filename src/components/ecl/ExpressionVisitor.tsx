@@ -15,6 +15,7 @@ import ConstraintOperator, {
   operatorToConstraintName,
 } from "./ConstraintOperator";
 import ExpressionConstraint from "./ExpressionConstraint";
+import LogicOperator from "./LogicOperator";
 import LogicStatement, {
   LogicStatementType,
   logicStatementTypeToOperator,
@@ -152,6 +153,14 @@ class ExpressionVisitor extends ECLVisitor {
         </LogicStatement>
       </AddCondition>
     );
+  }
+
+  visitConjunction(ctx: any): VisualExpressionType {
+    return <LogicOperator type="conjunction" />;
+  }
+
+  visitDisjunction(ctx: any): VisualExpressionType {
+    return <LogicOperator type="disjunction" />;
   }
 
   /**
