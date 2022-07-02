@@ -11,7 +11,7 @@ import useDebounce from "./useDebounce";
 export interface Concept {
   id: string;
   display?: string;
-  fullySpecifiedName?: string;
+  semanticTag?: string;
 }
 
 export type ConceptSearchResult = Concept[];
@@ -20,6 +20,8 @@ interface ConceptSearchArguments {
   endpoint: string;
   query: string;
 }
+
+const semanticTagPattern = /\(([^)]+)\)$/;
 
 /**
  * A hook for incorporating concept search into components.
@@ -85,19 +87,27 @@ function extractConceptsFromValueSet(valueSet: ValueSet) {
   if (!valueSet.expansion.contains) {
     throw new Error("No expansion.contains found in response");
   }
-  return valueSet.expansion.contains.map((concept) => ({
-    id: concept.code as string,
-    display: concept.display,
-    fullySpecifiedName:
-      concept.designation
-        ?.filter(matchFullySpecifiedNameDesignation)
-        ?.map((d) => d.value)
-        .reduce<string | null>(
-          (prev, curr, currentIndex, array) =>
-            currentIndex === 0 ? curr : prev,
-          null
-        ) || undefined,
-  }));
+  return valueSet.expansion.contains.map((concept) => {
+    const fullySpecifiedName =
+        concept.designation
+          ?.filter(matchFullySpecifiedNameDesignation)
+          ?.map((d) => d.value)
+          .reduce<string | null>(
+            (prev, curr, currentIndex, array) =>
+              currentIndex === 0 ? curr : prev,
+            null
+          ) || undefined,
+      semanticTagMatch = fullySpecifiedName?.match(semanticTagPattern),
+      semanticTag =
+        semanticTagMatch && semanticTagMatch.length > 1
+          ? semanticTagMatch[1]
+          : undefined;
+    return {
+      id: concept.code as string,
+      display: concept.display,
+      semanticTag,
+    };
+  });
 }
 
 function matchFullySpecifiedNameDesignation(

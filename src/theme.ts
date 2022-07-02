@@ -32,11 +32,13 @@ export const theme = createTheme(baseTheme, {
       defaultProps: {
         disableAnimation: true,
       },
-      // styleOverrides: {
-      //   root: {
-      //     backgroundColor: baseTheme.palette.background.paper,
-      //   },
-      // },
+    },
+    MuiAutocomplete: {
+      styleOverrides: {
+        option: {
+          alignItems: "flex-start",
+        },
+      },
     },
   },
 });

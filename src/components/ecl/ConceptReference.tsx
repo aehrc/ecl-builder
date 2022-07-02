@@ -3,7 +3,7 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Autocomplete, ListItem, ListItemText, TextField } from "@mui/material";
+import { Autocomplete, ListItem, TextField, Typography } from "@mui/material";
 import React, { SyntheticEvent, useContext, useState } from "react";
 import useConceptSearch, { Concept } from "../../hooks/useConceptSearch";
 import { OptionsContext } from "../ExpressionBuilder";
@@ -77,7 +77,14 @@ export default function ConceptReference({
       onInputChange={handleInputChange}
       renderOption={(props, concept) => (
         <ListItem {...props} key={concept.id}>
-          <ListItemText>{concept.display || concept.id}</ListItemText>
+          <Typography flexGrow={1}>{concept.display || concept.id}</Typography>
+          <Typography
+            flexShrink={0}
+            variant="body2"
+            sx={{ marginLeft: 1, fontStyle: "italic", lineHeight: 1.83 }}
+          >
+            {concept.semanticTag}
+          </Typography>
         </ListItem>
       )}
       filterOptions={(options, params) => options}
