@@ -3,8 +3,9 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Stack } from "@mui/material";
-import React, { PropsWithChildren } from "react";
+import { Add } from "@mui/icons-material";
+import { IconButton, Menu, MenuItem, Stack } from "@mui/material";
+import React, { PropsWithChildren, useRef, useState } from "react";
 import ConstraintOperator from "./ConstraintOperator";
 import { ChangeReporterProps } from "./ExpressionVisitor";
 
@@ -26,6 +27,13 @@ export default function SubExpression({
   onChange,
   children,
 }: SubExpressionProps) {
+  const addButton = useRef<HTMLButtonElement | null>(null),
+    [menuOpen, setMenuOpen] = useState(false);
+
+  function handleClickAttributeFilter() {
+    setMenuOpen(false);
+  }
+
   return (
     <Stack
       className="sub-expression"
@@ -36,6 +44,19 @@ export default function SubExpression({
     >
       {constraint ? null : <ConstraintOperator onChange={onChange} />}
       {children}
+      <IconButton
+        ref={addButton}
+        color="primary"
+        sx={{ alignSelf: "center", marginRight: -1 }}
+        onClick={() => setMenuOpen(true)}
+      >
+        <Add />
+      </IconButton>
+      <Menu open={menuOpen} anchorEl={addButton.current}>
+        <MenuItem onClick={handleClickAttributeFilter}>
+          Attribute filter
+        </MenuItem>
+      </Menu>
     </Stack>
   );
 }
