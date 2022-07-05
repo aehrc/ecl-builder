@@ -5,7 +5,7 @@
 
 import { createTheme } from "@mui/material";
 
-let baseTheme = createTheme();
+let baseTheme = createTheme({ typography: { fontSize: 13 } });
 export const theme = createTheme(baseTheme, {
   components: {
     MuiTabs: {

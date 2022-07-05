@@ -94,9 +94,32 @@ class ExpressionVisitor extends ECLVisitor {
   visitRefinedexpressionconstraint(ctx: any): VisualExpressionType {
     // We reuse the sub-expression visitor, adding additional content that will share the same
     // grouping within the UI.
+    const conjunctions: ParserRuleContext | undefined = ctx
+        .eclrefinement()
+        .subrefinement()
+        .eclattributeset()
+        .conjunctionattributeset()
+        ?.conjunction(),
+      disjunctions: ParserRuleContext | undefined = ctx
+        .eclrefinement()
+        .subrefinement()
+        .eclattributeset()
+        .disjunctionattributeset()
+        ?.disjunction();
+    const ctxs = [conjunctions, disjunctions].filter(
+      (ctx) => !!ctx
+    ) as ParserRuleContext[];
+    console.log("ctx", ctx);
+    console.log("ctxs", ctxs);
     return this.renderSubExpression(
       ctx.subexpressionconstraint(),
-      <Refinement>{this.visitChildren(ctx.eclrefinement())}</Refinement>
+      <Refinement
+        onChangeType={(type) =>
+          this.handleChangeLogicStatementTypes(ctxs, type)
+        }
+      >
+        {this.visitChildren(ctx.eclrefinement())}
+      </Refinement>
     );
   }
 

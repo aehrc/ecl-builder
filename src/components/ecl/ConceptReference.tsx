@@ -80,7 +80,12 @@ export default function ConceptReference({
           <Typography
             flexShrink={0}
             variant="body2"
-            sx={{ marginLeft: 1, fontStyle: "italic", lineHeight: 1.83 }}
+            sx={{
+              marginLeft: 1,
+              fontStyle: "italic",
+              lineHeight: 1.83,
+              alignSelf: "flex-start",
+            }}
           >
             {concept.semanticTag}
           </Typography>

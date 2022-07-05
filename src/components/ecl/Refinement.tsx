@@ -3,22 +3,32 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { MenuItem, Select, Stack, useTheme } from "@mui/material";
+import {
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Stack,
+  useTheme,
+} from "@mui/material";
 import React, { PropsWithChildren } from "react";
 import ExpressionGrouping from "./ExpressionGrouping";
 import { LogicStatementType } from "./LogicStatement";
 
 export interface RefinementProps extends PropsWithChildren {
   type?: LogicStatementType;
+  onChangeType: (type: LogicStatementType) => unknown;
 }
 
 export default function Refinement({
   type = "conjunction",
+  onChangeType,
   children,
 }: RefinementProps) {
   const theme = useTheme();
 
-  function handleSelectType() {}
+  function handleSelectType(event: SelectChangeEvent<LogicStatementType>) {
+    onChangeType(event.target.value as LogicStatementType);
+  }
 
   return (
     <Stack direction="row">
