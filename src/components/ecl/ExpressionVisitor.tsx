@@ -3,6 +3,7 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
+import { Stack } from "@mui/material";
 import antlr4, { ParserRuleContext } from "antlr4";
 import React, { cloneElement, isValidElement, ReactNode } from "react";
 import * as uuid from "uuid";
@@ -16,6 +17,7 @@ import ConstraintOperator, {
   constraintNameToOperator,
   operatorToConstraintName,
 } from "./ConstraintOperator";
+import ExpressionComparisonOperator from "./ExpressionComparisonOperator";
 import ExpressionConstraint from "./ExpressionConstraint";
 import LogicOperator from "./LogicOperator";
 import LogicStatement, {
@@ -23,6 +25,7 @@ import LogicStatement, {
   logicStatementTypeToOperator,
 } from "./LogicStatement";
 import MemberOfOperator from "./MemberOfOperator";
+import Refinement from "./Refinement";
 import SubExpression from "./SubExpression";
 import Wildcard from "./Wildcard";
 
@@ -82,6 +85,25 @@ class ExpressionVisitor extends ECLVisitor {
    * (descriptionfilterconstraint | conceptfilterconstraint))* (ws historysupplement)?;
    */
   visitSubexpressionconstraint(ctx: any): VisualExpressionType {
+    return this.renderSubExpression(ctx);
+  }
+
+  /**
+   * refinedexpressionconstraint : subexpressionconstraint ws COLON ws eclrefinement;
+   */
+  visitRefinedexpressionconstraint(ctx: any): VisualExpressionType {
+    // We reuse the sub-expression visitor, adding additional content that will share the same
+    // grouping within the UI.
+    return this.renderSubExpression(
+      ctx.subexpressionconstraint(),
+      <Refinement>{this.visitChildren(ctx.eclrefinement())}</Refinement>
+    );
+  }
+
+  private renderSubExpression(
+    ctx: any,
+    relatedContent?: ReactNode
+  ): VisualExpressionType {
     // If the expression contains a nested expression, we don't bother rendering a sub-expression
     // wrapper. We effectively merge these two levels together from a UI perspective.
     const content = ctx.expressionconstraint() ? (
@@ -89,6 +111,7 @@ class ExpressionVisitor extends ECLVisitor {
     ) : (
       <SubExpression
         constraint={ctx.constraintoperator()}
+        relatedContent={relatedContent}
         // This gets called when the user adds a hierarchy constraint, e.g. descendants and self.
         onAddConstraint={() =>
           this.handlePrepend(
@@ -127,6 +150,38 @@ class ExpressionVisitor extends ECLVisitor {
       </ConceptSearchScope.Provider>
     ) : (
       content
+    );
+  }
+
+  /**
+   * eclattribute : (LEFT_BRACE cardinality RIGHT_BRACE ws)? (reverseflag ws)? eclattributename ws
+   * ((expressioncomparisonoperator ws subexpressionconstraint) | (numericcomparisonoperator ws HASH
+   * numericvalue) | (stringcomparisonoperator ws (typedsearchterm | typedsearchtermset)) |
+   * (booleancomparisonoperator ws booleanvalue));
+   */
+  visitEclattribute(ctx: any): VisualExpressionType {
+    return (
+      <Stack className="attribute" direction="row">
+        {this.visitChildren(ctx)}
+      </Stack>
+    );
+  }
+
+  /**
+   * expressioncomparisonoperator : EQUALS | (EXCLAMATION EQUALS);
+   */
+  visitExpressioncomparisonoperator(ctx: any): VisualExpressionType {
+    return <ExpressionComparisonOperator />;
+  }
+
+  /**
+   * eclattributeset : subattributeset ws (conjunctionattributeset | disjunctionattributeset)?;
+   */
+  visitEclattributeset(ctx: any): VisualExpressionType {
+    return (
+      <Stack className="attribute-set" spacing={1}>
+        {this.visitChildren(ctx)}
+      </Stack>
     );
   }
 

@@ -3,39 +3,17 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Add } from "@mui/icons-material";
-import {
-  Box,
-  Button,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Stack,
-  SxProps,
-  Theme,
-} from "@mui/material";
-import React, { PropsWithChildren, ReactNode, useRef, useState } from "react";
+import { Box, SxProps, Theme } from "@mui/material";
+import React, { PropsWithChildren, ReactNode } from "react";
+import GroupingActions, { Action } from "./GroupingActions";
+import GroupingHeading from "./GroupingHeading";
 
 export interface ExpressionGroupingProps extends PropsWithChildren {
+  heading?: ReactNode;
   actions: Action[];
+  showActions?: boolean;
   className?: string;
-  showAddButton?: boolean;
   sx?: SxProps<Theme>;
-}
-
-export type Action = ActionItem | ActionHeading;
-
-export interface ActionItem {
-  type: "item";
-  label: string;
-  icon?: ReactNode;
-  onClick?: () => void;
-}
-
-export interface ActionHeading {
-  type: "heading";
-  label: string;
 }
 
 /**
@@ -61,103 +39,47 @@ function getStripingStyle(levels: number): Record<string, any> {
  * from the surrounding expression content.
  */
 export default function ExpressionGrouping({
+  heading,
   actions,
   children,
   className,
-  showAddButton = true,
+  showActions = true,
   sx,
 }: ExpressionGroupingProps) {
-  const stripingStyle = getStripingStyle(10),
-    [menuOpen, setMenuOpen] = useState(false),
-    addButton = useRef<HTMLButtonElement>(null),
-    numberOfItems = actions.filter((action) => action.type === "item").length,
-    firstItem: ActionItem | undefined = actions.find(
-      (action) => action.type === "item"
-    ) as ActionItem;
-
-  function handleCloseMenu() {
-    setMenuOpen(false);
-  }
-
-  function renderAction(options: Action, key: number) {
-    if (options.type === "item") {
-      const { label, icon, onClick } = options;
-      return (
-        <MenuItem key={key} onClick={onClick}>
-          <ListItemText>{label}</ListItemText>
-          <ListItemIcon>{icon}</ListItemIcon>
-        </MenuItem>
-      );
-    } else if (options.type === "heading") {
-      const { label } = options;
-      return (
-        <MenuItem key={key} disabled divider>
-          <ListItemText>{label}</ListItemText>
-        </MenuItem>
-      );
-    } else {
-      throw new Error("Invalid option type");
-    }
-  }
+  const stripingStyle = getStripingStyle(10);
 
   return (
-    <Box
-      className={`expression-grouping${className ? ` ${className}` : ""}`}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 1,
-        p: 2,
-        borderWidth: 1,
-        borderColor: "grey.400",
-        borderStyle: "solid",
-        borderRadius: 1,
-        backgroundColor: "grey.100",
-        position: "relative",
-        pb: showAddButton ? "2.2em" : "1.4em",
-        mb: "1em",
-        ...stripingStyle,
-        ...sx,
-      }}
-    >
-      {children}
-      {showAddButton && (
-        <Stack spacing={1} direction="row">
-          <Button
-            variant="contained"
-            startIcon={<Add />}
-            sx={{
-              position: "absolute",
-              bottom: "-2.5em",
-              marginBottom: "1.2em",
-              backgroundColor: "background.default",
-              color: "text.primary",
-              "&:hover": {
-                color: "primary.contrastText",
-              },
-              flexGrow: 1,
-            }}
-            ref={addButton}
-            onClick={
-              numberOfItems === 1
-                ? (firstItem as ActionItem).onClick
-                : () => setMenuOpen(true)
-            }
-          >
-            {numberOfItems === 1 ? firstItem.label : "Add"}
-          </Button>
-          {numberOfItems > 1 ? (
-            <Menu
-              open={menuOpen}
-              anchorEl={addButton.current}
-              onClose={handleCloseMenu}
-              onClick={handleCloseMenu}
-            >
-              {actions.map(renderAction)}
-            </Menu>
-          ) : null}
-        </Stack>
-      )}
+    // We need this additional level of element to prevent margins being collapsed when used inside
+    // flex box.
+    <Box flexGrow={1}>
+      <Box
+        className={`expression-grouping${className ? ` ${className}` : ""}`}
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
+          p: 2,
+          borderWidth: 1,
+          borderColor: "grey.400",
+          borderStyle: "solid",
+          borderRadius: 1,
+          backgroundColor: "grey.100",
+          position: "relative",
+          mt: heading ? "1.75em" : undefined,
+          mb: showActions ? "1.2em" : 0,
+          pt: heading ? "3em" : undefined,
+          pb: showActions ? "1.6em" : "1.4em",
+          "& > *": {
+            clear: "both",
+          },
+          ...stripingStyle,
+          ...sx,
+        }}
+      >
+        {heading && <GroupingHeading>{heading}</GroupingHeading>}
+        {children}
+        {showActions && <GroupingActions actions={actions} />}
+      </Box>
     </Box>
   );
 }

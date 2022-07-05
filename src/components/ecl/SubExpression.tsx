@@ -5,7 +5,7 @@
 
 import { Done } from "@mui/icons-material";
 import Stack from "@mui/material/Stack/Stack";
-import React, { PropsWithChildren, useState } from "react";
+import React, { PropsWithChildren, ReactNode, useState } from "react";
 import ConceptReference from "./ConceptReference";
 import ExpressionGrouping from "./ExpressionGrouping";
 import LogicOperator from "./LogicOperator";
@@ -14,6 +14,8 @@ import LogicStatement, { LogicStatementType } from "./LogicStatement";
 export interface SubExpressionProps extends PropsWithChildren {
   // The currently selected constraint type.
   constraint?: any;
+  // Additional content that is related to the sub-expression.
+  relatedContent?: ReactNode;
   // Called when a new constraint operator is added to the expression.
   onAddConstraint: () => unknown;
   // Called when the constraint operator is removed.
@@ -33,6 +35,7 @@ export interface SubExpressionProps extends PropsWithChildren {
  */
 export default function SubExpression({
   constraint,
+  relatedContent,
   onAddConstraint,
   onRemoveConstraint,
   onAddLogicStatement,
@@ -63,13 +66,16 @@ export default function SubExpression({
 
   function renderContent() {
     return (
-      <Stack
-        direction="row"
-        alignItems="flex-start"
-        alignSelf="stretch"
-        flexGrow={1}
-      >
-        {children}
+      <Stack>
+        <Stack
+          direction="row"
+          alignItems="flex-start"
+          alignSelf="stretch"
+          flexGrow={1}
+        >
+          {children}
+        </Stack>
+        {relatedContent}
       </Stack>
     );
   }
@@ -77,7 +83,7 @@ export default function SubExpression({
   return addLogicStatement ? (
     <LogicStatement
       type={addLogicStatement}
-      showAddButton={false}
+      showActions={false}
       onChangeType={(type) => setAddLogicStatement(type)}
       onAddCondition={handleLogicStatementUpdate}
     >

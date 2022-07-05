@@ -3,7 +3,7 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React, { PropsWithChildren, useState } from "react";
 import ConceptReference from "./ConceptReference";
 import ExpressionGrouping from "./ExpressionGrouping";
@@ -14,7 +14,7 @@ export type LogicStatementType = "conjunction" | "disjunction";
 
 export interface LogicStatementProps extends PropsWithChildren {
   type: LogicStatementType;
-  showAddButton?: boolean;
+  showActions?: boolean;
   onChangeType: (type: LogicStatementType) => unknown;
   onAddCondition: ChangeHandler;
 }
@@ -33,7 +33,7 @@ export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
  */
 export default function LogicStatement({
   type,
-  showAddButton = true,
+  showActions = true,
   onChangeType,
   onAddCondition,
   children,
@@ -49,9 +49,27 @@ export default function LogicStatement({
     setAddCondition(false);
   }
 
+  function renderHeading() {
+    return (
+      <Select
+        value={type}
+        onChange={handleSelectType}
+        sx={{ backgroundColor: "background.default" }}
+      >
+        <MenuItem value="conjunction">
+          matching all of these conditions
+        </MenuItem>
+        <MenuItem value="disjunction">
+          matching any of these conditions
+        </MenuItem>
+      </Select>
+    );
+  }
+
   return (
     <ExpressionGrouping
       className="logic-statement"
+      heading={renderHeading()}
       actions={[
         {
           type: "item",
@@ -59,26 +77,9 @@ export default function LogicStatement({
           onClick: () => setAddCondition(true),
         },
       ]}
-      showAddButton={showAddButton && !addCondition}
-      sx={{
-        mt: "1.8em",
-        pt: "3em",
-      }}
+      showActions={showActions && !addCondition}
+      sx={{ pb: showActions ? "2em" : "1.4em" }}
     >
-      <Stack direction="row" sx={{ position: "absolute", top: "-1.8em" }}>
-        <Select
-          value={type}
-          onChange={handleSelectType}
-          sx={{ backgroundColor: "background.default" }}
-        >
-          <MenuItem value="conjunction">
-            matching all of these conditions
-          </MenuItem>
-          <MenuItem value="disjunction">
-            matching any of these conditions
-          </MenuItem>
-        </Select>
-      </Stack>
       {addCondition ? (
         <>
           {children}
