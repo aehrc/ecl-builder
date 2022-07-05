@@ -75,9 +75,6 @@ export default function ExpressionGrouping({
       (action) => action.type === "item"
     ) as ActionItem;
 
-  console.log("actions", actions);
-  console.log("numberOfItems", numberOfItems);
-
   function handleCloseMenu() {
     setMenuOpen(false);
   }
