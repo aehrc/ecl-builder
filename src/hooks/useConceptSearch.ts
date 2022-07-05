@@ -30,6 +30,7 @@ const semanticTagPattern = /\(([^)]+)\)$/;
  */
 export default function useConceptSearch(
   endpoint: string,
+  valueSet: string,
   query: string,
   options: QueryObserverOptions<ConceptSearchResult, Error> = {}
 ) {
@@ -37,31 +38,31 @@ export default function useConceptSearch(
   const debouncedQuery = useDebounce(query);
   return useQuery<ConceptSearchResult, Error>(
     ["conceptSearch", endpoint, debouncedQuery],
-    () => executeConceptSearch(endpoint, debouncedQuery),
+    () => executeConceptSearch(endpoint, valueSet, debouncedQuery),
     options
   );
 }
 
 async function executeConceptSearch(
   endpoint: string,
+  valueSet: string,
   query: string
 ): Promise<ConceptSearchResult> {
   // Queries less than 3 characters are not sent to the server.
   if (query.length < 3) {
     return [];
   }
-  const editionUri = SCT_URI;
-  const searchParams = buildExpandParams(editionUri, query);
+  const searchParams = buildExpandParams(valueSet, query);
   const response = await fetch(
     `${endpoint}/ValueSet/$expand?${searchParams.toString()}`
   );
-  const valueSet: ValueSet = await response.json();
-  return extractConceptsFromValueSet(valueSet);
+  const parsedResponse: ValueSet = await response.json();
+  return extractConceptsFromValueSet(parsedResponse);
 }
 
-function buildExpandParams(editionUri: string, query: string): URLSearchParams {
+function buildExpandParams(valueSet: string, query: string): URLSearchParams {
   const searchParams = new URLSearchParams();
-  searchParams.set("url", `${editionUri}?fhir_vs`);
+  searchParams.set("url", valueSet);
   searchParams.set("filter", query);
   // Designations are included, so that we can get the semantic tag from the FSN.
   searchParams.set("includeDesignations", "true");

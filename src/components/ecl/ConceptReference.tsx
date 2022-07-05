@@ -7,6 +7,7 @@ import { Autocomplete, ListItem, TextField, Typography } from "@mui/material";
 import React, { SyntheticEvent, useContext, useState } from "react";
 import useConceptSearch, { Concept } from "../../hooks/useConceptSearch";
 import { OptionsContext } from "../ExpressionBuilder";
+import ConceptSearchScope from "./ConceptSearchScope";
 import { ChangeReporterProps } from "./ExpressionVisitor";
 
 export interface ConceptReferenceProps extends ChangeReporterProps {
@@ -25,6 +26,7 @@ export default function ConceptReference({
   onChange,
 }: ConceptReferenceProps) {
   const { terminologyServerUrl } = useContext(OptionsContext),
+    { valueSet, label } = useContext(ConceptSearchScope),
     [selectedConcept, setSelectedConcept] =
       useState<Concept | undefined>(concept),
     [searchQuery, setSearchQuery] = useState(""),
@@ -32,7 +34,7 @@ export default function ConceptReference({
       data: concepts,
       isLoading,
       remove,
-    } = useConceptSearch(terminologyServerUrl, searchQuery);
+    } = useConceptSearch(terminologyServerUrl, valueSet, searchQuery);
 
   function handleInputChange(
     event: SyntheticEvent<Element, Event>,
@@ -65,10 +67,7 @@ export default function ConceptReference({
       className="concept-reference"
       sx={{ flexGrow: 1 }}
       renderInput={(params) => (
-        <TextField
-          {...params}
-          label={selectedConcept?.id || "Search for a concept"}
-        />
+        <TextField {...params} label={selectedConcept?.id || label} />
       )}
       options={concepts || []}
       value={selectedConcept ?? null}

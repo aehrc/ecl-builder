@@ -6,10 +6,12 @@
 import antlr4, { ParserRuleContext } from "antlr4";
 import React, { cloneElement, isValidElement, ReactNode } from "react";
 import * as uuid from "uuid";
+import { SCT_URI } from "../../constants";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser from "../../parser/src/grammar/syntax/ECLParser";
 import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
 import ConceptReference from "./ConceptReference";
+import ConceptSearchScope from "./ConceptSearchScope";
 import ConstraintOperator, {
   constraintNameToOperator,
   operatorToConstraintName,
@@ -20,7 +22,9 @@ import LogicStatement, {
   LogicStatementType,
   logicStatementTypeToOperator,
 } from "./LogicStatement";
+import MemberOfOperator from "./MemberOfOperator";
 import SubExpression from "./SubExpression";
+import Wildcard from "./Wildcard";
 
 export type VisualExpressionType = ReactNode;
 
@@ -78,7 +82,9 @@ class ExpressionVisitor extends ECLVisitor {
    * (descriptionfilterconstraint | conceptfilterconstraint))* (ws historysupplement)?;
    */
   visitSubexpressionconstraint(ctx: any): VisualExpressionType {
-    return ctx.expressionconstraint() ? (
+    // If the expression contains a nested expression, we don't bother rendering a sub-expression
+    // wrapper. We effectively merge these two levels together from a UI perspective.
+    const content = ctx.expressionconstraint() ? (
       this.visitChildren(ctx.expressionconstraint())
     ) : (
       <SubExpression
@@ -107,6 +113,20 @@ class ExpressionVisitor extends ECLVisitor {
       >
         {this.visitChildren(ctx)}
       </SubExpression>
+    );
+    // If there is a "member of" operator within this sub-expression, we modify the scope of concept
+    // search to only return reference set concepts.
+    return ctx.memberof() ? (
+      <ConceptSearchScope.Provider
+        value={{
+          valueSet: `${SCT_URI}?fhir_vs=ecl/%3C%20446609009%20`,
+          label: "Search for a reference set",
+        }}
+      >
+        {content}
+      </ConceptSearchScope.Provider>
+    ) : (
+      content
     );
   }
 
@@ -153,6 +173,20 @@ class ExpressionVisitor extends ECLVisitor {
    */
   visitDisjunctionexpressionconstraint(ctx: any): VisualExpressionType {
     return this.visitLogicStatement(ctx, ctx.disjunction(), "disjunction");
+  }
+
+  /**
+   * CARAT ( ws LEFT_BRACE ws (refsetfieldset | wildcard) ws RIGHT_BRACE )?;
+   */
+  visitMemberof(ctx: any): VisualExpressionType {
+    return <MemberOfOperator />;
+  }
+
+  /**
+   * wildcard : ASTERISK;
+   */
+  visitWildcard(ctx: any): VisualExpressionType {
+    return <Wildcard />;
   }
 
   private visitLogicStatement(
