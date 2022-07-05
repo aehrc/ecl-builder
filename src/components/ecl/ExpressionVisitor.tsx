@@ -9,9 +9,9 @@ import * as uuid from "uuid";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser from "../../parser/src/grammar/syntax/ECLParser";
 import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
-import AddCondition from "./AddCondition";
 import ConceptReference from "./ConceptReference";
 import ConstraintOperator, {
+  constraintNameToOperator,
   operatorToConstraintName,
 } from "./ConstraintOperator";
 import ExpressionConstraint from "./ExpressionConstraint";
@@ -31,9 +31,14 @@ export interface ChangeReporterProps {
   onChange: ChangeHandler;
 }
 
-interface SupplementOptions {
-  // A string to use as a delimiter between the original expression and the supplement.
-  delimiter?: string;
+interface UpdateOptions {
+  // Set this to true if the subject expression has optional whitespace on the right side.
+  optionalWhiteSpaceRight?: boolean;
+  // Set this to true if the subject expression has optional whitespace on the left side.
+  optionalWhiteSpaceLeft?: boolean;
+}
+
+interface SupplementOptions extends UpdateOptions {
   // Set this to true to parenthesize the original expression.
   parenthesize?: boolean;
 }
@@ -59,15 +64,10 @@ class ExpressionVisitor extends ECLVisitor {
    * dottedexpressionconstraint | subexpressionconstraint ) ws;
    */
   visitExpressionconstraint(ctx: any): VisualExpressionType {
-    const expression = (
+    return ctx.subexpressionconstraint() ? (
       <ExpressionConstraint>{this.visitChildren(ctx)}</ExpressionConstraint>
-    );
-    return ctx.compoundexpressionconstraint() ? (
-      expression
     ) : (
-      <AddCondition onChange={(e) => this.handleAppend(ctx, e)}>
-        {expression}
-      </AddCondition>
+      this.visitChildren(ctx)
     );
   }
 
@@ -78,10 +78,32 @@ class ExpressionVisitor extends ECLVisitor {
    * (descriptionfilterconstraint | conceptfilterconstraint))* (ws historysupplement)?;
    */
   visitSubexpressionconstraint(ctx: any): VisualExpressionType {
-    return (
+    return ctx.expressionconstraint() ? (
+      this.visitChildren(ctx.expressionconstraint())
+    ) : (
       <SubExpression
         constraint={ctx.constraintoperator()}
-        onChange={(e) => this.handlePrepend(ctx, e)}
+        // This gets called when the user adds a hierarchy constraint, e.g. descendants and self.
+        onAddConstraint={() =>
+          this.handlePrepend(
+            ctx,
+            constraintNameToOperator["descendantorselfof"]
+          )
+        }
+        // This gets called when the user removes the hierarchy constraint, reverting to self.
+        onRemoveConstraint={() =>
+          this.handleRemove(ctx.constraintoperator(), {
+            optionalWhiteSpaceRight: true,
+          })
+        }
+        // This gets called when the user adds a logic statement to the sub-expression, e.g. AND.
+        onAddLogicStatement={(type, expression) =>
+          this.handleAppend(
+            ctx,
+            logicStatementTypeToOperator[type] + expression,
+            { parenthesize: true }
+          )
+        }
       >
         {this.visitChildren(ctx)}
       </SubExpression>
@@ -139,19 +161,15 @@ class ExpressionVisitor extends ECLVisitor {
     type: LogicStatementType
   ) {
     return (
-      <AddCondition
-        onChange={(e) => this.handleAppend(ctx, e, { parenthesize: true })}
+      <LogicStatement
+        onChangeType={(type) =>
+          this.handleChangeLogicStatementTypes(operatorCtx, type)
+        }
+        onAddCondition={(e) => this.handleAppend(ctx, e)}
+        type={type}
       >
-        <LogicStatement
-          onChangeType={(type) =>
-            this.handleChangeLogicStatementTypes(operatorCtx, type)
-          }
-          onAddCondition={(e) => this.handleAppend(ctx, e)}
-          type={type}
-        >
-          {this.visitChildren(ctx)}
-        </LogicStatement>
-      </AddCondition>
+        {this.visitChildren(ctx)}
+      </LogicStatement>
     );
   }
 
@@ -178,15 +196,34 @@ class ExpressionVisitor extends ECLVisitor {
    * have changed, and then substitutes those characters with the expression reported by the
    * component.
    */
-  handleUpdate(ctx: ParserRuleContext, expression: string): void {
-    this.handleUpdates([ctx], expression);
+  handleUpdate(
+    ctx: ParserRuleContext,
+    expression: string,
+    options: UpdateOptions = {}
+  ): void {
+    this.handleUpdates([ctx], expression, options);
+  }
+
+  /**
+   * Uses the parser rule context to identify the range of characters within the expression that
+   * have changed, and then removes those characters.
+   */
+  handleRemove(ctx: ParserRuleContext, options: UpdateOptions = {}): void {
+    this.handleUpdates([ctx], "", options);
   }
 
   /**
    * Performs the same function as `handleUpdate`, except that it can replace multiple
    * subexpressions with the same new expression.
    */
-  handleUpdates(ctxs: ParserRuleContext[], expression: string): void {
+  handleUpdates(
+    ctxs: ParserRuleContext[],
+    expression: string,
+    {
+      optionalWhiteSpaceRight = false,
+      optionalWhiteSpaceLeft = false,
+    }: UpdateOptions = {}
+  ): void {
     if (this.onChange) {
       const newExpression = ctxs.reduce((acc, ctx) => {
         const start = ctx.start.start,
@@ -195,12 +232,12 @@ class ExpressionVisitor extends ECLVisitor {
           // If the prefix ends with whitespace, replace it with a single space.
           let prefix = acc.slice(0, start);
           if (/\s/.test(prefix[prefix.length - 1])) {
-            prefix = prefix.trimEnd() + " ";
+            prefix = prefix.trimEnd() + (optionalWhiteSpaceLeft ? "" : " ");
           }
           // If the suffix starts with whitespace, replace it with a single space.
           let suffix = acc.slice(stop + 1);
           if (/\s/.test(suffix[0])) {
-            suffix = " " + suffix.trimStart();
+            suffix = (optionalWhiteSpaceRight ? "" : " ") + suffix.trimStart();
           }
           return prefix + expression + suffix;
         } else {
@@ -218,14 +255,14 @@ class ExpressionVisitor extends ECLVisitor {
   handlePrepend(
     ctx: ParserRuleContext,
     expression: string,
-    { delimiter = " ", parenthesize = false }: SupplementOptions = {}
+    { parenthesize = false }: SupplementOptions = {}
   ): void {
-    const suffix = /\s/.test(delimiter)
-        ? ctx.getText().trimStart()
-        : ctx.getText(),
-      parenthesizedSuffix = parenthesize ? `(${suffix})` : suffix,
-      newExpression = expression + delimiter + parenthesizedSuffix;
-    this.handleUpdate(ctx, newExpression);
+    const suffix = ctx.getText().trimStart(),
+      newExpression = expression + " " + suffix,
+      parenthesizedExpression = parenthesize
+        ? `(${newExpression})`
+        : newExpression;
+    this.handleUpdate(ctx, parenthesizedExpression);
   }
 
   /**
@@ -235,14 +272,14 @@ class ExpressionVisitor extends ECLVisitor {
   handleAppend(
     ctx: ParserRuleContext,
     expression: string,
-    { delimiter = " ", parenthesize = false }: SupplementOptions = {}
+    { parenthesize = false }: SupplementOptions = {}
   ): void {
-    const prefix = /\s/.test(delimiter)
-        ? ctx.getText().trimEnd()
-        : ctx.getText(),
-      parenthesizedPrefix = parenthesize ? `(${prefix})` : prefix,
-      newExpression = parenthesizedPrefix + delimiter + expression;
-    this.handleUpdate(ctx, newExpression);
+    const prefix = ctx.getText().trimEnd(),
+      newExpression = prefix + " " + expression,
+      parenthesizedExpression = parenthesize
+        ? `(${newExpression})`
+        : newExpression;
+    this.handleUpdate(ctx, parenthesizedExpression);
   }
 
   /**

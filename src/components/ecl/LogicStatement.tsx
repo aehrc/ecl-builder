@@ -4,14 +4,17 @@
  */
 
 import { MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
-import React, { PropsWithChildren } from "react";
-import AddCondition from "./AddCondition";
+import React, { PropsWithChildren, useState } from "react";
+import ConceptReference from "./ConceptReference";
+import ExpressionGrouping from "./ExpressionGrouping";
 import { ChangeHandler } from "./ExpressionVisitor";
+import LogicOperator from "./LogicOperator";
 
 export type LogicStatementType = "conjunction" | "disjunction";
 
 export interface LogicStatementProps extends PropsWithChildren {
   type: LogicStatementType;
+  showAddButton?: boolean;
   onChangeType: (type: LogicStatementType) => unknown;
   onAddCondition: ChangeHandler;
 }
@@ -30,51 +33,61 @@ export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
  */
 export default function LogicStatement({
   type,
+  showAddButton = true,
   onChangeType,
   onAddCondition,
   children,
 }: LogicStatementProps) {
+  const [addCondition, setAddCondition] = useState(false);
+
   function handleSelectType(event: SelectChangeEvent<LogicStatementType>) {
     onChangeType(event.target.value as LogicStatementType);
   }
 
+  function handleAddCondition(expression: string) {
+    onAddCondition(logicStatementTypeToOperator[type] + expression);
+    setAddCondition(false);
+  }
+
   return (
-    <Stack
-      className="logic-statement expression-grouping"
-      spacing={2}
-      sx={{
-        p: 2,
-        borderWidth: 1,
-        borderColor: "grey.800",
-        borderStyle: "dashed",
-        borderRadius: 1,
-        mt: "18px",
-        backgroundColor: "grey.100",
-        ".expression-grouping &": {
-          backgroundColor: "background.default",
+    <ExpressionGrouping
+      className="logic-statement"
+      actions={[
+        {
+          type: "item",
+          label: "Add condition",
+          onClick: () => setAddCondition(true),
         },
+      ]}
+      showAddButton={showAddButton && !addCondition}
+      sx={{
+        mt: "1.8em",
+        pt: "3em",
       }}
     >
-      <AddCondition logicStatementType={type} onChange={onAddCondition}>
-        <Stack
-          direction="row"
-          sx={{ position: "relative", top: -35, marginBottom: "-30px" }}
+      <Stack direction="row" sx={{ position: "absolute", top: "-1.8em" }}>
+        <Select
+          value={type}
+          onChange={handleSelectType}
+          sx={{ backgroundColor: "background.default" }}
         >
-          <Select
-            value={type}
-            onChange={handleSelectType}
-            sx={{ backgroundColor: "background.default" }}
-          >
-            <MenuItem value="conjunction">
-              matching all of these conditions
-            </MenuItem>
-            <MenuItem value="disjunction">
-              matching any of these conditions
-            </MenuItem>
-          </Select>
-        </Stack>
-        {children}
-      </AddCondition>
-    </Stack>
+          <MenuItem value="conjunction">
+            matching all of these conditions
+          </MenuItem>
+          <MenuItem value="disjunction">
+            matching any of these conditions
+          </MenuItem>
+        </Select>
+      </Stack>
+      {addCondition ? (
+        <>
+          {children}
+          <LogicOperator type={type} />
+          <ConceptReference onChange={handleAddCondition} />
+        </>
+      ) : (
+        children
+      )}
+    </ExpressionGrouping>
   );
 }

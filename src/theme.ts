@@ -40,5 +40,17 @@ export const theme = createTheme(baseTheme, {
         },
       },
     },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          gap: baseTheme.spacing(2),
+          justifyContent: "space-between",
+          "& .MuiListItemIcon-root": {
+            minWidth: "unset",
+            width: 24,
+          },
+        },
+      },
+    },
   },
 });

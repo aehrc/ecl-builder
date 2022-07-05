@@ -60,6 +60,7 @@
     "antlr4": "^4.10.1",
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
+    "react-hover": "^3.0.1",
     "react-query": "^3.39.1",
     "throttle-debounce": "^5.0.0",
     "uuid": "^8.3.2"

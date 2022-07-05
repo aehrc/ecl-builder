@@ -16,7 +16,7 @@ export interface LogicOperatorProps {
 
 export default function LogicOperator({ type }: LogicOperatorProps) {
   return (
-    <Typography sx={{ px: 1 }}>
+    <Typography sx={{ p: 1 }}>
       {logicStatementTypeToOperator[type].trim()}
     </Typography>
   );
