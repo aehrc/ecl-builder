@@ -6,12 +6,16 @@
 import { useTheme } from "@mui/material";
 import React from "react";
 
+export interface HorizontalLinkProps {
+  style?: React.CSSProperties | undefined;
+}
+
 /**
  * A horizontal line that suggests that two adjacent controls are related.
  *
  * @author John Grimes
  */
-export default function HorizontalLink() {
+export default function HorizontalLink({ style = {} }: HorizontalLinkProps) {
   const theme = useTheme();
 
   return (
@@ -25,6 +29,7 @@ export default function HorizontalLink() {
         height: 1,
         margin: 0,
         alignSelf: "center",
+        ...style,
       }}
     />
   );

@@ -8,11 +8,15 @@ import ComponentLabel from "./ComponentLabel";
 import HorizontalLink from "./HorizontalLink";
 
 export default function ExpressionComparisonOperator() {
+  const horizontalLinkStyle = { marginTop: "1.85em", alignSelf: "flex-start" };
+
   return (
     <>
-      <HorizontalLink />
-      <ComponentLabel sx={{ alignSelf: "center" }}>is equal to</ComponentLabel>
-      <HorizontalLink />
+      <HorizontalLink style={horizontalLinkStyle} />
+      <ComponentLabel sx={{ alignSelf: "flex-start" }}>
+        is equal to
+      </ComponentLabel>
+      <HorizontalLink style={horizontalLinkStyle} />
     </>
   );
 }

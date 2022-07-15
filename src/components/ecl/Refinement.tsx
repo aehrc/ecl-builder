@@ -64,7 +64,12 @@ export default function Refinement({
           </Select>
         }
         className="refinement"
-        actions={[]}
+        actions={[
+          {
+            type: "item",
+            label: "Add attribute",
+          },
+        ]}
         sx={{ mt: "2.8em" }}
       >
         <Stack spacing={1}>{children}</Stack>

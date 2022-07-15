@@ -11,6 +11,7 @@ import { SCT_URI } from "../../constants";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser from "../../parser/src/grammar/syntax/ECLParser";
 import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
+import Attribute from "./Attribute";
 import ConceptReference from "./ConceptReference";
 import ConceptSearchScope from "./ConceptSearchScope";
 import ConstraintOperator, {
@@ -183,15 +184,7 @@ class ExpressionVisitor extends ECLVisitor {
    * (booleancomparisonoperator ws booleanvalue));
    */
   visitEclattribute(ctx: any): VisualExpressionType {
-    return (
-      <Stack
-        className="attribute"
-        direction="row"
-        sx={{ "& .expression-grouping-wrapper": { alignSelf: "center" } }}
-      >
-        {this.visitChildren(ctx)}
-      </Stack>
-    );
+    return <Attribute>{this.visitChildren(ctx)}</Attribute>;
   }
 
   /**

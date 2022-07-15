@@ -4,12 +4,19 @@
  */
 
 import { Done } from "@mui/icons-material";
+import { Box } from "@mui/material";
 import Stack from "@mui/material/Stack/Stack";
-import React, { PropsWithChildren, ReactNode, useState } from "react";
+import React, {
+  PropsWithChildren,
+  ReactNode,
+  useContext,
+  useState,
+} from "react";
 import ConceptReference from "./ConceptReference";
 import ExpressionGrouping from "./ExpressionGrouping";
 import LogicOperator from "./LogicOperator";
 import LogicStatement, { LogicStatementType } from "./LogicStatement";
+import RenderingContext from "./RenderingContext";
 
 export interface SubExpressionProps extends PropsWithChildren {
   // The currently selected constraint type.
@@ -41,8 +48,9 @@ export default function SubExpression({
   onAddLogicStatement,
   children,
 }: SubExpressionProps) {
-  const [addLogicStatement, setAddLogicStatement] =
-    useState<LogicStatementType | null>(null);
+  const { insideEclAttribute } = useContext(RenderingContext),
+    [addLogicStatement, setAddLogicStatement] =
+      useState<LogicStatementType | null>(null);
 
   function handleClickHierarchy() {
     if (constraint) {
@@ -80,6 +88,82 @@ export default function SubExpression({
     );
   }
 
+  function GroupingWrapper({ children }: PropsWithChildren) {
+    return (
+      <ExpressionGrouping
+        className="sub-expression"
+        actions={[
+          {
+            type: "heading",
+            label: "Include:",
+          },
+          {
+            type: "item",
+            label: "Hierarchy",
+            onClick: handleClickHierarchy,
+            icon: constraint ? <Done /> : null,
+          },
+          {
+            type: "item",
+            label: "Reference set members",
+          },
+          {
+            type: "item",
+            label: "Replaced concepts",
+          },
+          {
+            type: "heading",
+            label: "Filter on:",
+          },
+          {
+            type: "item",
+            label: "Attributes",
+          },
+          {
+            type: "item",
+            label: "Descriptions",
+          },
+          {
+            type: "item",
+            label: "Definition status",
+          },
+          {
+            type: "item",
+            label: "Module",
+          },
+          {
+            type: "item",
+            label: "Effective time",
+          },
+          {
+            type: "item",
+            label: "Active status",
+          },
+          {
+            type: "item",
+            label: "Reference set attributes",
+          },
+          {
+            type: "heading",
+            label: "Add logic statement:",
+          },
+          {
+            type: "item",
+            label: "AND condition",
+            onClick: () => setAddLogicStatement("conjunction"),
+          },
+          {
+            type: "item",
+            label: "OR condition",
+            onClick: () => setAddLogicStatement("disjunction"),
+          },
+        ]}
+      >
+        {children}
+      </ExpressionGrouping>
+    );
+  }
+
   return addLogicStatement ? (
     <LogicStatement
       type={addLogicStatement}
@@ -91,77 +175,9 @@ export default function SubExpression({
       <LogicOperator type={addLogicStatement} />
       <ConceptReference onChange={handleLogicStatementUpdate} />
     </LogicStatement>
+  ) : insideEclAttribute ? (
+    <Box flexGrow={1}>{renderContent()}</Box>
   ) : (
-    <ExpressionGrouping
-      className="sub-expression"
-      actions={[
-        {
-          type: "heading",
-          label: "Include:",
-        },
-        {
-          type: "item",
-          label: "Hierarchy",
-          onClick: handleClickHierarchy,
-          icon: constraint ? <Done /> : null,
-        },
-        {
-          type: "item",
-          label: "Reference set members",
-        },
-        {
-          type: "item",
-          label: "Replaced concepts",
-        },
-        {
-          type: "heading",
-          label: "Filter on:",
-        },
-        {
-          type: "item",
-          label: "Attributes",
-        },
-        {
-          type: "item",
-          label: "Descriptions",
-        },
-        {
-          type: "item",
-          label: "Definition status",
-        },
-        {
-          type: "item",
-          label: "Module",
-        },
-        {
-          type: "item",
-          label: "Effective time",
-        },
-        {
-          type: "item",
-          label: "Active status",
-        },
-        {
-          type: "item",
-          label: "Reference set attributes",
-        },
-        {
-          type: "heading",
-          label: "Add logic statement:",
-        },
-        {
-          type: "item",
-          label: "AND condition",
-          onClick: () => setAddLogicStatement("conjunction"),
-        },
-        {
-          type: "item",
-          label: "OR condition",
-          onClick: () => setAddLogicStatement("disjunction"),
-        },
-      ]}
-    >
-      {renderContent()}
-    </ExpressionGrouping>
+    <GroupingWrapper>{renderContent()}</GroupingWrapper>
   );
 }

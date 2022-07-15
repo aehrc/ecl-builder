@@ -24,7 +24,7 @@ export default function ComponentLabel({ sx, children }: ComponentLabelProps) {
         borderColor: "grey.400",
         borderStyle: "solid",
         borderRadius: 1,
-        p: "0.95em",
+        p: "1.02em",
         userSelect: "none",
         ...sx,
       }}
