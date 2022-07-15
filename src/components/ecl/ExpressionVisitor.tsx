@@ -99,13 +99,13 @@ class ExpressionVisitor extends ECLVisitor {
         .eclrefinement()
         .subrefinement()
         .eclattributeset()
-        .conjunctionattributeset()
+        ?.conjunctionattributeset()
         ?.conjunction(),
       disjunctions: ParserRuleContext | undefined = ctx
         .eclrefinement()
         .subrefinement()
         .eclattributeset()
-        .disjunctionattributeset()
+        ?.disjunctionattributeset()
         ?.disjunction();
     const ctxs = [conjunctions, disjunctions].filter(
       (ctx) => !!ctx
