@@ -184,7 +184,11 @@ class ExpressionVisitor extends ECLVisitor {
    */
   visitEclattribute(ctx: any): VisualExpressionType {
     return (
-      <Stack className="attribute" direction="row">
+      <Stack
+        className="attribute"
+        direction="row"
+        sx={{ "& .expression-grouping-wrapper": { alignSelf: "center" } }}
+      >
         {this.visitChildren(ctx)}
       </Stack>
     );

@@ -51,7 +51,7 @@ export default function ExpressionGrouping({
   return (
     // We need this additional level of element to prevent margins being collapsed when used inside
     // flex box.
-    <Box flexGrow={1}>
+    <Box className="expression-grouping-wrapper" flexGrow={1}>
       <Box
         className={`expression-grouping${className ? ` ${className}` : ""}`}
         sx={{
