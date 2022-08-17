@@ -5,6 +5,7 @@
 
 import { MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
 import React from "react";
+import { SCT_URI } from "../../constants";
 import { ChangeReporterProps } from "./ExpressionVisitor";
 import HorizontalLink from "./HorizontalLink";
 
@@ -31,7 +32,7 @@ export const operatorToConstraintName: Record<string, ConstraintType> =
       .map((entry) => entry.reverse())
   );
 
-type ConstraintType = keyof typeof constraintNameToOperator;
+export type ConstraintType = keyof typeof constraintNameToOperator;
 
 export default function ConceptConstraintSelector({
   constraint,
@@ -69,3 +70,4 @@ export default function ConceptConstraintSelector({
     </Stack>
   );
 }
+export const REFERENCE_SET_VALUE_SET_URI = `${SCT_URI}?fhir_vs=ecl/%3C%20446609009%20`;

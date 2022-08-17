@@ -23,6 +23,8 @@ export interface SubExpressionProps extends PropsWithChildren {
   constraint?: any;
   // Additional content that is related to the sub-expression.
   relatedContent?: ReactNode;
+  // Whether to show the actions button.
+  showActions?: boolean;
   // Called when a new constraint operator is added to the expression.
   onAddConstraint: () => unknown;
   // Called when the constraint operator is removed.
@@ -43,6 +45,7 @@ export interface SubExpressionProps extends PropsWithChildren {
 export default function SubExpression({
   constraint,
   relatedContent,
+  showActions,
   onAddConstraint,
   onRemoveConstraint,
   onAddLogicStatement,
@@ -158,6 +161,7 @@ export default function SubExpression({
             onClick: () => setAddLogicStatement("disjunction"),
           },
         ]}
+        showActions={showActions}
       >
         {children}
       </ExpressionGrouping>

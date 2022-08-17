@@ -7,14 +7,15 @@ import { Stack } from "@mui/material";
 import antlr4, { ParserRuleContext } from "antlr4";
 import React, { cloneElement, isValidElement, ReactNode } from "react";
 import * as uuid from "uuid";
-import { SCT_URI } from "../../constants";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser from "../../parser/src/grammar/syntax/ECLParser";
 import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
 import Attribute from "./Attribute";
+import BlankExpression from "./BlankExpression";
 import ConceptConstraintSelector, {
   constraintNameToOperator,
   operatorToConstraintName,
+  REFERENCE_SET_VALUE_SET_URI,
 } from "./ConceptConstraintSelector";
 import ConceptReference from "./ConceptReference";
 import ConceptSearchScope from "./ConceptSearchScope";
@@ -31,11 +32,11 @@ import Wildcard from "./Wildcard";
 
 export type VisualExpressionType = ReactNode;
 
-export type ChangeHandler = (expression: string) => unknown;
+export type ChangeHandler<T = string> = (expression: T) => unknown;
 
-export interface ChangeReporterProps {
+export interface ChangeReporterProps<T = string> {
   // Invoked when expression is updated.
-  onChange: ChangeHandler;
+  onChange: ChangeHandler<T>;
 }
 
 interface UpdateOptions {
@@ -165,7 +166,7 @@ class ExpressionVisitor extends ECLVisitor {
     return ctx.memberof() ? (
       <ConceptSearchScope.Provider
         value={{
-          valueSet: `${SCT_URI}?fhir_vs=ecl/%3C%20446609009%20`,
+          valueSet: REFERENCE_SET_VALUE_SET_URI,
           label: "Search for a reference set",
         }}
       >
@@ -459,7 +460,7 @@ export function visitExpressionTree(
   // If there is nothing but whitespace in the expression, we render a blank concept reference
   // component to bootstrap the build.
   if (expression.trim().length === 0) {
-    return <ConceptReference onChange={(e) => visitor.handleReplace(e)} />;
+    return <BlankExpression onChange={(e) => visitor.handleReplace(e)} />;
   } else {
     return visitor.visit(tree);
   }

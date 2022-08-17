@@ -10,7 +10,7 @@ import GroupingHeading from "./GroupingHeading";
 
 export interface ExpressionGroupingProps extends PropsWithChildren {
   heading?: ReactNode;
-  actions: Action[];
+  actions?: Action[];
   showActions?: boolean;
   className?: string;
   sx?: SxProps<Theme>;
@@ -78,7 +78,7 @@ export default function ExpressionGrouping({
       >
         {heading && <GroupingHeading>{heading}</GroupingHeading>}
         {children}
-        {showActions && <GroupingActions actions={actions} />}
+        {showActions && <GroupingActions actions={actions ?? []} />}
       </Box>
     </Box>
   );
