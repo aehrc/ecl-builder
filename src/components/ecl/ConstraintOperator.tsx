@@ -42,7 +42,7 @@ export type ConstraintType = keyof typeof constraintNameToOperator;
  */
 export default function ConstraintOperator({
   constraint,
-  onChang,
+  onChange,
 }: ConstraintOperatorProps) {
   function handleSelectConstraint(
     event: SelectChangeEvent<ConstraintType>
