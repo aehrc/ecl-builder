@@ -12,13 +12,13 @@ import ECLParser from "../../parser/src/grammar/syntax/ECLParser";
 import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
 import Attribute from "./Attribute";
 import BlankExpression from "./BlankExpression";
-import ConceptConstraintSelector, {
+import ConceptReference from "./ConceptReference";
+import ConceptSearchScope from "./ConceptSearchScope";
+import ConstraintOperator, {
   constraintNameToOperator,
   operatorToConstraintName,
   REFERENCE_SET_VALUE_SET_URI,
-} from "./ConceptConstraintSelector";
-import ConceptReference from "./ConceptReference";
-import ConceptSearchScope from "./ConceptSearchScope";
+} from "./ConstraintOperator";
 import ExpressionComparisonOperator from "./ExpressionComparisonOperator";
 import ExpressionConstraint from "./ExpressionConstraint";
 import LogicOperator from "./LogicOperator";
@@ -26,6 +26,7 @@ import LogicStatement, {
   LogicStatementType,
   logicStatementTypeToOperator,
 } from "./LogicStatement";
+import MemberOfOperator from "./MemberOfOperator";
 import Refinement from "./Refinement";
 import SubExpression from "./SubExpression";
 import Wildcard from "./Wildcard";
@@ -211,7 +212,7 @@ class ExpressionVisitor extends ECLVisitor {
    */
   visitConstraintoperator(ctx: any): VisualExpressionType {
     return (
-      <ConceptConstraintSelector
+      <ConstraintOperator
         constraint={operatorToConstraintName[ctx.getText()]}
         onChange={(e) => this.handleUpdate(ctx, e)}
       />
@@ -254,12 +255,7 @@ class ExpressionVisitor extends ECLVisitor {
    * CARAT ( ws LEFT_BRACE ws (refsetfieldset | wildcard) ws RIGHT_BRACE )?;
    */
   visitMemberof(ctx: any): VisualExpressionType {
-    return (
-      <ConceptConstraintSelector
-        constraint={operatorToConstraintName[ctx.getText()]}
-        onChange={(e) => this.handleUpdate(ctx, e)}
-      />
-    );
+    return <MemberOfOperator />;
   }
 
   /**

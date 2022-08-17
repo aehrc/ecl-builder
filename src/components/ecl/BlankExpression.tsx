@@ -4,14 +4,12 @@
  */
 
 import React, { useState } from "react";
-import ConceptConstraintSelector, {
+import ConceptReference from "./ConceptReference";
+import ConstraintOperator, {
   constraintNameToOperator,
   ConstraintType,
   operatorToConstraintName,
-  REFERENCE_SET_VALUE_SET_URI,
-} from "./ConceptConstraintSelector";
-import ConceptReference from "./ConceptReference";
-import ConceptSearchScope from "./ConceptSearchScope";
+} from "./ConstraintOperator";
 import { ChangeReporterProps } from "./ExpressionVisitor";
 import SubExpression from "./SubExpression";
 
@@ -33,23 +31,12 @@ export default function BlankExpression({ onChange }: BlankExpressionProps) {
       onRemoveConstraint={() => null}
       onAddLogicStatement={() => null}
     >
-      <ConceptConstraintSelector
+      <ConstraintOperator
         onChange={(operator) =>
           setConstraint(operatorToConstraintName[operator])
         }
       />
-      {constraint === "memberof" ? (
-        <ConceptSearchScope.Provider
-          value={{
-            valueSet: REFERENCE_SET_VALUE_SET_URI,
-            label: "Search for a reference set",
-          }}
-        >
-          <ConceptReference onChange={handleChange} />
-        </ConceptSearchScope.Provider>
-      ) : (
-        <ConceptReference onChange={handleChange} />
-      )}
+      <ConceptReference onChange={handleChange} />
     </SubExpression>
   );
 }

@@ -9,10 +9,12 @@ import { SCT_URI } from "../../constants";
 import { ChangeReporterProps } from "./ExpressionVisitor";
 import HorizontalLink from "./HorizontalLink";
 
-export interface ConceptConstraintSelectorProps extends ChangeReporterProps {
+export interface ConstraintOperatorProps extends ChangeReporterProps {
   // The currently selected constraint type.
   constraint?: ConstraintType;
 }
+
+export const REFERENCE_SET_VALUE_SET_URI = `${SCT_URI}?fhir_vs=ecl/%3C%20446609009%20`;
 
 export const constraintNameToOperator = {
   childof: "<!",
@@ -23,7 +25,6 @@ export const constraintNameToOperator = {
   parentorselfof: ">>!",
   ancestororselfof: ">>",
   ancestorof: ">",
-  memberof: "^",
 };
 export const operatorToConstraintName: Record<string, ConstraintType> =
   Object.fromEntries(
@@ -34,10 +35,15 @@ export const operatorToConstraintName: Record<string, ConstraintType> =
 
 export type ConstraintType = keyof typeof constraintNameToOperator;
 
-export default function ConceptConstraintSelector({
+/**
+ * Represents a constraint operator, that modifies the scope of a subexpression.
+ *
+ * @author John Grimes
+ */
+export default function ConstraintOperator({
   constraint,
-  onChange,
-}: ConceptConstraintSelectorProps) {
+  onChang,
+}: ConstraintOperatorProps) {
   function handleSelectConstraint(
     event: SelectChangeEvent<ConstraintType>
   ): void {
@@ -51,7 +57,7 @@ export default function ConceptConstraintSelector({
   }
 
   return (
-    <Stack className="concept-constraint-selector" direction="row">
+    <Stack className="constraint-operator" direction="row">
       <Select
         value={constraint || "descendantorselfof"}
         onChange={handleSelectConstraint}
@@ -64,10 +70,8 @@ export default function ConceptConstraintSelector({
         <MenuItem value="ancestorof">ancestors of</MenuItem>
         <MenuItem value="childof">children of</MenuItem>
         <MenuItem value="parentof">parents of</MenuItem>
-        <MenuItem value="memberof">member of</MenuItem>
       </Select>
       <HorizontalLink />
     </Stack>
   );
 }
-export const REFERENCE_SET_VALUE_SET_URI = `${SCT_URI}?fhir_vs=ecl/%3C%20446609009%20`;
