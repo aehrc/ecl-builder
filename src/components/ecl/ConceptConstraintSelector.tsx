@@ -4,7 +4,7 @@
  */
 
 import { MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import { ChangeReporterProps } from "./ExpressionVisitor";
 import HorizontalLink from "./HorizontalLink";
 
@@ -37,15 +37,10 @@ export default function ConceptConstraintSelector({
   constraint,
   onChange,
 }: ConceptConstraintSelectorProps) {
-  const [selectedConstraint, setSelectedConstraint] = useState<ConstraintType>(
-    constraint || "descendantorselfof"
-  );
-
   function handleSelectConstraint(
     event: SelectChangeEvent<ConstraintType>
   ): void {
     const newConstraint = event.target.value as ConstraintType;
-    setSelectedConstraint(newConstraint);
     onChange(buildExpression(newConstraint));
   }
 
@@ -56,7 +51,10 @@ export default function ConceptConstraintSelector({
 
   return (
     <Stack className="concept-constraint-selector" direction="row">
-      <Select value={selectedConstraint} onChange={handleSelectConstraint}>
+      <Select
+        value={constraint || "descendantorselfof"}
+        onChange={handleSelectConstraint}
+      >
         <MenuItem value="descendantorselfof">self and descendants of</MenuItem>
         <MenuItem value="ancestororselfof">self and ancestors of</MenuItem>
         <MenuItem value="childorselfof">self and children of</MenuItem>
