@@ -8,7 +8,7 @@ import React, { useState } from "react";
 import { ChangeReporterProps } from "./ExpressionVisitor";
 import HorizontalLink from "./HorizontalLink";
 
-export interface ConstraintOperatorProps extends ChangeReporterProps {
+export interface ConceptConstraintSelectorProps extends ChangeReporterProps {
   // The currently selected constraint type.
   constraint?: ConstraintType;
 }
@@ -22,6 +22,7 @@ export const constraintNameToOperator = {
   parentorselfof: ">>!",
   ancestororselfof: ">>",
   ancestorof: ">",
+  memberof: "^",
 };
 export const operatorToConstraintName: Record<string, ConstraintType> =
   Object.fromEntries(
@@ -32,15 +33,10 @@ export const operatorToConstraintName: Record<string, ConstraintType> =
 
 type ConstraintType = keyof typeof constraintNameToOperator;
 
-/**
- * Represents a constraint operator, that modifies the scope of a subexpression.
- *
- * @author John Grimes
- */
-export default function ConstraintOperator({
+export default function ConceptConstraintSelector({
   constraint,
   onChange,
-}: ConstraintOperatorProps) {
+}: ConceptConstraintSelectorProps) {
   const [selectedConstraint, setSelectedConstraint] = useState<ConstraintType>(
     constraint || "descendantorselfof"
   );
@@ -59,7 +55,7 @@ export default function ConstraintOperator({
   }
 
   return (
-    <Stack className="constraint-operator" direction="row">
+    <Stack className="concept-constraint-selector" direction="row">
       <Select value={selectedConstraint} onChange={handleSelectConstraint}>
         <MenuItem value="descendantorselfof">self and descendants of</MenuItem>
         <MenuItem value="ancestororselfof">self and ancestors of</MenuItem>
@@ -69,6 +65,7 @@ export default function ConstraintOperator({
         <MenuItem value="ancestorof">ancestors of</MenuItem>
         <MenuItem value="childof">children of</MenuItem>
         <MenuItem value="parentof">parents of</MenuItem>
+        <MenuItem value="memberof">member of</MenuItem>
       </Select>
       <HorizontalLink />
     </Stack>
