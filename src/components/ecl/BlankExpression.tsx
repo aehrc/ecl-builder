@@ -34,6 +34,7 @@ export default function BlankExpression({ onChange }: BlankExpressionProps) {
       onAddLogicStatement={() => null}
     >
       <ConstraintOperator
+        constraint={constraint}
         onChange={(operator) =>
           setConstraint(operatorToConstraintName[operator])
         }
