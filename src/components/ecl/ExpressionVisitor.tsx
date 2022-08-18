@@ -8,7 +8,19 @@ import antlr4, { ParserRuleContext } from "antlr4";
 import React, { cloneElement, isValidElement, ReactNode } from "react";
 import * as uuid from "uuid";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
-import ECLParser from "../../parser/src/grammar/syntax/ECLParser";
+import ECLParser, {
+  ConjunctionContext,
+  ConjunctionexpressionconstraintContext,
+  ConstraintoperatorContext,
+  DisjunctionContext,
+  DisjunctionexpressionconstraintContext,
+  EclattributeContext,
+  EclattributesetContext,
+  EclconceptreferenceContext,
+  ExpressionconstraintContext,
+  RefinedexpressionconstraintContext,
+  SubexpressionconstraintContext,
+} from "../../parser/src/grammar/syntax/ECLParser";
 import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
 import Attribute from "./Attribute";
 import BlankExpression from "./BlankExpression";
@@ -59,7 +71,9 @@ class ExpressionVisitor extends ECLVisitor {
    * expressionconstraint : ws ( refinedexpressionconstraint | compoundexpressionconstraint |
    * dottedexpressionconstraint | subexpressionconstraint ) ws;
    */
-  visitExpressionconstraint(ctx: any): VisualExpressionType {
+  visitExpressionconstraint(
+    ctx: ExpressionconstraintContext
+  ): VisualExpressionType {
     return ctx.subexpressionconstraint() ? (
       <ExpressionConstraint>{this.visitChildren(ctx)}</ExpressionConstraint>
     ) : (
@@ -73,31 +87,36 @@ class ExpressionVisitor extends ECLVisitor {
    * (eclfocusconcept | (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) ) (ws
    * (descriptionfilterconstraint | conceptfilterconstraint))* (ws historysupplement)?;
    */
-  visitSubexpressionconstraint(ctx: any): VisualExpressionType {
+  visitSubexpressionconstraint(
+    ctx: SubexpressionconstraintContext
+  ): VisualExpressionType {
     return this.renderSubExpression(ctx);
   }
 
   /**
    * refinedexpressionconstraint : subexpressionconstraint ws COLON ws eclrefinement;
    */
-  visitRefinedexpressionconstraint(ctx: any): VisualExpressionType {
+  visitRefinedexpressionconstraint(
+    ctx: RefinedexpressionconstraintContext
+  ): VisualExpressionType {
+    const conjunctions =
+        ctx
+          .eclrefinement()
+          .subrefinement()
+          .eclattributeset()
+          ?.conjunctionattributeset()
+          ?.conjunction() ?? [],
+      disjunctions =
+        ctx
+          .eclrefinement()
+          .subrefinement()
+          .eclattributeset()
+          ?.disjunctionattributeset()
+          ?.disjunction() ?? [],
+      ctxs = conjunctions.concat(disjunctions);
+
     // We reuse the sub-expression visitor, adding additional content that will share the same
     // grouping within the UI.
-    const conjunctions: ParserRuleContext | undefined = ctx
-        .eclrefinement()
-        .subrefinement()
-        .eclattributeset()
-        ?.conjunctionattributeset()
-        ?.conjunction(),
-      disjunctions: ParserRuleContext | undefined = ctx
-        .eclrefinement()
-        .subrefinement()
-        .eclattributeset()
-        ?.disjunctionattributeset()
-        ?.disjunction();
-    const ctxs = [conjunctions, disjunctions].filter(
-      (ctx) => !!ctx
-    ) as ParserRuleContext[];
     return this.renderSubExpression(
       ctx.subexpressionconstraint(),
       <Refinement
@@ -111,7 +130,7 @@ class ExpressionVisitor extends ECLVisitor {
   }
 
   private renderSubExpression(
-    ctx: any,
+    ctx: SubexpressionconstraintContext,
     relatedContent?: ReactNode
   ): VisualExpressionType {
     // If the expression contains a nested expression, we don't bother rendering a sub-expression
@@ -120,8 +139,8 @@ class ExpressionVisitor extends ECLVisitor {
       this.visitChildren(ctx.expressionconstraint())
     ) : (
       <SubExpression
-        constraint={ctx.constraintoperator()}
-        memberOf={ctx.memberof()}
+        constraint={!!ctx.constraintoperator()}
+        memberOf={!!ctx.memberof()}
         relatedContent={relatedContent}
         onAddConstraint={() =>
           this.transformer.prepend(
@@ -129,19 +148,31 @@ class ExpressionVisitor extends ECLVisitor {
             constraintNameToOperator["descendantorselfof"]
           )
         }
-        onRemoveConstraint={() =>
-          this.transformer.remove(ctx.constraintoperator(), {
-            optionalWhiteSpaceRight: true,
-          })
-        }
+        onRemoveConstraint={() => {
+          const constraintoperator = ctx.constraintoperator();
+          if (constraintoperator) {
+            this.transformer.remove(constraintoperator, {
+              optionalWhiteSpaceRight: true,
+            });
+          } else {
+            console.warn(
+              "Passed nullish constraintoperator to onRemoveConstraint"
+            );
+          }
+        }}
         onAddMemberOf={() =>
           this.transformer.prepend(ctx.eclfocusconcept(), MEMBER_OF_OPERATOR)
         }
-        onRemoveMemberOf={() =>
-          this.transformer.remove(ctx.memberof(), {
-            optionalWhiteSpaceRight: true,
-          })
-        }
+        onRemoveMemberOf={() => {
+          const memberof = ctx.memberof();
+          if (memberof) {
+            this.transformer.remove(memberof, {
+              optionalWhiteSpaceRight: true,
+            });
+          } else {
+            console.warn("Passed nullish memberof to onRemoveMemberOf");
+          }
+        }}
         // This gets called when the user adds a logic statement to the sub-expression, e.g. AND.
         onAddLogicStatement={(type, expression) =>
           this.transformer.append(
@@ -176,21 +207,21 @@ class ExpressionVisitor extends ECLVisitor {
    * numericvalue) | (stringcomparisonoperator ws (typedsearchterm | typedsearchtermset)) |
    * (booleancomparisonoperator ws booleanvalue));
    */
-  visitEclattribute(ctx: any): VisualExpressionType {
+  visitEclattribute(ctx: EclattributeContext): VisualExpressionType {
     return <Attribute>{this.visitChildren(ctx)}</Attribute>;
   }
 
   /**
    * expressioncomparisonoperator : EQUALS | (EXCLAMATION EQUALS);
    */
-  visitExpressioncomparisonoperator(ctx: any): VisualExpressionType {
+  visitExpressioncomparisonoperator(): VisualExpressionType {
     return <ExpressionComparisonOperator />;
   }
 
   /**
    * eclattributeset : subattributeset ws (conjunctionattributeset | disjunctionattributeset)?;
    */
-  visitEclattributeset(ctx: any): VisualExpressionType {
+  visitEclattributeset(ctx: EclattributesetContext): VisualExpressionType {
     return (
       <Stack className="attribute-set" spacing={1}>
         {this.visitChildren(ctx)}
@@ -202,7 +233,9 @@ class ExpressionVisitor extends ECLVisitor {
    * constraintoperator : childof | childorselfof | descendantorselfof | descendantof | parentof |
    * parentorselfof | ancestororselfof | ancestorof;
    */
-  visitConstraintoperator(ctx: any): VisualExpressionType {
+  visitConstraintoperator(
+    ctx: ConstraintoperatorContext
+  ): VisualExpressionType {
     return (
       <ConstraintOperator
         constraint={operatorToConstraintName[ctx.getText()]}
@@ -215,12 +248,14 @@ class ExpressionVisitor extends ECLVisitor {
    * constraintoperator : childof | childorselfof | descendantorselfof | descendantof | parentof |
    * parentorselfof | ancestororselfof | ancestorof;
    */
-  visitEclconceptreference(ctx: any): VisualExpressionType {
+  visitEclconceptreference(
+    ctx: EclconceptreferenceContext
+  ): VisualExpressionType {
     return (
       <ConceptReference
         concept={{
           id: ctx.conceptid().getText(),
-          display: ctx.term().getText(),
+          display: ctx.term()?.getText(),
         }}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
       />
@@ -231,7 +266,9 @@ class ExpressionVisitor extends ECLVisitor {
    * conjunctionexpressionconstraint : subexpressionconstraint (ws conjunction ws
    * subexpressionconstraint)+;
    */
-  visitConjunctionexpressionconstraint(ctx: any): VisualExpressionType {
+  visitConjunctionexpressionconstraint(
+    ctx: ConjunctionexpressionconstraintContext
+  ): VisualExpressionType {
     return this.visitLogicStatement(ctx, ctx.conjunction(), "conjunction");
   }
 
@@ -239,26 +276,28 @@ class ExpressionVisitor extends ECLVisitor {
    * disjunctionexpressionconstraint : subexpressionconstraint (ws disjunction ws
    * subexpressionconstraint)+;
    */
-  visitDisjunctionexpressionconstraint(ctx: any): VisualExpressionType {
+  visitDisjunctionexpressionconstraint(
+    ctx: DisjunctionexpressionconstraintContext
+  ): VisualExpressionType {
     return this.visitLogicStatement(ctx, ctx.disjunction(), "disjunction");
   }
 
   /**
    * CARAT ( ws LEFT_BRACE ws (refsetfieldset | wildcard) ws RIGHT_BRACE )?;
    */
-  visitMemberof(ctx: any): VisualExpressionType {
+  visitMemberof(): VisualExpressionType {
     return <MemberOfOperator />;
   }
 
   /**
    * wildcard : ASTERISK;
    */
-  visitWildcard(ctx: any): VisualExpressionType {
+  visitWildcard(): VisualExpressionType {
     return <Wildcard />;
   }
 
   private visitLogicStatement(
-    ctx: any,
+    ctx: ConjunctionContext | DisjunctionContext,
     operatorCtx: ParserRuleContext[],
     type: LogicStatementType
   ) {
@@ -275,11 +314,11 @@ class ExpressionVisitor extends ECLVisitor {
     );
   }
 
-  visitConjunction(ctx: any): VisualExpressionType {
+  visitConjunction(): VisualExpressionType {
     return <LogicOperator type="conjunction" />;
   }
 
-  visitDisjunction(ctx: any): VisualExpressionType {
+  visitDisjunction(): VisualExpressionType {
     return <LogicOperator type="disjunction" />;
   }
 
@@ -293,13 +332,11 @@ class ExpressionVisitor extends ECLVisitor {
     this.transformer.applyUpdates(ctxs, logicStatementTypeToOperator[type]);
   }
 
-  visit(ctx: any): VisualExpressionType {
-    // @ts-ignore
+  visit(ctx: ParserRuleContext): VisualExpressionType {
     return super.visit(ctx);
   }
 
-  visitChildren(ctx: any): VisualExpressionType {
-    // @ts-ignore
+  visitChildren(ctx: ParserRuleContext): VisualExpressionType {
     const children = super.visitChildren(ctx);
     if (Array.isArray(children)) {
       // This adds a unique key to each child element, to satisfy the requirement of React that all
@@ -313,14 +350,14 @@ class ExpressionVisitor extends ECLVisitor {
     }
   }
 
-  protected defaultResult(): VisualExpressionType {
+  protected defaultResult(): never {
     throw new Error(
       "ExpressionVisitor: visitation fell through to default result"
     );
   }
 }
 
-function getExpressionContext(expression: string) {
+function getExpressionContext(expression: string): ExpressionconstraintContext {
   const input = new antlr4.InputStream(expression),
     lexer = new ECLLexer(input),
     tokens = new antlr4.CommonTokenStream(lexer),
@@ -331,7 +368,7 @@ function getExpressionContext(expression: string) {
 export function visitExpression(
   expression: string,
   onChange: (expression: string) => unknown
-) {
+): VisualExpressionType {
   return visitExpressionTree(
     expression,
     getExpressionContext(expression),
@@ -341,9 +378,9 @@ export function visitExpression(
 
 export function visitExpressionTree(
   expression: string,
-  tree: any,
+  tree: ParserRuleContext,
   onChange: (expression: string) => unknown
-) {
+): VisualExpressionType {
   const visitor = new ExpressionVisitor(expression, onChange);
   // If there is nothing but whitespace in the expression, we render a blank concept reference
   // component to bootstrap the build.

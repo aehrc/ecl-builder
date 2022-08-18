@@ -6,7 +6,7 @@
 import { Stack } from "@mui/material";
 import React, { PropsWithChildren } from "react";
 
-export interface GroupingHeadingProps extends PropsWithChildren {}
+export type GroupingHeadingProps = PropsWithChildren;
 
 export default function GroupingHeading({ children }: GroupingHeadingProps) {
   return (

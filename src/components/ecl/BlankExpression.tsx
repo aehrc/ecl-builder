@@ -13,7 +13,7 @@ import ConstraintOperator, {
 import { ChangeReporterProps } from "./ExpressionVisitor";
 import SubExpression from "./SubExpression";
 
-export interface BlankExpressionProps extends ChangeReporterProps {}
+export type BlankExpressionProps = ChangeReporterProps;
 
 export default function BlankExpression({ onChange }: BlankExpressionProps) {
   const [constraint, setConstraint] =
@@ -25,10 +25,12 @@ export default function BlankExpression({ onChange }: BlankExpressionProps) {
 
   return (
     <SubExpression
-      constraint={constraint}
+      constraint={!!constraint}
       showActions={false}
       onAddConstraint={() => null}
       onRemoveConstraint={() => null}
+      onAddMemberOf={() => null}
+      onRemoveMemberOf={() => null}
       onAddLogicStatement={() => null}
     >
       <ConstraintOperator

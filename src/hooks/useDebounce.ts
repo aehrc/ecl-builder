@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
  *
  * Inspired by: https://dev.to/arnonate/debouncing-react-query-with-hooks-2ek6
  */
-export default function useDebounce(value: string, delay: number = 250) {
+export default function useDebounce(value: string, delay = 250) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {

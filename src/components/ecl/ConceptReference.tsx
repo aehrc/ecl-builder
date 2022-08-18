@@ -91,7 +91,7 @@ export default function ConceptReference({
           </Typography>
         </ListItem>
       )}
-      filterOptions={(options, params) => options}
+      filterOptions={(options) => options}
       onChange={handleSelectConcept}
       onClose={remove}
       loading={isLoading}

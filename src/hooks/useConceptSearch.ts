@@ -16,11 +16,6 @@ export interface Concept {
 
 export type ConceptSearchResult = Concept[];
 
-interface ConceptSearchArguments {
-  endpoint: string;
-  query: string;
-}
-
 const semanticTagPattern = /\(([^)]+)\)$/;
 
 /**
@@ -94,8 +89,7 @@ function extractConceptsFromValueSet(valueSet: ValueSet) {
           ?.filter(matchFullySpecifiedNameDesignation)
           ?.map((d) => d.value)
           .reduce<string | null>(
-            (prev, curr, currentIndex, array) =>
-              currentIndex === 0 ? curr : prev,
+            (prev, curr, currentIndex) => (currentIndex === 0 ? curr : prev),
             null
           ) || undefined,
       semanticTagMatch = fullySpecifiedName?.match(semanticTagPattern),

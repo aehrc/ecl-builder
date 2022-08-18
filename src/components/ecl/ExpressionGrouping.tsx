@@ -19,7 +19,7 @@ export interface ExpressionGroupingProps extends PropsWithChildren {
 /**
  * Creates a set of styles that "stripes" nested expression groups to ensure adequate contrast.
  */
-function getStripingStyle(levels: number): Record<string, any> {
+function getStripingStyle(levels: number): Record<string, unknown> {
   let style = {};
   for (let i = 0; i < levels; i++) {
     style = {

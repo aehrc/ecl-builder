@@ -80,16 +80,14 @@ export default function SubExpression({
     }
   }
 
-  function handleClickAddAnd() {
-    setAddLogicStatement("conjunction");
-  }
-
-  function handleClickAddOr() {
-    setAddLogicStatement("disjunction");
-  }
-
   function handleLogicStatementUpdate(expression: string) {
-    onAddLogicStatement(addLogicStatement!, expression);
+    if (addLogicStatement) {
+      onAddLogicStatement(addLogicStatement, expression);
+    } else {
+      console.warn(
+        "Attempt to update logic statement when no statement is selected"
+      );
+    }
   }
 
   function renderContent() {
