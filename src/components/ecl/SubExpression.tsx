@@ -19,16 +19,22 @@ import LogicStatement, { LogicStatementType } from "./LogicStatement";
 import RenderingContext from "./RenderingContext";
 
 export interface SubExpressionProps extends PropsWithChildren {
-  // The currently selected constraint type.
-  constraint?: any;
+  // Set to true if the subexpression contains a constraint operator.
+  constraint?: boolean;
+  // Set to true if the subexpression contains a member of operator.
+  memberOf?: boolean;
   // Additional content that is related to the sub-expression.
   relatedContent?: ReactNode;
   // Whether to show the actions button.
   showActions?: boolean;
-  // Called when a new constraint operator is added to the expression.
+  // Called when a constraint operator is added to the expression.
   onAddConstraint: () => unknown;
   // Called when the constraint operator is removed.
   onRemoveConstraint: () => unknown;
+  // Called when a member of operator is added to the expression.
+  onAddMemberOf: () => unknown;
+  // Called when the member of operator is removed.
+  onRemoveMemberOf: () => unknown;
   // Called when a logical statement is added to the expression.
   onAddLogicStatement: (
     type: LogicStatementType,
@@ -44,10 +50,13 @@ export interface SubExpressionProps extends PropsWithChildren {
  */
 export default function SubExpression({
   constraint,
+  memberOf,
   relatedContent,
   showActions,
   onAddConstraint,
   onRemoveConstraint,
+  onAddMemberOf,
+  onRemoveMemberOf,
   onAddLogicStatement,
   children,
 }: SubExpressionProps) {
@@ -60,6 +69,14 @@ export default function SubExpression({
       onRemoveConstraint();
     } else {
       onAddConstraint();
+    }
+  }
+
+  function handleClickReferenceSetMembers() {
+    if (memberOf) {
+      onRemoveMemberOf();
+    } else {
+      onAddMemberOf();
     }
   }
 
@@ -109,6 +126,8 @@ export default function SubExpression({
           {
             type: "item",
             label: "Reference set members",
+            onClick: handleClickReferenceSetMembers,
+            icon: memberOf ? <Done /> : null,
           },
           {
             type: "item",

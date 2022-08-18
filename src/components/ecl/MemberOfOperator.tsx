@@ -8,6 +8,8 @@ import React from "react";
 import ComponentLabel from "./ComponentLabel";
 import HorizontalLink from "./HorizontalLink";
 
+export const MEMBER_OF_OPERATOR = "^";
+
 export default function MemberOfOperator() {
   return (
     <Stack className="member-of-operator" direction="row">
