@@ -39,7 +39,7 @@ export default function AddCondition({
   }
 
   return (
-    <Stack spacing={2} flexGrow={1}>
+    <Stack className="add-condition" spacing={2} flexGrow={1}>
       {children}
       {addMode ? (
         <>

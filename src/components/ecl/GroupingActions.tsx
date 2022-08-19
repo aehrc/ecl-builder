@@ -66,7 +66,7 @@ export default function GroupingActions({ actions }: GroupingActionsProps) {
   }
 
   return (
-    <Stack spacing={1} direction="row">
+    <Stack className="grouping-actions" spacing={1} direction="row">
       <Button
         variant="contained"
         startIcon={<Add />}

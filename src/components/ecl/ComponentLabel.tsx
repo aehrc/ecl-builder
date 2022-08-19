@@ -18,6 +18,7 @@ export interface ComponentLabelProps extends PropsWithChildren {
 export default function ComponentLabel({ sx, children }: ComponentLabelProps) {
   return (
     <Box
+      className="component-label"
       sx={{
         backgroundColor: "background.default",
         borderWidth: 1,
@@ -26,6 +27,7 @@ export default function ComponentLabel({ sx, children }: ComponentLabelProps) {
         borderRadius: 1,
         p: "1.02em",
         userSelect: "none",
+        fontSize: "0.95em",
         ...sx,
       }}
     >

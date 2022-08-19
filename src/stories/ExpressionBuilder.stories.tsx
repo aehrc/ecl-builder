@@ -3,9 +3,12 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
+import { Stack, ThemeProvider } from "@mui/material";
 import { storiesOf } from "@storybook/react";
-import React from "react";
+import React, { useState } from "react";
 import ExpressionBuilder from "../components/ExpressionBuilder";
+import ExpressionResult from "../components/ExpressionResult";
+import { theme } from "../theme";
 
 // Load each of the text examples into an object, with the file name as the key and the contents as
 // the value.
@@ -41,7 +44,7 @@ const sortedKeys = examples.keys().sort((a, b) => {
   return comparison;
 });
 
-stories.add("Blank", () => <ExpressionBuilder />);
+stories.add("Blank", () => <BuilderAndResult />);
 
 for (const name of sortedKeys) {
   // The name of the story will be the filename of the example, minus the extension.
@@ -51,6 +54,25 @@ for (const name of sortedKeys) {
     ?.replace(/\.txt$/, "");
 
   stories.add(displayName || "Unnamed example", () => (
-    <ExpressionBuilder expression={examples(name).default} />
+    <BuilderAndResult expression={examples(name).default} />
   ));
+}
+
+function BuilderAndResult({ expression }: { expression?: string }) {
+  const [currentExpression, setCurrentExpression] =
+    useState<string | undefined>(expression);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <Stack>
+        <ExpressionBuilder
+          expression={currentExpression}
+          onChange={setCurrentExpression}
+        />
+        {currentExpression ? (
+          <ExpressionResult expression={currentExpression} />
+        ) : null}
+      </Stack>
+    </ThemeProvider>
+  );
 }

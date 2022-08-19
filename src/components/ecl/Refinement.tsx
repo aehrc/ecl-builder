@@ -31,7 +31,7 @@ export default function Refinement({
   }
 
   return (
-    <Stack direction="row">
+    <Stack className="refinement" direction="row">
       <hr
         style={{
           width: theme.spacing(2),

@@ -5,7 +5,8 @@
 
 import { Autocomplete, ListItem, TextField, Typography } from "@mui/material";
 import React, { SyntheticEvent, useContext, useState } from "react";
-import useConceptSearch, { Concept } from "../../hooks/useConceptSearch";
+import useConceptSearch from "../../hooks/useConceptSearch";
+import { Concept } from "../../hooks/useValueSetExpansion";
 import { OptionsContext } from "../ExpressionBuilder";
 import ConceptSearchScope from "./ConceptSearchScope";
 import { ChangeReporterProps } from "./ExpressionVisitor";
@@ -76,7 +77,9 @@ export default function ConceptReference({
       onInputChange={handleInputChange}
       renderOption={(props, concept) => (
         <ListItem {...props} key={concept.id}>
-          <Typography flexGrow={1}>{concept.display || concept.id}</Typography>
+          <Typography sx={{ fontSize: "0.95em" }} flexGrow={1}>
+            {concept.display || concept.id}
+          </Typography>
           <Typography
             flexShrink={0}
             variant="body2"

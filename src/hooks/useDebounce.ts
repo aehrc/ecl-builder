@@ -6,11 +6,11 @@
 import { useEffect, useState } from "react";
 
 /**
- * A hook for implementing debounce on a string value.
+ * A hook for implementing debounce on a value.
  *
  * Inspired by: https://dev.to/arnonate/debouncing-react-query-with-hooks-2ek6
  */
-export default function useDebounce(value: string, delay = 250) {
+export default function useDebounce<T = string>(value: T, delay = 250) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   useEffect(() => {

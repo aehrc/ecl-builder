@@ -92,8 +92,9 @@ export default function SubExpression({
 
   function renderContent() {
     return (
-      <Stack>
+      <Stack className="sub-expression-content">
         <Stack
+          className="sub-expression-primary-content"
           direction="row"
           alignItems="flex-start"
           alignSelf="stretch"
@@ -197,7 +198,9 @@ export default function SubExpression({
       <ConceptReference onChange={handleLogicStatementUpdate} />
     </LogicStatement>
   ) : insideEclAttribute ? (
-    <Box flexGrow={1}>{renderContent()}</Box>
+    <Box className="sub-expression" flexGrow={1}>
+      {renderContent()}
+    </Box>
   ) : (
     <GroupingWrapper>{renderContent()}</GroupingWrapper>
   );

@@ -10,7 +10,11 @@ export type GroupingHeadingProps = PropsWithChildren;
 
 export default function GroupingHeading({ children }: GroupingHeadingProps) {
   return (
-    <Stack direction="row" sx={{ position: "absolute", top: "-1.8em" }}>
+    <Stack
+      className="grouping-heading"
+      direction="row"
+      sx={{ position: "absolute", top: "-1.8em" }}
+    >
       {children}
     </Stack>
   );

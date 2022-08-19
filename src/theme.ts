@@ -5,7 +5,7 @@
 
 import { createTheme } from "@mui/material";
 
-const baseTheme = createTheme({ typography: { fontSize: 13 } });
+const baseTheme = createTheme();
 export const theme = createTheme(baseTheme, {
   components: {
     MuiTabs: {
@@ -32,6 +32,11 @@ export const theme = createTheme(baseTheme, {
       defaultProps: {
         disableAnimation: true,
       },
+      styleOverrides: {
+        root: {
+          fontSize: "0.95em",
+        },
+      },
     },
     MuiAutocomplete: {
       styleOverrides: {
@@ -43,12 +48,40 @@ export const theme = createTheme(baseTheme, {
     MuiMenuItem: {
       styleOverrides: {
         root: {
+          fontSize: "0.95em",
           gap: baseTheme.spacing(2),
           justifyContent: "space-between",
           "& .MuiListItemIcon-root": {
             minWidth: "unset",
-            width: 24,
+            width: 4,
           },
+        },
+      },
+    },
+    MuiTableCell: {
+      styleOverrides: {
+        body: {
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          fontSize: "0.9em",
+        },
+        head: {
+          fontSize: "0.9em",
+        },
+      },
+    },
+    MuiInputBase: {
+      styleOverrides: {
+        input: {
+          fontSize: "0.95em",
+        },
+      },
+    },
+    MuiAlert: {
+      styleOverrides: {
+        message: {
+          fontSize: "1.05em",
         },
       },
     },
