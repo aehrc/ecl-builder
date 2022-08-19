@@ -53,7 +53,7 @@ export const theme = createTheme(baseTheme, {
           justifyContent: "space-between",
           "& .MuiListItemIcon-root": {
             minWidth: "unset",
-            width: 4,
+            width: 16,
           },
         },
       },

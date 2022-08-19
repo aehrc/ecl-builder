@@ -63,6 +63,7 @@
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
     "react-hover": "^3.0.1",
+    "react-simple-code-editor": "^0.13.0",
     "throttle-debounce": "^5.0.0",
     "uuid": "^8.3.2"
   }
