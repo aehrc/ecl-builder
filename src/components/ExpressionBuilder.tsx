@@ -25,7 +25,9 @@ export interface ExpressionBuilderOptions {
   // The URL of the FHIR terminology server to use for concept search.
   terminologyServerUrl: string;
   // The maximum number of results to return within concept search.
-  searchMaxResults: number;
+  maxSearchResults: number;
+  // The minimum number of characters required to submit a query to the terminology server.
+  minQueryLength: number;
 }
 
 export const OptionsContext = createContext<ExpressionBuilderOptions>(
@@ -93,7 +95,8 @@ function applyDefaultOptions(
 ): ExpressionBuilderOptions {
   return {
     terminologyServerUrl: "https://tx.ontoserver.csiro.au/fhir",
-    searchMaxResults: 10,
+    maxSearchResults: 10,
+    minQueryLength: 3,
     ...options,
   };
 }

@@ -3,11 +3,12 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Alert } from "@mui/material";
+import { Alert, Stack } from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import { SCT_URI } from "../constants";
 import useValueSetExpansion from "../hooks/useValueSetExpansion";
+import { formatNumber } from "../number";
 import { queryClient } from "../queryClient";
 import ExpressionResultTable from "./ExpressionResultTable";
 
@@ -22,7 +23,7 @@ export interface ExpressionResultOptions {
   // The URL of the FHIR terminology server to use for concept search.
   terminologyServerUrl: string;
   // The maximum number of results to return within concept search.
-  searchMaxResults: number;
+  maxSearchResults: number;
 }
 
 export default function ExpressionResult({
@@ -30,10 +31,11 @@ export default function ExpressionResult({
   options = {},
 }: ResultProps) {
   function ExpressionResultContent() {
-    const { terminologyServerUrl } = applyDefaultOptions(options),
+    const { terminologyServerUrl, maxSearchResults } =
+        applyDefaultOptions(options),
       { data, isLoading, error } = useValueSetExpansion(
         terminologyServerUrl,
-        buildExpandParams(expression)
+        buildExpandParams(expression, maxSearchResults)
       );
     if (isLoading) {
       return <Loading />;
@@ -45,10 +47,20 @@ export default function ExpressionResult({
       console.warn("No error, but also no data");
       return null;
     }
-    if (data.length < 1) {
+    if (data.concepts.length < 1) {
       return <Alert severity="info">No results returned.</Alert>;
     }
-    return <ExpressionResultTable results={data} />;
+    return (
+      <Stack className="expression-result">
+        {data.total && data.total > maxSearchResults ? (
+          <Alert severity="info">
+            Showing {formatNumber(maxSearchResults)} of{" "}
+            {formatNumber(data.total)} results total.
+          </Alert>
+        ) : null}
+        <ExpressionResultTable results={data} />
+      </Stack>
+    );
   }
 
   return (
@@ -66,12 +78,12 @@ function applyDefaultOptions(
 ): ExpressionResultOptions {
   return {
     terminologyServerUrl: "https://tx.ontoserver.csiro.au/fhir",
-    searchMaxResults: 10,
+    maxSearchResults: 10,
     ...options,
   };
 }
 
-function buildExpandParams(expression: string): URLSearchParams {
+function buildExpandParams(expression: string, limit: number): URLSearchParams {
   const searchParams = new URLSearchParams();
   searchParams.set(
     "url",
@@ -87,8 +99,7 @@ function buildExpandParams(expression: string): URLSearchParams {
       "expansion.contains.fullySpecifiedName," +
       "expansion.contains.active"
   );
-  // TODO: Make this configurable.
-  searchParams.set("count", "10");
+  searchParams.set("count", limit.toString(10));
   return searchParams;
 }
 

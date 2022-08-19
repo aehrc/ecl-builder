@@ -17,7 +17,10 @@ export interface Concept {
   semanticTag?: string;
 }
 
-export type ConceptSearchResult = Concept[];
+export interface ConceptSearchResult {
+  concepts: Concept[];
+  total?: number;
+}
 
 export const SEMANTIC_TAG_PATTERN = /\(([^)]+)\)$/;
 
@@ -79,13 +82,14 @@ export function extractConceptsFromValueSet(
   if (!valueSet.expansion) {
     throw new Error("No expansion found in response");
   }
-  if (valueSet.expansion.total === 0) {
-    return [];
+  const total = valueSet.expansion.total;
+  if (total === 0) {
+    return { concepts: [], total };
   }
   if (!valueSet.expansion.contains) {
     throw new Error("No expansion.contains found in response");
   }
-  return valueSet.expansion.contains.map((concept) => {
+  const concepts = valueSet.expansion.contains.map((concept) => {
     const fullySpecifiedName =
         concept.designation
           ?.filter(matchFullySpecifiedNameDesignation)
@@ -105,6 +109,7 @@ export function extractConceptsFromValueSet(
       semanticTag,
     };
   });
+  return { concepts, total };
 }
 
 function checkFhirJson(response: Response): boolean {

@@ -31,7 +31,7 @@ export default function ExpressionResultTable({
           </TableRow>
         </TableHead>
         <TableBody>
-          {results?.map((concept) => (
+          {results.concepts?.map((concept) => (
             <TableRow key={concept.id}>
               <TableCell>{concept.id}</TableCell>
               <TableCell>{concept.display}</TableCell>

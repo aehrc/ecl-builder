@@ -26,16 +26,19 @@ export default function ConceptReference({
   concept,
   onChange,
 }: ConceptReferenceProps) {
-  const { terminologyServerUrl } = useContext(OptionsContext),
+  const { terminologyServerUrl, maxSearchResults, minQueryLength } =
+      useContext(OptionsContext),
     { valueSet, label } = useContext(ConceptSearchScope),
     [selectedConcept, setSelectedConcept] =
       useState<Concept | undefined>(concept),
     [searchQuery, setSearchQuery] = useState(""),
-    {
-      data: concepts,
-      isLoading,
-      remove,
-    } = useConceptSearch(terminologyServerUrl, valueSet, searchQuery);
+    { data, isLoading, remove } = useConceptSearch(
+      terminologyServerUrl,
+      valueSet,
+      searchQuery,
+      maxSearchResults,
+      minQueryLength
+    );
 
   function handleInputChange(
     event: SyntheticEvent<Element, Event>,
@@ -70,7 +73,7 @@ export default function ConceptReference({
       renderInput={(params) => (
         <TextField {...params} label={selectedConcept?.id || label} />
       )}
-      options={concepts || []}
+      options={data?.concepts || []}
       value={selectedConcept ?? null}
       getOptionLabel={(concept) => concept.display || concept.id}
       isOptionEqualToValue={(a, b) => a.id === b.id}

@@ -18,19 +18,24 @@ export default function useConceptSearch(
   endpoint: string,
   valueSet: string,
   query: string,
+  limit: number,
+  minQueryLength: number,
   options: QueryObserverOptions<ConceptSearchResult, Error> = {}
 ): UseQueryResult<ConceptSearchResult, Error> {
   // The query is debounced to avoid too many requests to the server.
-  const searchParams = buildExpandParams(valueSet, query),
+  const searchParams = buildExpandParams(valueSet, query, limit),
     debouncedSearchParams = useDebounce(searchParams);
   return useValueSetExpansion(endpoint, debouncedSearchParams, {
     ...options,
-    // TODO: Make this configurable.
-    enabled: query.length >= 3,
+    enabled: query.length >= minQueryLength,
   });
 }
 
-function buildExpandParams(valueSet: string, query: string): URLSearchParams {
+function buildExpandParams(
+  valueSet: string,
+  query: string,
+  limit: number
+): URLSearchParams {
   const searchParams = new URLSearchParams();
   searchParams.set("url", valueSet);
   searchParams.set("filter", query);
@@ -44,7 +49,6 @@ function buildExpandParams(valueSet: string, query: string): URLSearchParams {
       "expansion.contains.fullySpecifiedName," +
       "expansion.contains.active"
   );
-  // TODO: Make this configurable.
-  searchParams.set("count", "10");
+  searchParams.set("count", limit.toString(10));
   return searchParams;
 }
