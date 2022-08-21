@@ -5,13 +5,10 @@
 
 import { Box, SxProps, Theme } from "@mui/material";
 import React, { PropsWithChildren, ReactNode } from "react";
-import GroupingActions, { Action } from "./GroupingActions";
 import GroupingHeading from "./GroupingHeading";
 
 export interface ExpressionGroupingProps extends PropsWithChildren {
   heading?: ReactNode;
-  actions?: Action[];
-  showActions?: boolean;
   className?: string;
   sx?: SxProps<Theme>;
 }
@@ -40,10 +37,8 @@ function getStripingStyle(levels: number): Record<string, unknown> {
  */
 export default function ExpressionGrouping({
   heading,
-  actions,
   children,
   className,
-  showActions = true,
   sx,
 }: ExpressionGroupingProps) {
   const stripingStyle = getStripingStyle(10);
@@ -66,9 +61,9 @@ export default function ExpressionGrouping({
           backgroundColor: "grey.100",
           position: "relative",
           mt: heading ? "1.75em" : undefined,
-          mb: showActions ? "1.2em" : 0,
+          mb: 0,
           pt: heading ? "3em" : undefined,
-          pb: showActions ? "1.6em" : "1.4em",
+          pb: "1.4em",
           "& > *": {
             clear: "both",
           },
@@ -78,7 +73,6 @@ export default function ExpressionGrouping({
       >
         {heading && <GroupingHeading>{heading}</GroupingHeading>}
         {children}
-        {showActions && <GroupingActions actions={actions ?? []} />}
       </Box>
     </Box>
   );

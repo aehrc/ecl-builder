@@ -3,19 +3,19 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Add } from "@mui/icons-material";
+import { SvgIconComponent } from "@mui/icons-material";
 import {
-  Button,
+  IconButton,
   ListItemIcon,
   ListItemText,
   Menu,
   MenuItem,
-  Stack,
 } from "@mui/material";
-import React, { ReactNode, useRef, useState } from "react";
+import React, { PropsWithChildren, ReactNode, useRef, useState } from "react";
 
-export interface GroupingActionsProps {
+export interface ActionsProps extends PropsWithChildren {
   actions: Action[];
+  icon: SvgIconComponent;
 }
 
 export type Action = ActionItem | ActionHeading;
@@ -32,13 +32,14 @@ export interface ActionHeading {
   label: string;
 }
 
-export default function GroupingActions({ actions }: GroupingActionsProps) {
+export default function Actions({ actions, icon }: ActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false),
-    addButton = useRef<HTMLButtonElement>(null),
+    addButton = useRef(null),
     numberOfItems = actions.filter((action) => action.type === "item").length,
     firstItem: ActionItem | undefined = actions.find(
       (action) => action.type === "item"
-    ) as ActionItem;
+    ) as ActionItem,
+    Icon = icon;
 
   function handleCloseMenu() {
     setMenuOpen(false);
@@ -66,40 +67,33 @@ export default function GroupingActions({ actions }: GroupingActionsProps) {
   }
 
   return (
-    <Stack className="grouping-actions" spacing={1} direction="row">
-      <Button
-        variant="contained"
-        startIcon={<Add />}
-        sx={{
-          position: "absolute",
-          bottom: "-2.5em",
-          marginBottom: "1.2em",
-          backgroundColor: "background.default",
-          color: "text.primary",
-          "&:hover": {
-            color: "primary.contrastText",
-          },
-          flexGrow: 1,
-        }}
+    <>
+      <IconButton
+        className="actions"
         ref={addButton}
+        sx={(theme) => ({
+          alignSelf: "stretch",
+          backgroundColor: theme.palette.grey[200],
+        })}
         onClick={
           numberOfItems === 1
             ? (firstItem as ActionItem).onClick
             : () => setMenuOpen(true)
         }
       >
-        {numberOfItems === 1 ? firstItem.label : "Add"}
-      </Button>
+        <Icon fontSize="small" />
+      </IconButton>
       {numberOfItems > 1 ? (
         <Menu
           open={menuOpen}
           anchorEl={addButton.current}
+          anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
           onClose={handleCloseMenu}
           onClick={handleCloseMenu}
         >
           {actions.map(renderAction)}
         </Menu>
       ) : null}
-    </Stack>
+    </>
   );
 }

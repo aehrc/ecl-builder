@@ -26,7 +26,6 @@ export default function BlankExpression({ onChange }: BlankExpressionProps) {
   return (
     <SubExpression
       constraint={!!constraint}
-      showActions={false}
       onAddConstraint={() => null}
       onRemoveConstraint={() => null}
       onAddMemberOf={() => null}

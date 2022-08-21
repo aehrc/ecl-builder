@@ -21,13 +21,10 @@ export default function ComponentLabel({ sx, children }: ComponentLabelProps) {
       className="component-label"
       sx={{
         backgroundColor: "background.default",
-        borderWidth: 1,
-        borderColor: "grey.400",
-        borderStyle: "solid",
-        borderRadius: 1,
-        p: "1.02em",
+        p: "1.09em",
         userSelect: "none",
         fontSize: "0.95em",
+        whiteSpace: "nowrap",
         ...sx,
       }}
     >

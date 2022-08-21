@@ -7,7 +7,6 @@ import { MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
 import React from "react";
 import { SCT_URI } from "../../constants";
 import { ChangeReporterProps } from "./ExpressionVisitor";
-import HorizontalLink from "./HorizontalLink";
 
 export interface ConstraintOperatorProps extends ChangeReporterProps {
   // The currently selected constraint type.
@@ -71,7 +70,6 @@ export default function ConstraintOperator({
         <MenuItem value="childof">children of</MenuItem>
         <MenuItem value="parentof">parents of</MenuItem>
       </Select>
-      <HorizontalLink />
     </Stack>
   );
 }

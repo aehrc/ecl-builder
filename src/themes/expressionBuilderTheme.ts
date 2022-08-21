@@ -85,5 +85,29 @@ export const theme = createTheme(baseTheme, {
         },
       },
     },
+    MuiSelect: {
+      defaultProps: {
+        variant: "filled",
+      },
+      styleOverrides: {
+        root: {
+          border: 0,
+          borderRadius: 0,
+          backgroundColor: baseTheme.palette.background.paper,
+          "&::before": { border: 0 },
+          "&.Mui-focused": {
+            backgroundColor: baseTheme.palette.background.paper,
+          },
+          "&:hover": {
+            backgroundColor: baseTheme.palette.background.paper,
+          },
+        },
+        select: {
+          height: "2.63em",
+          lineHeight: "2.55em",
+          paddingTop: baseTheme.spacing(1),
+        },
+      },
+    },
   },
 });

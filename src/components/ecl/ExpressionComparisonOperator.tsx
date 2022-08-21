@@ -13,7 +13,15 @@ export default function ExpressionComparisonOperator() {
   return (
     <>
       <HorizontalLink style={horizontalLinkStyle} />
-      <ComponentLabel sx={{ alignSelf: "flex-start" }}>
+      <ComponentLabel
+        sx={{
+          alignSelf: "flex-start",
+          borderWidth: 1,
+          borderColor: "grey.400",
+          borderStyle: "solid",
+          borderRadius: 1,
+        }}
+      >
         is equal to
       </ComponentLabel>
       <HorizontalLink style={horizontalLinkStyle} />

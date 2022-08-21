@@ -3,8 +3,11 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
+import { Add } from "@mui/icons-material";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React, { PropsWithChildren, useState } from "react";
+import NeatRow from "../NeatRow";
+import Actions from "./Actions";
 import ConceptReference from "./ConceptReference";
 import ExpressionGrouping from "./ExpressionGrouping";
 import { ChangeHandler } from "./ExpressionVisitor";
@@ -14,7 +17,6 @@ export type LogicStatementType = "conjunction" | "disjunction";
 
 export interface LogicStatementProps extends PropsWithChildren {
   type: LogicStatementType;
-  showActions?: boolean;
   onChangeType: (type: LogicStatementType) => unknown;
   onAddCondition: ChangeHandler;
 }
@@ -33,7 +35,6 @@ export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
  */
 export default function LogicStatement({
   type,
-  showActions = true,
   onChangeType,
   onAddCondition,
   children,
@@ -51,18 +52,30 @@ export default function LogicStatement({
 
   function renderHeading() {
     return (
-      <Select
-        value={type}
-        onChange={handleSelectType}
-        sx={{ backgroundColor: "background.default" }}
-      >
-        <MenuItem value="conjunction">
-          matching all of these conditions
-        </MenuItem>
-        <MenuItem value="disjunction">
-          matching any of these conditions
-        </MenuItem>
-      </Select>
+      <NeatRow>
+        <Select
+          value={type}
+          onChange={handleSelectType}
+          sx={{ backgroundColor: "background.default", border: 0 }}
+        >
+          <MenuItem value="conjunction">
+            matching all of these conditions
+          </MenuItem>
+          <MenuItem value="disjunction">
+            matching any of these conditions
+          </MenuItem>
+        </Select>
+        <Actions
+          actions={[
+            {
+              type: "item",
+              label: "Add condition",
+              onClick: () => setAddCondition(true),
+            },
+          ]}
+          icon={Add}
+        />
+      </NeatRow>
     );
   }
 
@@ -70,15 +83,7 @@ export default function LogicStatement({
     <ExpressionGrouping
       className="logic-statement"
       heading={renderHeading()}
-      actions={[
-        {
-          type: "item",
-          label: "Add condition",
-          onClick: () => setAddCondition(true),
-        },
-      ]}
-      showActions={showActions && !addCondition}
-      sx={{ pb: showActions ? "2em" : "1.4em" }}
+      sx={{ pb: "1.4em" }}
     >
       {addCondition ? (
         <>

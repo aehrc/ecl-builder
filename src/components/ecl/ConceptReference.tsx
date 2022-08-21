@@ -71,7 +71,24 @@ export default function ConceptReference({
       className="concept-reference"
       sx={{ flexGrow: 1 }}
       renderInput={(params) => (
-        <TextField {...params} label={selectedConcept?.id || label} />
+        <TextField
+          {...params}
+          variant="filled"
+          label={selectedConcept?.id || label}
+          sx={(theme) => ({
+            "& .MuiInputBase-root, & .MuiInputBase-root.MuiFilledInput-focused":
+              {
+                border: 0,
+                borderRadius: 0,
+                backgroundColor: theme.palette.background.paper,
+                fontSize: "1.05rem",
+                "&:hover": {
+                  backgroundColor: theme.palette.background.paper,
+                },
+              },
+            "& .MuiFilledInput-root::before": { border: 0 },
+          })}
+        />
       )}
       options={data?.concepts || []}
       value={selectedConcept ?? null}

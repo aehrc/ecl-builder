@@ -3,12 +3,13 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Stack, ThemeProvider } from "@mui/material";
+import { createTheme, Stack, ThemeProvider } from "@mui/material";
 import { storiesOf } from "@storybook/react";
 import React, { useState } from "react";
 import ExpressionBuilder from "../components/ExpressionBuilder";
 import ExpressionResult from "../components/ExpressionResult";
-import { theme } from "../theme";
+
+const theme = createTheme();
 
 // Load each of the text examples into an object, with the file name as the key and the contents as
 // the value.
