@@ -6,11 +6,11 @@
 import { Add } from "@mui/icons-material";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React, { PropsWithChildren, useState } from "react";
+import Actions from "../Actions";
+import ExpressionGrouping from "../ExpressionGrouping";
+import { ChangeHandler } from "../ExpressionVisitor";
 import NeatRow from "../NeatRow";
-import Actions from "./Actions";
-import ConceptReference from "./ConceptReference";
-import ExpressionGrouping from "./ExpressionGrouping";
-import { ChangeHandler } from "./ExpressionVisitor";
+import ConceptReference from "../sub/ConceptReference";
 import LogicOperator from "./LogicOperator";
 
 export type LogicStatementType = "conjunction" | "disjunction";

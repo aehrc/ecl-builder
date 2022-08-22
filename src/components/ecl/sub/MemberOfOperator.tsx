@@ -5,7 +5,7 @@
 
 import { Stack } from "@mui/material";
 import React from "react";
-import ComponentLabel from "./ComponentLabel";
+import ComponentLabel from "../ComponentLabel";
 
 export const MEMBER_OF_OPERATOR = "^";
 

@@ -103,9 +103,12 @@ export const theme = createTheme(baseTheme, {
           },
         },
         select: {
-          height: "2.55em",
-          lineHeight: "2.55em",
+          height: "2.56em",
+          lineHeight: "2.56em",
           paddingTop: baseTheme.spacing(1),
+          "&:focus": {
+            backgroundColor: baseTheme.palette.background.paper,
+          },
         },
       },
     },

@@ -5,11 +5,11 @@
 
 import { Autocomplete, ListItem, TextField, Typography } from "@mui/material";
 import React, { SyntheticEvent, useContext, useState } from "react";
-import useConceptSearch from "../../hooks/useConceptSearch";
-import { Concept } from "../../hooks/useValueSetExpansion";
-import { OptionsContext } from "../ExpressionBuilder";
+import useConceptSearch from "../../../hooks/useConceptSearch";
+import { Concept } from "../../../hooks/useValueSetExpansion";
+import { OptionsContext } from "../../ExpressionBuilder";
+import { ChangeReporterProps } from "../ExpressionVisitor";
 import ConceptSearchScope from "./ConceptSearchScope";
-import { ChangeReporterProps } from "./ExpressionVisitor";
 
 export interface ConceptReferenceProps extends ChangeReporterProps {
   // The currently selected concept.
@@ -76,7 +76,7 @@ export default function ConceptReference({
           variant="filled"
           label={selectedConcept?.id || label}
           sx={(theme) => ({
-            "& .MuiInputBase-root, & .MuiInputBase-root.MuiFilledInput-focused, & .MuiAutocomplete-inputFocused":
+            "& .MuiInputBase-root, & .MuiInputBase-root.MuiFilledInput-root.Mui-focused, & .MuiAutocomplete-inputFocused":
               {
                 border: 0,
                 borderRadius: 0,

@@ -6,13 +6,13 @@
 import { Add } from "@mui/icons-material";
 import { Button, Stack } from "@mui/material";
 import React, { PropsWithChildren, useState } from "react";
-import ConceptReference from "./ConceptReference";
-import { ChangeReporterProps } from "./ExpressionVisitor";
-import LogicOperator from "./LogicOperator";
+import LogicOperator from "./compound/LogicOperator";
 import {
   LogicStatementType,
   logicStatementTypeToOperator,
-} from "./LogicStatement";
+} from "./compound/LogicStatement";
+import { ChangeReporterProps } from "./ExpressionVisitor";
+import ConceptReference from "./sub/ConceptReference";
 
 export interface AddConditionProps
   extends PropsWithChildren,

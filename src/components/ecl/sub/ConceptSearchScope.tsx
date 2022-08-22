@@ -4,7 +4,7 @@
  */
 
 import { createContext } from "react";
-import { SCT_URI } from "../../constants";
+import { SCT_URI } from "../../../constants";
 
 export interface ConceptSearchScopeType {
   valueSet: string;

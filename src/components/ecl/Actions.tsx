@@ -73,7 +73,17 @@ export default function Actions({ actions, icon }: ActionsProps) {
         ref={addButton}
         sx={(theme) => ({
           alignSelf: "stretch",
-          backgroundColor: theme.palette.grey[200],
+          backgroundColor: menuOpen
+            ? theme.palette.primary.main
+            : theme.palette.grey[200],
+          color: menuOpen ? theme.palette.primary.contrastText : "inherit",
+          "&:hover": {
+            backgroundColor: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+          },
+          "&:focus": {
+            color: theme.palette.primary.main,
+          },
         })}
         onClick={
           numberOfItems === 1

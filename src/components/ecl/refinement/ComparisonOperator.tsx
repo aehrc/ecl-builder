@@ -5,8 +5,8 @@
 
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React from "react";
-import { ChangeReporterProps } from "./ExpressionVisitor";
-import HorizontalLink from "./HorizontalLink";
+import { ChangeReporterProps } from "../ExpressionVisitor";
+import HorizontalLink from "../HorizontalLink";
 
 export interface ExpressionComparisonOperatorProps extends ChangeReporterProps {
   type: ComparisonOperatorType;
@@ -19,7 +19,7 @@ export const comparisonOperatorToLabel = {
 
 export type ComparisonOperatorType = keyof typeof comparisonOperatorToLabel;
 
-export default function ExpressionComparisonOperator({
+export default function ComparisonOperator({
   type,
   onChange,
 }: ExpressionComparisonOperatorProps) {

@@ -5,8 +5,8 @@
 
 import { MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
 import React from "react";
-import { SCT_URI } from "../../constants";
-import { ChangeReporterProps } from "./ExpressionVisitor";
+import { SCT_URI } from "../../../constants";
+import { ChangeReporterProps } from "../ExpressionVisitor";
 
 export interface ConstraintOperatorProps extends ChangeReporterProps {
   // The currently selected constraint type.

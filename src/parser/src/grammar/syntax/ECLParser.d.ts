@@ -23,6 +23,12 @@ export class SubexpressionconstraintContext extends ParserRuleContext {
   expressionconstraint(): ExpressionconstraintContext;
 }
 
+export class CompoundexpressionconstraintContext extends ParserRuleContext {
+  conjunctionexpressionconstraint(): ConjunctionexpressionconstraintContext;
+
+  disjunctionexpressionconstraint(): DisjunctionexpressionconstraintContext;
+}
+
 export class ConstraintoperatorContext extends ParserRuleContext {}
 
 export class MemberofContext extends ParserRuleContext {}

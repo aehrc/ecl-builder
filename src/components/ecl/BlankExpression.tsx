@@ -4,14 +4,14 @@
  */
 
 import React, { useState } from "react";
-import ConceptReference from "./ConceptReference";
+import { ChangeReporterProps } from "./ExpressionVisitor";
+import ConceptReference from "./sub/ConceptReference";
 import ConstraintOperator, {
   constraintNameToOperator,
   ConstraintType,
   operatorToConstraintName,
-} from "./ConstraintOperator";
-import { ChangeReporterProps } from "./ExpressionVisitor";
-import SubExpression from "./SubExpression";
+} from "./sub/ConstraintOperator";
+import SubExpression from "./sub/SubExpression";
 
 export type BlankExpressionProps = ChangeReporterProps;
 

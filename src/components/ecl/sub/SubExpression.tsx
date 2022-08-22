@@ -5,20 +5,18 @@
 
 import { Done, Tune } from "@mui/icons-material";
 import Stack from "@mui/material/Stack/Stack";
-import React, { PropsWithChildren, ReactNode, useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
+import Actions from "../Actions";
+import LogicOperator from "../compound/LogicOperator";
+import LogicStatement, { LogicStatementType } from "../compound/LogicStatement";
 import NeatRow from "../NeatRow";
-import Actions from "./Actions";
 import ConceptReference from "./ConceptReference";
-import LogicOperator from "./LogicOperator";
-import LogicStatement, { LogicStatementType } from "./LogicStatement";
 
 export interface SubExpressionProps extends PropsWithChildren {
   // Set to true if the subexpression contains a constraint operator.
   constraint?: boolean;
   // Set to true if the subexpression contains a member of operator.
   memberOf?: boolean;
-  // Additional content that is related to the sub-expression.
-  relatedContent?: ReactNode;
   // Called when a constraint operator is added to the expression.
   onAddConstraint: () => unknown;
   // Called when the constraint operator is removed.
@@ -43,7 +41,6 @@ export interface SubExpressionProps extends PropsWithChildren {
 export default function SubExpression({
   constraint,
   memberOf,
-  relatedContent,
   onAddConstraint,
   onRemoveConstraint,
   onAddMemberOf,
@@ -82,10 +79,7 @@ export default function SubExpression({
 
   function renderContent() {
     return (
-      <Stack
-        className="sub-expression"
-        sx={{ flexGrow: 1, alignSelf: "flex-start" }}
-      >
+      <Stack className="sub-expression" sx={{ flexGrow: 1 }}>
         <NeatRow className="sub-expression-content">
           {children}
           <Actions
@@ -160,7 +154,6 @@ export default function SubExpression({
             icon={Tune}
           />
         </NeatRow>
-        {relatedContent}
       </Stack>
     );
   }

@@ -4,7 +4,7 @@
  */
 
 import React from "react";
-import ComponentLabel from "./ComponentLabel";
+import ComponentLabel from "../ComponentLabel";
 
 export default function Wildcard() {
   return <ComponentLabel sx={{ flexGrow: 1 }}>any concept</ComponentLabel>;
