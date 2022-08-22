@@ -301,6 +301,7 @@ class ExpressionVisitor extends ECLVisitor {
     operatorCtx: ParserRuleContext[],
     type: LogicStatementType
   ) {
+    const children = this.visitChildren(ctx);
     return (
       <LogicStatement
         onChangeType={(type) =>
@@ -309,7 +310,17 @@ class ExpressionVisitor extends ECLVisitor {
         onAddCondition={(e) => this.transformer.append(ctx, e)}
         type={type}
       >
-        {this.visitChildren(ctx)}
+        {Array.isArray(children)
+          ? children.map((child, i) => (
+              <Stack
+                className="logic-statement-sub-expression"
+                key={i}
+                direction="row"
+              >
+                {child}
+              </Stack>
+            ))
+          : children}
       </LogicStatement>
     );
   }

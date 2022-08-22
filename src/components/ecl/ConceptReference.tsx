@@ -80,7 +80,7 @@ export default function ConceptReference({
               border: 0,
               borderRadius: 0,
               backgroundColor: theme.palette.background.paper,
-              fontSize: "1.05rem",
+              fontSize: "0.95rem",
               "&:hover": {
                 backgroundColor: theme.palette.background.paper,
               },

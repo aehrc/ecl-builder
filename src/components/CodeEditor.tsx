@@ -27,7 +27,7 @@ export default function CodeEditor({ expression, onChange }: Props) {
         borderColor: "grey.400",
         borderStyle: "solid",
         borderRadius: 1,
-        p: "1.02em",
+        p: 2,
         userSelect: "none",
         fontSize: "0.85em",
         fontFamily: "monospace",

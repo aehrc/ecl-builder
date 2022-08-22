@@ -35,7 +35,7 @@ export default function Refinement({
 
   function renderHeading() {
     return (
-      <NeatRow>
+      <NeatRow className="refinement-heading">
         <Select
           value={type}
           onChange={handleSelectType}
@@ -76,8 +76,8 @@ export default function Refinement({
         }}
       />
       <ExpressionGrouping
-        heading={renderHeading()}
         className="refinement"
+        heading={renderHeading()}
         sx={{ mt: "2.8em" }}
       >
         <Stack spacing={1}>{children}</Stack>

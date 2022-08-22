@@ -16,7 +16,7 @@ export interface LogicOperatorProps {
 
 export default function LogicOperator({ type }: LogicOperatorProps) {
   return (
-    <Typography variant="button" sx={{ py: "0.3em" }}>
+    <Typography variant="button" sx={{ px: 2 }}>
       {logicStatementTypeToOperator[type].trim()}
     </Typography>
   );

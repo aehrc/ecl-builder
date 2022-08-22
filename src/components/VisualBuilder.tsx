@@ -18,5 +18,9 @@ interface Props {
  * @author John Grimes
  */
 export default function VisualBuilder({ expression, onChange }: Props) {
-  return <Box>{visitExpression(expression, onChange)}</Box>;
+  return (
+    <Box className="visual-builder">
+      {visitExpression(expression, onChange)}
+    </Box>
+  );
 }

@@ -52,7 +52,7 @@ export default function LogicStatement({
 
   function renderHeading() {
     return (
-      <NeatRow>
+      <NeatRow className="logic-statement-heading">
         <Select
           value={type}
           onChange={handleSelectType}
@@ -80,11 +80,7 @@ export default function LogicStatement({
   }
 
   return (
-    <ExpressionGrouping
-      className="logic-statement"
-      heading={renderHeading()}
-      sx={{ pb: "1.4em" }}
-    >
+    <ExpressionGrouping className="logic-statement" heading={renderHeading()}>
       {addCondition ? (
         <>
           {children}

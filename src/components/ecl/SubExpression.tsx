@@ -82,8 +82,11 @@ export default function SubExpression({
 
   function renderContent() {
     return (
-      <Stack className="sub-expression-content" sx={{ flexGrow: 1 }}>
-        <NeatRow className="sub-expression-primary-content">
+      <Stack
+        className="sub-expression"
+        sx={{ flexGrow: 1, alignSelf: "flex-start" }}
+      >
+        <NeatRow className="sub-expression-content">
           {children}
           <Actions
             actions={[

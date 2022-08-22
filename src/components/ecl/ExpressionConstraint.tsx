@@ -13,11 +13,12 @@ import React, { PropsWithChildren } from "react";
  */
 export default function ExpressionConstraint({ children }: PropsWithChildren) {
   return (
-    <Box flexGrow={1}>
+    <Box className="expression-constraint-wrapper" flexGrow={1}>
       <Stack
         className="expression-constraint"
         spacing={2}
         flexGrow={1}
+        direction="row"
         alignSelf="stretch"
       >
         {children}
