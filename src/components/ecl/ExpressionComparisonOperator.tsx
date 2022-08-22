@@ -7,7 +7,20 @@ import React from "react";
 import ComponentLabel from "./ComponentLabel";
 import HorizontalLink from "./HorizontalLink";
 
-export default function ExpressionComparisonOperator() {
+export interface ExpressionComparisonOperatorProps {
+  type: ComparisonOperatorType;
+}
+
+export const comparisonOperatorToLabel = {
+  "=": "is equal to",
+  "!=": "is not equal to",
+};
+
+export type ComparisonOperatorType = keyof typeof comparisonOperatorToLabel;
+
+export default function ExpressionComparisonOperator({
+  type,
+}: ExpressionComparisonOperatorProps) {
   const horizontalLinkStyle = { marginTop: "1.85em", alignSelf: "flex-start" };
 
   return (
@@ -22,7 +35,7 @@ export default function ExpressionComparisonOperator() {
           borderRadius: 1,
         }}
       >
-        is equal to
+        {comparisonOperatorToLabel[type]}
       </ComponentLabel>
       <HorizontalLink style={horizontalLinkStyle} />
     </>

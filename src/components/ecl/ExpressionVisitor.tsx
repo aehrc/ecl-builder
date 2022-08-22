@@ -17,6 +17,7 @@ import ECLParser, {
   EclattributeContext,
   EclattributesetContext,
   EclconceptreferenceContext,
+  ExpressioncomparisonoperatorContext,
   ExpressionconstraintContext,
   RefinedexpressionconstraintContext,
   SubexpressionconstraintContext,
@@ -214,8 +215,12 @@ class ExpressionVisitor extends ECLVisitor {
   /**
    * expressioncomparisonoperator : EQUALS | (EXCLAMATION EQUALS);
    */
-  visitExpressioncomparisonoperator(): VisualExpressionType {
-    return <ExpressionComparisonOperator />;
+  visitExpressioncomparisonoperator(
+    ctx: ExpressioncomparisonoperatorContext
+  ): VisualExpressionType {
+    return (
+      <ExpressionComparisonOperator type={ctx.EXCLAMATION() ? "!=" : "="} />
+    );
   }
 
   /**

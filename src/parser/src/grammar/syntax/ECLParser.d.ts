@@ -80,3 +80,7 @@ export class EclconceptreferenceContext extends ParserRuleContext {
 export class ConceptidContext extends ParserRuleContext {}
 
 export class TermContext extends ParserRuleContext {}
+
+export class ExpressioncomparisonoperatorContext extends ParserRuleContext {
+  EXCLAMATION(): TerminalNode | undefined;
+}
