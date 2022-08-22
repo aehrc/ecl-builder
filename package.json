@@ -60,16 +60,9 @@
     "@tanstack/react-query": "^4.2.1",
     "@types/antlr4": "^4.7.2",
     "@types/fhir": "^0.0.35",
-    "@types/lodash.debounce": "^4.0.7",
-    "@types/lodash.throttle": "^4.1.7",
-    "@types/throttle-debounce": "^5.0.0",
     "@types/uuid": "^8.3.4",
     "antlr4": "^4.10.1",
-    "lodash.debounce": "^4.0.8",
-    "lodash.throttle": "^4.1.1",
-    "react-hover": "^3.0.1",
     "react-simple-code-editor": "^0.13.0",
-    "throttle-debounce": "^5.0.0",
     "uuid": "^8.3.2"
   }
 }
