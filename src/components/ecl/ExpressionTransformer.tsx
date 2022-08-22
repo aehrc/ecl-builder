@@ -6,10 +6,12 @@
 import { ParserRuleContext } from "antlr4";
 
 export interface UpdateOptions {
-  // Set this to true if the subject expression has optional whitespace on the right side.
-  optionalWhiteSpaceRight?: boolean;
-  // Set this to true if the subject expression has optional whitespace on the left side.
-  optionalWhiteSpaceLeft?: boolean;
+  // Set this to true if the subject expression has optional whitespace on the right side that needs
+  // to be collapsed, e.g. when removing the sub-expression.
+  collapseWhiteSpaceRight?: boolean;
+  // Set this to true if the subject expression has optional whitespace on the left side that needs
+  // to be collapsed, e.g. when removing the sub-expression.
+  collapseWhiteSpaceLeft?: boolean;
 }
 
 export interface SupplementOptions extends UpdateOptions {
@@ -29,6 +31,10 @@ export default class ExpressionTransformer {
   constructor(expression: string, onChange: (expression: string) => unknown) {
     this.expression = expression;
     this.onChange = onChange;
+  }
+
+  handleChange(expression: string): void {
+    this.onChange(expression);
   }
 
   /**
@@ -67,9 +73,7 @@ export default class ExpressionTransformer {
    * Replaces the entire expression.
    */
   replace(expression: string): void {
-    if (this.onChange) {
-      this.onChange(expression);
-    }
+    this.handleChange(expression);
   }
 
   /**
@@ -96,36 +100,49 @@ export default class ExpressionTransformer {
   /**
    * Performs the same function as `handleUpdate`, except that it can replace multiple
    * subexpressions with the same new expression.
+   *
+   * @param ctxs The parser rule contexts to update. Must be sorted in the order that they occur
+   * within the expression.
+   * @param replacement The expression that will be used to update the parts of the larger
+   * expression described by the array of contexts.
    */
   applyUpdates(
     ctxs: ParserRuleContext[],
-    expression: string,
+    replacement: string,
     {
-      optionalWhiteSpaceRight = false,
-      optionalWhiteSpaceLeft = false,
+      collapseWhiteSpaceRight = false,
+      collapseWhiteSpaceLeft = false,
     }: UpdateOptions = {}
   ): void {
-    if (this.onChange) {
-      const newExpression = ctxs.reduce((acc, ctx) => {
-        const start = ctx.start.start,
-          stop = ctx.stop?.stop;
-        if (stop !== undefined) {
-          // If the prefix ends with whitespace, replace it with a single space.
-          let prefix = acc.slice(0, start);
-          if (/\s/.test(prefix[prefix.length - 1])) {
-            prefix = prefix.trimEnd() + (optionalWhiteSpaceLeft ? "" : " ");
-          }
-          // If the suffix starts with whitespace, replace it with a single space.
-          let suffix = acc.slice(stop + 1);
-          if (/\s/.test(suffix[0])) {
-            suffix = (optionalWhiteSpaceRight ? "" : " ") + suffix.trimStart();
-          }
-          return prefix + expression + suffix;
-        } else {
-          return acc;
-        }
-      }, this.expression);
-      this.onChange(newExpression);
+    let cursor = 0;
+    // Go through each of the contexts and add two things to an array:
+    // - The slice since the start of the expression, or since the last context, and;
+    // - The replacement expression.
+    const newExpressionParts = ctxs.reduce((acc: string[], ctx) => {
+      const start = ctx.start.start,
+        stop = ctx.stop.stop;
+      // Conditionally modify the whitespace at the leading edge of the prefix expression.
+      let prefix = this.expression.slice(cursor, start);
+      if (cursor > 0 && /\s/.test(prefix[0])) {
+        prefix = (collapseWhiteSpaceRight ? "" : " ") + prefix.trimStart();
+      }
+      // Conditionally modify the whitespace at the trailing edge of the prefix expression.
+      if (/\s/.test(prefix[prefix.length - 1])) {
+        prefix = prefix.trimEnd() + (collapseWhiteSpaceLeft ? "" : " ");
+      }
+      cursor = stop + 1;
+      return acc.concat(prefix, replacement);
+    }, []);
+    // Once all the contexts have been processed, add the slice from the end of the last context
+    // to the end of the expression.
+    if (cursor < this.expression.length) {
+      // Conditionally modify the whitespace at the leading edge of the suffix expression.
+      let suffix = this.expression.slice(cursor);
+      if (/\s/.test(suffix[0])) {
+        suffix = (collapseWhiteSpaceRight ? "" : " ") + suffix.trimStart();
+      }
+      newExpressionParts.push(suffix);
     }
+    this.handleChange(newExpressionParts.join(""));
   }
 }

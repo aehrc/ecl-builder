@@ -4,7 +4,7 @@
   "description": "UI components that help you build SNOMED CT ECL expressions",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "lint": "eslint .",
     "storybook": "start-storybook -p 6006 --https --ssl-ca /Users/gri306/Code/ecl-builder/.local/cert.pem --ssl-cert /Users/gri306/Code/ecl-builder/.local/cert.pem --ssl-key /Users/gri306/Code/ecl-builder/.local/key.pem",
     "build-storybook": "build-storybook"
@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/aehrc/ecl-builder#readme",
   "devDependencies": {
-    "@babel/core": "^7.18.5",
+    "@babel/core": "^7.18.10",
+    "@babel/preset-env": "^7.18.10",
+    "@babel/preset-typescript": "^7.18.6",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@mui/icons-material": "^5.8.4",
@@ -33,12 +35,15 @@
     "@storybook/manager-webpack4": "^6.5.8",
     "@storybook/react": "^6.5.8",
     "@storybook/testing-library": "^0.0.13",
+    "@types/jest": "^28.1.7",
     "@types/react": "^18.0.12",
     "@typescript-eslint/eslint-plugin": "^5.33.1",
     "@typescript-eslint/parser": "^5.33.1",
+    "babel-jest": "^28.1.3",
     "babel-loader": "^8.2.5",
     "eslint": "^8.22.0",
     "eslint-plugin-react": "^7.30.1",
+    "jest": "^28.1.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "typescript": "^4.7.3"

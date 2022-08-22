@@ -152,7 +152,7 @@ class ExpressionVisitor extends ECLVisitor {
           const constraintoperator = ctx.constraintoperator();
           if (constraintoperator) {
             this.transformer.remove(constraintoperator, {
-              optionalWhiteSpaceRight: true,
+              collapseWhiteSpaceRight: true,
             });
           } else {
             console.warn(
@@ -167,7 +167,7 @@ class ExpressionVisitor extends ECLVisitor {
           const memberof = ctx.memberof();
           if (memberof) {
             this.transformer.remove(memberof, {
-              optionalWhiteSpaceRight: true,
+              collapseWhiteSpaceRight: true,
             });
           } else {
             console.warn("Passed nullish memberof to onRemoveMemberOf");
