@@ -76,15 +76,16 @@ export default function ConceptReference({
           variant="filled"
           label={selectedConcept?.id || label}
           sx={(theme) => ({
-            "& .MuiInputBase-root, & .MuiAutocomplete-inputFocused": {
-              border: 0,
-              borderRadius: 0,
-              backgroundColor: theme.palette.background.paper,
-              fontSize: "0.95rem",
-              "&:hover": {
+            "& .MuiInputBase-root, & .MuiInputBase-root.MuiFilledInput-focused, & .MuiAutocomplete-inputFocused":
+              {
+                border: 0,
+                borderRadius: 0,
                 backgroundColor: theme.palette.background.paper,
+                fontSize: "0.95rem",
+                "&:hover": {
+                  backgroundColor: theme.palette.background.paper,
+                },
               },
-            },
             "& .MuiFilledInput-root::before": { border: 0 },
           })}
         />
