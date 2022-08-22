@@ -171,7 +171,9 @@ export default function SubExpression({
       onChangeType={(type) => setAddLogicStatement(type)}
       onAddCondition={handleLogicStatementUpdate}
     >
-      {renderContent()}
+      <Stack className="logic-statement-sub-expression" direction="row">
+        {renderContent()}
+      </Stack>
       <LogicOperator type={addLogicStatement} />
       <ConceptReference onChange={handleLogicStatementUpdate} />
     </LogicStatement>
