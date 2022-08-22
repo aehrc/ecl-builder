@@ -219,7 +219,10 @@ class ExpressionVisitor extends ECLVisitor {
     ctx: ExpressioncomparisonoperatorContext
   ): VisualExpressionType {
     return (
-      <ExpressionComparisonOperator type={ctx.EXCLAMATION() ? "!=" : "="} />
+      <ExpressionComparisonOperator
+        type={ctx.EXCLAMATION() ? "!=" : "="}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+      />
     );
   }
 

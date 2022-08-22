@@ -25,6 +25,7 @@ export default function ComponentLabel({ sx, children }: ComponentLabelProps) {
         userSelect: "none",
         fontSize: "0.95em",
         whiteSpace: "nowrap",
+        alignSelf: "flex-start",
         ...sx,
       }}
     >
