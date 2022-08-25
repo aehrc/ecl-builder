@@ -11,8 +11,11 @@ export interface ConceptSearchScopeType {
   label: string;
 }
 
-const ConceptSearchScope = createContext<ConceptSearchScopeType>({
+export const DEFAULT_SEARCH_SCOPE = {
   valueSet: `${SCT_URI}?fhir_vs`,
   label: "Search for a concept",
-});
+};
+
+const ConceptSearchScope =
+  createContext<ConceptSearchScopeType>(DEFAULT_SEARCH_SCOPE);
 export default ConceptSearchScope;

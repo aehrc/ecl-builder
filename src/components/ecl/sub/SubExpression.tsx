@@ -11,6 +11,7 @@ import LogicOperator from "../compound/LogicOperator";
 import LogicStatement, { LogicStatementType } from "../compound/LogicStatement";
 import NeatRow from "../NeatRow";
 import ConceptReference from "./ConceptReference";
+import ConceptSearchScope, { DEFAULT_SEARCH_SCOPE } from "./ConceptSearchScope";
 
 export interface SubExpressionProps extends PropsWithChildren {
   // Set to true if the subexpression contains a constraint operator.
@@ -168,7 +169,9 @@ export default function SubExpression({
         {renderContent()}
       </Stack>
       <LogicOperator type={addLogicStatement} />
-      <ConceptReference onChange={handleLogicStatementUpdate} />
+      <ConceptSearchScope.Provider value={DEFAULT_SEARCH_SCOPE}>
+        <ConceptReference onChange={handleLogicStatementUpdate} />
+      </ConceptSearchScope.Provider>
     </LogicStatement>
   ) : (
     renderContent()
