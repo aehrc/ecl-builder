@@ -53,7 +53,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
   ): VisualExpressionType {
     return (
       <LogicStatementSubExpression
-        onRemove={() => this.transformer.removeAll(this.removalContext)}
+        onRemove={() => this.transformer.removeAllSpans(this.removalContext)}
       >
         {new SubExpressionVisitor({ transformer: this.transformer }).visit(ctx)}
       </LogicStatementSubExpression>
@@ -72,7 +72,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
       const children = interleave(ctx.subexpressionconstraint(), operatorCtx);
       result = [];
       for (let i = 0; i < children.length; i++) {
-        const removalContext = this.getLogicStatementRemovalContext(
+        const removalContext = this.transformer.getBinaryOperatorRemovalContext(
           children,
           i
         );
@@ -115,34 +115,5 @@ export default class CompoundVisitor extends BaseEclVisitor {
    */
   visitDisjunction(): VisualExpressionType {
     return <LogicOperator type="disjunction" />;
-  }
-
-  private getLogicStatementRemovalContext(
-    ctxs: ParserRuleContext[],
-    subjectIndex: number
-  ) {
-    const removalContext: ParserRuleContext[] = [];
-    for (let currentIndex = 0; currentIndex < ctxs.length; currentIndex++) {
-      if (subjectIndex === currentIndex) {
-        // Always include the subject context itself in the removal context.
-        removalContext.push(ctxs[currentIndex]);
-      } else if (
-        subjectIndex === ctxs.length - 1 &&
-        (subjectIndex + 1) % 2 === 1 &&
-        currentIndex === subjectIndex - 1
-      ) {
-        // If this is a subject context that is the last child, include the previous logical
-        // operator in the removal context.
-        removalContext.push(ctxs[currentIndex]);
-      } else if (
-        (subjectIndex + 1) % 2 === 1 &&
-        currentIndex === subjectIndex + 1
-      ) {
-        // If this is a subject context, include the next logical operator in the removal
-        // context.
-        removalContext.push(ctxs[currentIndex]);
-      }
-    }
-    return removalContext;
   }
 }

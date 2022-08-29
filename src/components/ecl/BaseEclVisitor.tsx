@@ -7,17 +7,17 @@ import { ParserRuleContext } from "antlr4";
 import { cloneElement, isValidElement } from "react";
 import * as uuid from "uuid";
 import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
-import ExpressionTransformer from "./ExpressionTransformer";
+import ExpressionTransformer, { Span } from "./ExpressionTransformer";
 import { VisualExpressionType } from "./ExpressionVisitor";
 
 export interface BaseEclVisitorOptions {
   transformer: ExpressionTransformer;
-  removalContext?: ParserRuleContext[];
+  removalContext?: Span[];
 }
 
 export default class BaseEclVisitor extends ECLVisitor {
   readonly transformer: ExpressionTransformer;
-  readonly removalContext: ParserRuleContext[];
+  readonly removalContext: Span[];
 
   constructor(options: BaseEclVisitorOptions) {
     super();

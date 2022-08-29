@@ -4,7 +4,8 @@
  */
 
 import { ParserRuleContext } from "antlr4";
-import React from "react";
+import React, { ReactNode } from "react";
+import { interleave } from "../../../array";
 import {
   ConjunctionContext,
   DisjunctionContext,
@@ -34,11 +35,18 @@ export default class RefinementVisitor extends BaseEclVisitor {
   visitRefinedexpressionconstraint(
     ctx: RefinedexpressionconstraintContext
   ): VisualExpressionType {
+    const visitor = new RefinementVisitor({
+      transformer: this.transformer,
+      removalContext: [
+        this.transformer.spanFromTerminalNode(ctx.COLON()),
+        this.transformer.spanFromContext(ctx.eclrefinement()),
+      ],
+    });
     return (
       <RefinedExpression
-        subExpression={this.visit(ctx.subexpressionconstraint())}
+        subExpression={visitor.visit(ctx.subexpressionconstraint())}
       >
-        {this.visit(ctx.eclrefinement())}
+        {visitor.visit(ctx.eclrefinement())}
       </RefinedExpression>
     );
   }
@@ -86,6 +94,31 @@ export default class RefinementVisitor extends BaseEclVisitor {
     operatorCtx: ParserRuleContext[],
     type: LogicStatementType
   ): VisualExpressionType {
+    let result: VisualExpressionType;
+    const logicalAttributeSet =
+      ctx.conjunctionattributeset() ?? ctx.disjunctionattributeset();
+    const subAttributeSets = [
+      ctx.subattributeset(),
+      ...(logicalAttributeSet?.subattributeset() ?? []),
+    ];
+    if (subAttributeSets.length > 1) {
+      const children = interleave(subAttributeSets, operatorCtx);
+      result = [];
+      for (let i = 0; i < children.length; i++) {
+        const removalContext = this.transformer.getBinaryOperatorRemovalContext(
+          children,
+          i
+        );
+        result = (result as ReactNode[]).concat(
+          new RefinementVisitor({
+            transformer: this.transformer,
+            removalContext,
+          }).visit(children[i])
+        );
+      }
+    } else {
+      result = this.visitChildren(ctx);
+    }
     return (
       <AttributeSet
         type={type}
@@ -99,7 +132,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
           this.transformer.append(ctx, expression)
         }
       >
-        {this.visitChildren(ctx)}
+        {result}
       </AttributeSet>
     );
   }
@@ -111,7 +144,13 @@ export default class RefinementVisitor extends BaseEclVisitor {
    * (booleancomparisonoperator ws booleanvalue));
    */
   visitEclattribute(ctx: EclattributeContext): VisualExpressionType {
-    return <Attribute>{this.visitChildren(ctx)}</Attribute>;
+    return (
+      <Attribute
+        onRemove={() => this.transformer.removeAllSpans(this.removalContext)}
+      >
+        {this.visitChildren(ctx)}
+      </Attribute>
+    );
   }
 
   /**

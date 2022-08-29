@@ -4,6 +4,7 @@
  */
 
 import { Parser, ParserRuleContext } from "antlr4";
+import { TerminalNode } from "antlr4/tree/Tree";
 
 export default class ECLParser extends Parser {
   expressionconstraint(): ExpressionconstraintContext;
@@ -38,6 +39,8 @@ export class EclfocusconceptContext extends ParserRuleContext {}
 export class RefinedexpressionconstraintContext extends ParserRuleContext {
   subexpressionconstraint(): SubexpressionconstraintContext;
 
+  COLON(): TerminalNode;
+
   eclrefinement(): EclrefinementContext;
 }
 
@@ -50,6 +53,8 @@ export class SubrefinementContext extends ParserRuleContext {
 }
 
 export class EclattributesetContext extends ParserRuleContext {
+  subattributeset(): SubattributesetContext;
+
   conjunctionattributeset(): ConjunctionattributesetContext | null | undefined;
 
   disjunctionattributeset(): DisjunctionattributesetContext | null | undefined;
@@ -67,11 +72,17 @@ export class DisjunctionexpressionconstraintContext extends ParserRuleContext {
   disjunction(): DisjunctionContext[];
 }
 
+export class SubattributesetContext extends ParserRuleContext {}
+
 export class ConjunctionattributesetContext extends ParserRuleContext {
+  subattributeset(): SubattributesetContext[];
+
   conjunction(): ConjunctionContext[];
 }
 
 export class DisjunctionattributesetContext extends ParserRuleContext {
+  subattributeset(): SubattributesetContext[];
+
   disjunction(): DisjunctionContext[];
 }
 

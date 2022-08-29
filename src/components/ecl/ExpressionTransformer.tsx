@@ -4,6 +4,7 @@
  */
 
 import { ParserRuleContext } from "antlr4";
+import { TerminalNode } from "antlr4/tree/Tree";
 
 export interface UpdateOptions {
   // Set this to true if the subject expression has optional whitespace on the right side that needs
@@ -17,6 +18,11 @@ export interface UpdateOptions {
 export interface SupplementOptions extends UpdateOptions {
   // Set this to true to parenthesize the original expression.
   parenthesize?: boolean;
+}
+
+export interface Span {
+  start: number;
+  stop: number;
 }
 
 /**
@@ -93,6 +99,14 @@ export default class ExpressionTransformer {
   }
 
   /**
+   * Uses the parser rule context to identify the range of characters within a set of expressions,
+   * and then removes those characters.
+   */
+  removeAllSpans(spans: Span[], options: UpdateOptions = {}): void {
+    this.applyUpdatesToSpans(spans, "", options);
+  }
+
+  /**
    * Uses the parser rule context to identify the range of characters within the expression that
    * have changed, and then substitutes those characters with the expression reported by the
    * component.
@@ -105,17 +119,29 @@ export default class ExpressionTransformer {
     this.applyUpdates([ctx], expression, options);
   }
 
+  applyUpdates(
+    ctxs: ParserRuleContext[],
+    replacement: string,
+    options: UpdateOptions = {}
+  ): void {
+    this.applyUpdatesToSpans(
+      ctxs.map((ctx) => this.spanFromContext(ctx)),
+      replacement,
+      options
+    );
+  }
+
   /**
    * Performs the same function as `handleUpdate`, except that it can replace multiple
    * subexpressions with the same new expression.
    *
-   * @param ctxs The parser rule contexts to update. Must be sorted in the order that they occur
-   * within the expression.
+   * @param spans The spans to update. Must be sorted in the order that they occur within the
+   * expression.
    * @param replacement The expression that will be used to update the parts of the larger
-   * expression described by the array of contexts.
+   * expression described by the array of spans.
    */
-  applyUpdates(
-    ctxs: ParserRuleContext[],
+  applyUpdatesToSpans(
+    spans: Span[],
     replacement: string,
     {
       collapseWhiteSpaceRight = false,
@@ -126,9 +152,9 @@ export default class ExpressionTransformer {
     // Go through each of the contexts and add two things to an array:
     // - The slice since the start of the expression, or since the last context, and;
     // - The replacement expression.
-    const newExpressionParts = ctxs.reduce((acc: string[], ctx) => {
-      const start = ctx.start.start,
-        stop = ctx.stop.stop;
+    const newExpressionParts = spans.reduce((acc: string[], span) => {
+      const start = span.start,
+        stop = span.stop;
       // Conditionally modify the whitespace at the leading edge of the prefix expression.
       let prefix = this.expression.slice(cursor, start);
       if (cursor > 0 && /\s/.test(prefix[0])) {
@@ -152,5 +178,47 @@ export default class ExpressionTransformer {
       newExpressionParts.push(suffix);
     }
     this.handleChange(newExpressionParts.join(""));
+  }
+
+  spanFromContext(ctx: ParserRuleContext): Span {
+    return { start: ctx.start.start, stop: ctx.stop.stop };
+  }
+
+  spanFromTerminalNode(node: TerminalNode): Span {
+    return { start: node.symbol.start, stop: node.symbol.stop };
+  }
+
+  /**
+   * For an expression containing any number of binary expressions (e.g. [SUBJECT] [OPERATOR]
+   * [SUBJECT] [OPERATOR] [SUBJECT]), this method can tell the set expressions should be removed
+   * when a nominated expression is removed, in order to retain validity.
+   */
+  getBinaryOperatorRemovalContext(
+    ctxs: ParserRuleContext[],
+    subjectIndex: number
+  ): Span[] {
+    const removalContext: ParserRuleContext[] = [];
+    for (let currentIndex = 0; currentIndex < ctxs.length; currentIndex++) {
+      if (subjectIndex === currentIndex) {
+        // Always include the subject context itself in the removal context.
+        removalContext.push(ctxs[currentIndex]);
+      } else if (
+        subjectIndex === ctxs.length - 1 &&
+        (subjectIndex + 1) % 2 === 1 &&
+        currentIndex === subjectIndex - 1
+      ) {
+        // If this is a subject context that is the last child, include the previous logical
+        // operator in the removal context.
+        removalContext.push(ctxs[currentIndex]);
+      } else if (
+        (subjectIndex + 1) % 2 === 1 &&
+        currentIndex === subjectIndex + 1
+      ) {
+        // If this is a subject context, include the next logical operator in the removal
+        // context.
+        removalContext.push(ctxs[currentIndex]);
+      }
+    }
+    return removalContext.map(this.spanFromContext);
   }
 }
