@@ -6,10 +6,12 @@
 import { ParserRuleContext } from "antlr4";
 import React, { ReactNode } from "react";
 import { interleave } from "../../../array";
+import { ATTRIBUTE_VALUE_SET_URI } from "../../../constants";
 import {
   ConjunctionContext,
   DisjunctionContext,
   EclattributeContext,
+  EclattributenameContext,
   EclattributesetContext,
   ExpressioncomparisonoperatorContext,
   RefinedexpressionconstraintContext,
@@ -22,6 +24,7 @@ import {
   logicStatementTypeToOperator,
 } from "../compound/LogicStatement";
 import { VisualExpressionType } from "../ExpressionVisitor";
+import ConceptSearchScope from "../sub/ConceptSearchScope";
 import SubExpressionVisitor from "../sub/SubExpressionVisitor";
 import Attribute from "./Attribute";
 import AttributeSet from "./AttributeSet";
@@ -60,9 +63,11 @@ export default class RefinementVisitor extends BaseEclVisitor {
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext
   ): VisualExpressionType {
-    return new SubExpressionVisitor({ transformer: this.transformer }).visit(
-      ctx
-    );
+    return new SubExpressionVisitor({
+      transformer: this.transformer,
+      removalContext: this.removalContext,
+      refinement: true,
+    }).visit(ctx);
   }
 
   /**
@@ -180,5 +185,21 @@ export default class RefinementVisitor extends BaseEclVisitor {
    */
   visitDisjunction(ctx: DisjunctionContext): VisualExpressionType {
     return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
+  }
+
+  /**
+   * eclattributename : subexpressionconstraint;
+   */
+  visitEclattributename(ctx: EclattributenameContext): VisualExpressionType {
+    return (
+      <ConceptSearchScope.Provider
+        value={{
+          valueSet: ATTRIBUTE_VALUE_SET_URI,
+          label: "Search for an attribute",
+        }}
+      >
+        {this.visitChildren(ctx)}
+      </ConceptSearchScope.Provider>
+    );
   }
 }

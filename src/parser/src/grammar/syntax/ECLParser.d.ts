@@ -105,3 +105,5 @@ export class TermContext extends ParserRuleContext {}
 export class ExpressioncomparisonoperatorContext extends ParserRuleContext {
   EXCLAMATION(): TerminalNode | undefined;
 }
+
+export class EclattributenameContext extends ParserRuleContext {}

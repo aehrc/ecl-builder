@@ -24,14 +24,7 @@ export default function BlankExpression({ onChange }: BlankExpressionProps) {
   }
 
   return (
-    <SubExpression
-      constraint={!!constraint}
-      onAddConstraint={() => null}
-      onRemoveConstraint={() => null}
-      onAddMemberOf={() => null}
-      onRemoveMemberOf={() => null}
-      onAddLogicStatement={() => null}
-    >
+    <SubExpression constraint={!!constraint} hideActions>
       <ConstraintOperator
         constraint={constraint}
         onChange={(operator) =>

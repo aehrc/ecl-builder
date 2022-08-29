@@ -6,6 +6,7 @@
 import { Add } from "@mui/icons-material";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React, { PropsWithChildren } from "react";
+import { DEFAULT_REFINEMENT } from "../../../constants";
 import Actions from "../Actions";
 import {
   LogicStatementType,
@@ -32,7 +33,7 @@ export default function AttributeSet({
 
   function handleAddAttribute() {
     onAddAttribute(
-      `${logicStatementTypeToOperator[type]} 47429007 |associated with| = 138875005 |SNOMED CT Concept|`
+      `${logicStatementTypeToOperator[type]} ${DEFAULT_REFINEMENT}`
     );
   }
 

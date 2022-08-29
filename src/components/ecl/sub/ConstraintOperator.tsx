@@ -5,15 +5,12 @@
 
 import { MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
 import React from "react";
-import { SCT_URI } from "../../../constants";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 
 export interface ConstraintOperatorProps extends ChangeReporterProps {
   // The currently selected constraint type.
   constraint?: ConstraintType;
 }
-
-export const REFERENCE_SET_VALUE_SET_URI = `${SCT_URI}?fhir_vs=ecl/%3C%20446609009%20`;
 
 export const constraintNameToOperator = {
   childof: "<!",

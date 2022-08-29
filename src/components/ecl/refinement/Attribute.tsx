@@ -17,10 +17,12 @@ export default function Attribute({ children, onRemove }: AttributeProps) {
       <Stack className="attribute-removal-context" direction="row" flexGrow={1}>
         {children}
       </Stack>
-      <RemoveButton
-        tooltip="Remove this attribute from the refinement"
-        onClick={onRemove}
-      />
+      {onRemove ? (
+        <RemoveButton
+          tooltip="Remove this attribute from the refinement"
+          onClick={onRemove}
+        />
+      ) : null}
     </Stack>
   );
 }

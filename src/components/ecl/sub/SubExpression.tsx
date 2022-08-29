@@ -6,29 +6,38 @@
 import { Done, Tune } from "@mui/icons-material";
 import Stack from "@mui/material/Stack/Stack";
 import React, { PropsWithChildren, useState } from "react";
+import { DEFAULT_REFINEMENT } from "../../../constants";
 import Actions from "../Actions";
 import BlankLogicStatement from "../compound/BlankLogicStatement";
 import { LogicStatementType } from "../compound/LogicStatement";
 import NeatRow from "../NeatRow";
 
 export interface SubExpressionProps extends PropsWithChildren {
-  // Set to true if the subexpression contains a constraint operator.
+  // Set to true if the sub-expression contains a constraint operator.
   constraint?: boolean;
-  // Set to true if the subexpression contains a member of operator.
+  // Set to true if the sub-expression contains a member of operator.
   memberOf?: boolean;
+  // Set to true if the sub-expression contains a refinement.
+  refinement?: boolean;
+  // Used to hide actions, e.g. when rendering a blank sub-expression.
+  hideActions?: boolean;
   // Called when a constraint operator is added to the expression.
-  onAddConstraint: () => unknown;
+  onAddConstraint?: () => unknown;
   // Called when the constraint operator is removed.
-  onRemoveConstraint: () => unknown;
+  onRemoveConstraint?: () => unknown;
   // Called when a member of operator is added to the expression.
-  onAddMemberOf: () => unknown;
+  onAddMemberOf?: () => unknown;
   // Called when the member of operator is removed.
-  onRemoveMemberOf: () => unknown;
+  onRemoveMemberOf?: () => unknown;
+  // Called when the refinement is removed.
+  onRemoveRefinement?: () => unknown;
   // Called when a logical statement is added to the expression.
-  onAddLogicStatement: (
+  onAddLogicStatement?: (
     type: LogicStatementType,
     expression: string
   ) => unknown;
+  // Called when an attribute refinement is added to the expression.
+  onAddRefinement?: (expression: string) => unknown;
 }
 
 /**
@@ -40,34 +49,38 @@ export interface SubExpressionProps extends PropsWithChildren {
 export default function SubExpression({
   constraint,
   memberOf,
+  refinement,
+  hideActions,
   onAddConstraint,
   onRemoveConstraint,
   onAddMemberOf,
   onRemoveMemberOf,
+  onRemoveRefinement,
   onAddLogicStatement,
+  onAddRefinement,
   children,
 }: SubExpressionProps) {
   const [addLogicStatement, setAddLogicStatement] =
     useState<LogicStatementType | null>(null);
 
   function handleClickHierarchy() {
-    if (constraint) {
+    if (constraint && onRemoveConstraint) {
       onRemoveConstraint();
-    } else {
+    } else if (onAddConstraint) {
       onAddConstraint();
     }
   }
 
   function handleClickReferenceSetMembers() {
-    if (memberOf) {
+    if (memberOf && onRemoveMemberOf) {
       onRemoveMemberOf();
-    } else {
+    } else if (onAddMemberOf) {
       onAddMemberOf();
     }
   }
 
   function handleLogicStatementUpdate(expression: string) {
-    if (addLogicStatement) {
+    if (addLogicStatement && onAddLogicStatement) {
       onAddLogicStatement(addLogicStatement, expression);
     } else {
       console.warn(
@@ -76,82 +89,94 @@ export default function SubExpression({
     }
   }
 
+  function handleAddRefinement() {
+    if (refinement && onRemoveRefinement) {
+      onRemoveRefinement();
+    } else if (onAddRefinement) {
+      onAddRefinement(DEFAULT_REFINEMENT);
+    }
+  }
+
   function renderContent() {
     return (
       <Stack className="sub-expression" sx={{ flexGrow: 1 }}>
         <NeatRow className="sub-expression-content">
           {children}
-          <Actions
-            actions={[
-              {
-                type: "heading",
-                label: "Include:",
-              },
-              {
-                type: "item",
-                label: "Hierarchy",
-                onClick: handleClickHierarchy,
-                icon: constraint ? <Done /> : null,
-              },
-              {
-                type: "item",
-                label: "Reference set members",
-                onClick: handleClickReferenceSetMembers,
-                icon: memberOf ? <Done /> : null,
-              },
-              {
-                type: "item",
-                label: "Replaced concepts",
-              },
-              {
-                type: "heading",
-                label: "Filter on:",
-              },
-              {
-                type: "item",
-                label: "Attributes",
-              },
-              {
-                type: "item",
-                label: "Descriptions",
-              },
-              {
-                type: "item",
-                label: "Definition status",
-              },
-              {
-                type: "item",
-                label: "Module",
-              },
-              {
-                type: "item",
-                label: "Effective time",
-              },
-              {
-                type: "item",
-                label: "Active status",
-              },
-              {
-                type: "item",
-                label: "Reference set attributes",
-              },
-              {
-                type: "heading",
-                label: "Add logic statement:",
-              },
-              {
-                type: "item",
-                label: "AND condition",
-                onClick: () => setAddLogicStatement("conjunction"),
-              },
-              {
-                type: "item",
-                label: "OR condition",
-                onClick: () => setAddLogicStatement("disjunction"),
-              },
-            ]}
-            icon={Tune}
-          />
+          {hideActions ? null : (
+            <Actions
+              actions={[
+                {
+                  type: "heading",
+                  label: "Include:",
+                },
+                {
+                  type: "item",
+                  label: "Hierarchy",
+                  onClick: handleClickHierarchy,
+                  icon: constraint ? <Done /> : null,
+                },
+                {
+                  type: "item",
+                  label: "Reference set members",
+                  onClick: handleClickReferenceSetMembers,
+                  icon: memberOf ? <Done /> : null,
+                },
+                {
+                  type: "item",
+                  label: "Replaced concepts",
+                },
+                {
+                  type: "heading",
+                  label: "Filter on:",
+                },
+                {
+                  type: "item",
+                  label: "Attributes",
+                  onClick: handleAddRefinement,
+                  icon: refinement ? <Done /> : null,
+                },
+                {
+                  type: "item",
+                  label: "Descriptions",
+                },
+                {
+                  type: "item",
+                  label: "Definition status",
+                },
+                {
+                  type: "item",
+                  label: "Module",
+                },
+                {
+                  type: "item",
+                  label: "Effective time",
+                },
+                {
+                  type: "item",
+                  label: "Active status",
+                },
+                {
+                  type: "item",
+                  label: "Reference set attributes",
+                },
+                {
+                  type: "heading",
+                  label: "Add logic statement:",
+                },
+                {
+                  type: "item",
+                  label: "AND condition",
+                  onClick: () => setAddLogicStatement("conjunction"),
+                },
+                {
+                  type: "item",
+                  label: "OR condition",
+                  onClick: () => setAddLogicStatement("disjunction"),
+                },
+              ]}
+              icon={Tune}
+            />
+          )}
         </NeatRow>
       </Stack>
     );

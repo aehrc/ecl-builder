@@ -4,13 +4,14 @@
  */
 
 import React from "react";
+import { REFERENCE_SET_VALUE_SET_URI } from "../../../constants";
 import {
   CompoundexpressionconstraintContext,
   ConstraintoperatorContext,
   EclconceptreferenceContext,
   SubexpressionconstraintContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
-import BaseEclVisitor from "../BaseEclVisitor";
+import BaseEclVisitor, { BaseEclVisitorOptions } from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
 import { logicStatementTypeToOperator } from "../compound/LogicStatement";
 import { VisualExpressionType } from "../ExpressionVisitor";
@@ -19,13 +20,23 @@ import ConceptSearchScope from "./ConceptSearchScope";
 import ConstraintOperator, {
   constraintNameToOperator,
   operatorToConstraintName,
-  REFERENCE_SET_VALUE_SET_URI,
 } from "./ConstraintOperator";
 import MemberOfOperator, { MEMBER_OF_OPERATOR } from "./MemberOfOperator";
 import SubExpression from "./SubExpression";
 import Wildcard from "./Wildcard";
 
+export interface SubExpressionVisitorOptions extends BaseEclVisitorOptions {
+  refinement?: boolean;
+}
+
 export default class SubExpressionVisitor extends BaseEclVisitor {
+  private readonly refinement: boolean;
+
+  constructor(options: SubExpressionVisitorOptions) {
+    super(options);
+    this.refinement = options.refinement ?? false;
+  }
+
   /**
    * subexpressionconstraint: (constraintoperator ws)? ( ( (memberof ws)? (eclfocusconcept |
    * (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) (ws memberfilterconstraint)*) |
@@ -43,6 +54,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
       <SubExpression
         constraint={!!ctx.constraintoperator()}
         memberOf={!!ctx.memberof()}
+        refinement={this.refinement}
         onAddConstraint={() =>
           this.transformer.prepend(
             ctx,
@@ -74,6 +86,9 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
             console.warn("Passed nullish memberof to onRemoveMemberOf");
           }
         }}
+        onRemoveRefinement={() =>
+          this.transformer.removeAllSpans(this.removalContext)
+        }
         // This gets called when the user adds a logic statement to the sub-expression, e.g. AND.
         onAddLogicStatement={(type, expression) =>
           this.transformer.append(
@@ -82,6 +97,8 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
             { parenthesize: true }
           )
         }
+        // This gets called when the user adds an attribute refinement to the sub-expression.
+        onAddRefinement={(e) => this.transformer.append(ctx, `: ${e}`)}
       >
         {this.visitChildren(ctx)}
       </SubExpression>
