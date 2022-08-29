@@ -7,11 +7,9 @@ import { Done, Tune } from "@mui/icons-material";
 import Stack from "@mui/material/Stack/Stack";
 import React, { PropsWithChildren, useState } from "react";
 import Actions from "../Actions";
-import LogicOperator from "../compound/LogicOperator";
-import LogicStatement, { LogicStatementType } from "../compound/LogicStatement";
+import BlankLogicStatement from "../compound/BlankLogicStatement";
+import { LogicStatementType } from "../compound/LogicStatement";
 import NeatRow from "../NeatRow";
-import ConceptReference from "./ConceptReference";
-import ConceptSearchScope, { DEFAULT_SEARCH_SCOPE } from "./ConceptSearchScope";
 
 export interface SubExpressionProps extends PropsWithChildren {
   // Set to true if the subexpression contains a constraint operator.
@@ -160,19 +158,13 @@ export default function SubExpression({
   }
 
   return addLogicStatement ? (
-    <LogicStatement
+    <BlankLogicStatement
       type={addLogicStatement}
-      onChangeType={(type) => setAddLogicStatement(type)}
-      onAddCondition={handleLogicStatementUpdate}
+      onChangeType={setAddLogicStatement}
+      onSave={(_, e) => handleLogicStatementUpdate(e)}
     >
-      <Stack className="logic-statement-sub-expression" direction="row">
-        {renderContent()}
-      </Stack>
-      <LogicOperator type={addLogicStatement} />
-      <ConceptSearchScope.Provider value={DEFAULT_SEARCH_SCOPE}>
-        <ConceptReference onChange={handleLogicStatementUpdate} />
-      </ConceptSearchScope.Provider>
-    </LogicStatement>
+      {renderContent()}
+    </BlankLogicStatement>
   ) : (
     renderContent()
   );
