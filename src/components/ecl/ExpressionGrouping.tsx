@@ -52,7 +52,7 @@ export default function ExpressionGrouping({
         sx={{
           display: "flex",
           flexDirection: "column",
-          gap: 0.5,
+          gap: 1,
           p: 2,
           borderWidth: 1,
           borderColor: "grey.400",

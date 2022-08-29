@@ -52,7 +52,9 @@ export default class RefinementVisitor extends BaseEclVisitor {
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext
   ): VisualExpressionType {
-    return new SubExpressionVisitor(this.transformer).visit(ctx);
+    return new SubExpressionVisitor({ transformer: this.transformer }).visit(
+      ctx
+    );
   }
 
   /**
@@ -131,13 +133,13 @@ export default class RefinementVisitor extends BaseEclVisitor {
    *  mws) | COMMA;
    */
   visitConjunction(ctx: ConjunctionContext): VisualExpressionType {
-    return new CompoundVisitor(this.transformer).visit(ctx);
+    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
   }
 
   /**
    * disjunction : ((CAP_O | O)|(CAP_O | O)) ((CAP_R | R)|(CAP_R | R)) mws;
    */
   visitDisjunction(ctx: DisjunctionContext): VisualExpressionType {
-    return new CompoundVisitor(this.transformer).visit(ctx);
+    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
   }
 }

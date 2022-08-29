@@ -81,7 +81,15 @@ export default class ExpressionTransformer {
    * have changed, and then removes those characters.
    */
   remove(ctx: ParserRuleContext, options: UpdateOptions = {}): void {
-    this.applyUpdates([ctx], "", options);
+    this.removeAll([ctx], options);
+  }
+
+  /**
+   * Uses the parser rule context to identify the range of characters within a set of expressions,
+   * and then removes those characters.
+   */
+  removeAll(ctxs: ParserRuleContext[], options: UpdateOptions = {}): void {
+    this.applyUpdates(ctxs, "", options);
   }
 
   /**

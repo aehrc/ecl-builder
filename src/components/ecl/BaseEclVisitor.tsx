@@ -10,12 +10,19 @@ import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
 import ExpressionTransformer from "./ExpressionTransformer";
 import { VisualExpressionType } from "./ExpressionVisitor";
 
+export interface BaseEclVisitorOptions {
+  transformer: ExpressionTransformer;
+  removalContext?: ParserRuleContext[];
+}
+
 export default class BaseEclVisitor extends ECLVisitor {
   readonly transformer: ExpressionTransformer;
+  readonly removalContext: ParserRuleContext[];
 
-  constructor(transformer: ExpressionTransformer) {
+  constructor(options: BaseEclVisitorOptions) {
     super();
-    this.transformer = transformer;
+    this.transformer = options.transformer;
+    this.removalContext = options.removalContext ?? [];
   }
 
   visit(ctx: ParserRuleContext): VisualExpressionType {

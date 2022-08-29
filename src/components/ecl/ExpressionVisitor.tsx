@@ -37,7 +37,7 @@ export interface ChangeReporterProps<T = string> {
  */
 class ExpressionVisitor extends BaseEclVisitor {
   constructor(expression: string, onChange: (expression: string) => unknown) {
-    super(new ExpressionTransformer(expression, onChange));
+    super({ transformer: new ExpressionTransformer(expression, onChange) });
   }
 
   /**
@@ -63,7 +63,9 @@ class ExpressionVisitor extends BaseEclVisitor {
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext
   ): VisualExpressionType {
-    return new SubExpressionVisitor(this.transformer).visit(ctx);
+    return new SubExpressionVisitor({ transformer: this.transformer }).visit(
+      ctx
+    );
   }
 
   /**
@@ -73,7 +75,7 @@ class ExpressionVisitor extends BaseEclVisitor {
   visitCompoundexpressionconstraint(
     ctx: CompoundexpressionconstraintContext
   ): VisualExpressionType {
-    return new CompoundVisitor(this.transformer).visit(ctx);
+    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
   }
 
   /**
@@ -82,7 +84,7 @@ class ExpressionVisitor extends BaseEclVisitor {
   visitRefinedexpressionconstraint(
     ctx: RefinedexpressionconstraintContext
   ): VisualExpressionType {
-    return new RefinementVisitor(this.transformer).visit(ctx);
+    return new RefinementVisitor({ transformer: this.transformer }).visit(ctx);
   }
 }
 

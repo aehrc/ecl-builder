@@ -3,13 +3,11 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Stack } from "@mui/material";
 import { ParserRuleContext } from "antlr4";
-import React from "react";
+import React, { ReactNode } from "react";
+import { interleave } from "../../../array";
 import {
-  ConjunctionContext,
   ConjunctionexpressionconstraintContext,
-  DisjunctionContext,
   DisjunctionexpressionconstraintContext,
   SubexpressionconstraintContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
@@ -21,6 +19,7 @@ import LogicStatement, {
   LogicStatementType,
   logicStatementTypeToOperator,
 } from "./LogicStatement";
+import LogicStatementSubExpression from "./LogicStatementSubExpression";
 
 export default class CompoundVisitor extends BaseEclVisitor {
   /**
@@ -52,15 +51,41 @@ export default class CompoundVisitor extends BaseEclVisitor {
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext
   ): VisualExpressionType {
-    return new SubExpressionVisitor(this.transformer).visit(ctx);
+    return (
+      <LogicStatementSubExpression
+        onRemove={() => this.transformer.removeAll(this.removalContext)}
+      >
+        {new SubExpressionVisitor({ transformer: this.transformer }).visit(ctx)}
+      </LogicStatementSubExpression>
+    );
   }
 
   private visitLogicStatement(
-    ctx: ConjunctionContext | DisjunctionContext,
+    ctx:
+      | ConjunctionexpressionconstraintContext
+      | DisjunctionexpressionconstraintContext,
     operatorCtx: ParserRuleContext[],
     type: LogicStatementType
   ): VisualExpressionType {
-    const children = this.visitChildren(ctx);
+    let result: VisualExpressionType;
+    if (ctx.subexpressionconstraint().length > 1) {
+      const children = interleave(ctx.subexpressionconstraint(), operatorCtx);
+      result = [];
+      for (let i = 0; i < children.length; i++) {
+        const removalContext = this.getLogicStatementRemovalContext(
+          children,
+          i
+        );
+        result = (result as ReactNode[]).concat(
+          new CompoundVisitor({
+            transformer: this.transformer,
+            removalContext,
+          }).visit(children[i])
+        );
+      }
+    } else {
+      result = this.visitChildren(ctx);
+    }
     return (
       <LogicStatement
         onChangeType={(type) =>
@@ -72,17 +97,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
         onAddCondition={(e) => this.transformer.append(ctx, e)}
         type={type}
       >
-        {Array.isArray(children)
-          ? children.map((child, i) => (
-              <Stack
-                className="logic-statement-sub-expression"
-                key={i}
-                direction="row"
-              >
-                {child}
-              </Stack>
-            ))
-          : children}
+        {result}
       </LogicStatement>
     );
   }
@@ -100,5 +115,34 @@ export default class CompoundVisitor extends BaseEclVisitor {
    */
   visitDisjunction(): VisualExpressionType {
     return <LogicOperator type="disjunction" />;
+  }
+
+  private getLogicStatementRemovalContext(
+    ctxs: ParserRuleContext[],
+    subjectIndex: number
+  ) {
+    const removalContext: ParserRuleContext[] = [];
+    for (let currentIndex = 0; currentIndex < ctxs.length; currentIndex++) {
+      if (subjectIndex === currentIndex) {
+        // Always include the subject context itself in the removal context.
+        removalContext.push(ctxs[currentIndex]);
+      } else if (
+        subjectIndex === ctxs.length - 1 &&
+        (subjectIndex + 1) % 2 === 1 &&
+        currentIndex === subjectIndex - 1
+      ) {
+        // If this is a subject context that is the last child, include the previous logical
+        // operator in the removal context.
+        removalContext.push(ctxs[currentIndex]);
+      } else if (
+        (subjectIndex + 1) % 2 === 1 &&
+        currentIndex === subjectIndex + 1
+      ) {
+        // If this is a subject context, include the next logical operator in the removal
+        // context.
+        removalContext.push(ctxs[currentIndex]);
+      }
+    }
+    return removalContext;
   }
 }

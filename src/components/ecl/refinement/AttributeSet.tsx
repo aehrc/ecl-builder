@@ -4,7 +4,7 @@
  */
 
 import { Add } from "@mui/icons-material";
-import { MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React, { PropsWithChildren } from "react";
 import Actions from "../Actions";
 import {
@@ -67,7 +67,7 @@ export default function AttributeSet({
       heading={renderHeading()}
       sx={{ mt: "2.8em" }}
     >
-      <Stack spacing={1}>{children}</Stack>
+      {children}
     </ExpressionGrouping>
   );
 }

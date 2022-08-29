@@ -109,7 +109,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   visitCompoundexpressionconstraint(
     ctx: CompoundexpressionconstraintContext
   ): VisualExpressionType {
-    return new CompoundVisitor(this.transformer).visit(ctx);
+    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
   }
 
   /**

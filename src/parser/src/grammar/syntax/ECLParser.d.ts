@@ -56,10 +56,14 @@ export class EclattributesetContext extends ParserRuleContext {
 }
 
 export class ConjunctionexpressionconstraintContext extends ParserRuleContext {
+  subexpressionconstraint(): SubexpressionconstraintContext[];
+
   conjunction(): ConjunctionContext[];
 }
 
 export class DisjunctionexpressionconstraintContext extends ParserRuleContext {
+  subexpressionconstraint(): SubexpressionconstraintContext[];
+
   disjunction(): DisjunctionContext[];
 }
 
