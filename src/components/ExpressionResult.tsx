@@ -11,6 +11,7 @@ import useValueSetExpansion from "../hooks/useValueSetExpansion";
 import { formatNumber } from "../number";
 import { queryClient } from "../queryClient";
 import ExpressionResultTable from "./ExpressionResultTable";
+import Loading from "./Loading";
 
 export interface ResultProps {
   // The expression to display results for.
@@ -19,54 +20,65 @@ export interface ResultProps {
   options?: Partial<ExpressionResultOptions>;
 }
 
+interface ResultContentProps extends ResultProps {
+  options: ExpressionResultOptions;
+}
+
 export interface ExpressionResultOptions {
   // The URL of the FHIR terminology server to use for concept search.
   terminologyServerUrl: string;
   // The maximum number of results to return within concept search.
   maxSearchResults: number;
+  // The delay (in milliseconds) before the loading indicator is displayed.
+  loadingDelay: number;
 }
 
 export default function ExpressionResult({
   expression,
   options = {},
 }: ResultProps) {
-  function ExpressionResultContent() {
-    const { terminologyServerUrl, maxSearchResults } =
-        applyDefaultOptions(options),
-      { data, isLoading, error } = useValueSetExpansion(
-        terminologyServerUrl,
-        buildExpandParams(expression, maxSearchResults)
-      );
-    if (isLoading) {
-      return <Loading />;
-    }
-    if (error) {
-      return <Alert severity="error">{error.message}</Alert>;
-    }
-    if (!data) {
-      console.warn("No error, but also no data");
-      return null;
-    }
-    if (data.concepts.length < 1) {
-      return <Alert severity="info">No results returned.</Alert>;
-    }
-    return (
-      <Stack className="expression-result">
-        {data.total && data.total > maxSearchResults ? (
-          <Alert severity="info">
-            Showing {formatNumber(maxSearchResults)} of{" "}
-            {formatNumber(data.total)} results total.
-          </Alert>
-        ) : null}
-        <ExpressionResultTable results={data} />
-      </Stack>
-    );
-  }
-
+  const resolvedOptions = applyDefaultOptions(options);
   return (
     <QueryClientProvider client={queryClient}>
-      <ExpressionResultContent />
+      <Loading delay={resolvedOptions.loadingDelay}>
+        <ExpressionResultContent
+          expression={expression}
+          options={resolvedOptions}
+        />
+      </Loading>
     </QueryClientProvider>
+  );
+}
+
+function ExpressionResultContent({
+  expression,
+  options: { terminologyServerUrl, maxSearchResults },
+}: ResultContentProps) {
+  const { data, error } = useValueSetExpansion(
+    terminologyServerUrl,
+    buildExpandParams(expression, maxSearchResults),
+    { suspense: true, keepPreviousData: false }
+  );
+  if (error) {
+    return <Alert severity="error">{error.message}</Alert>;
+  }
+  if (!data) {
+    console.warn("No error, but also no data");
+    return null;
+  }
+  if (data.concepts.length < 1) {
+    return <Alert severity="info">No results returned.</Alert>;
+  }
+  return (
+    <Stack className="expression-result">
+      {data.total && data.total > maxSearchResults ? (
+        <Alert severity="info">
+          Showing {formatNumber(maxSearchResults)} of {formatNumber(data.total)}{" "}
+          results total.
+        </Alert>
+      ) : null}
+      <ExpressionResultTable results={data} />
+    </Stack>
   );
 }
 
@@ -79,6 +91,7 @@ function applyDefaultOptions(
   return {
     terminologyServerUrl: "https://tx.ontoserver.csiro.au/fhir",
     maxSearchResults: 10,
+    loadingDelay: 500,
     ...options,
   };
 }
@@ -101,9 +114,4 @@ function buildExpandParams(expression: string, limit: number): URLSearchParams {
   );
   searchParams.set("count", limit.toString(10));
   return searchParams;
-}
-
-function Loading() {
-  // TODO: Turn this into something a bit nicer.
-  return null;
 }

@@ -90,9 +90,11 @@ export default function ConceptReference({
   }
 
   function getOptions(): ConceptReferenceOptionType[] {
-    if (selectedConcept && searchQuery.length < minQueryLength) {
-      // If a concept is selected, is it the only option until such time as the search is cleared.
+    if (selectedConcept && selectedConcept.type === "ANY_CONCEPT") {
       return [selectedConcept];
+    } else if (selectedConcept && searchQuery.length < minQueryLength) {
+      // If a concept is selected, is it the only option until such time as the search is cleared.
+      return [selectedConcept, ANY_CONCEPT];
     } else {
       return selectedConcept
         ? // If a concept is selected, it should be the first option, followed by the search results
