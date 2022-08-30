@@ -23,7 +23,7 @@ export default function NeatRow({ className, children }: NeatRowProps) {
         backgroundColor: theme.palette.grey[400],
         p: "1px",
         borderRadius: "4px",
-        "& > *:first-child": {
+        "& > *:first-of-type": {
           borderRadius: "3px 0 0 3px",
           overflow: "hidden",
         },
