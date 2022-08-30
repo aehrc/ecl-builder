@@ -22,32 +22,18 @@ import LogicStatement, {
 import LogicStatementSubExpression from "./LogicStatementSubExpression";
 
 export default class CompoundVisitor extends BaseEclVisitor {
-  /**
-   * conjunctionexpressionconstraint : subexpressionconstraint (ws conjunction ws
-   * subexpressionconstraint)+;
-   */
   visitConjunctionexpressionconstraint(
     ctx: ConjunctionexpressionconstraintContext
   ): VisualExpressionType {
-    return this.visitLogicStatement(ctx, ctx.conjunction(), "conjunction");
+    return this.renderLogicStatement(ctx, ctx.conjunction(), "conjunction");
   }
 
-  /**
-   * disjunctionexpressionconstraint : subexpressionconstraint (ws disjunction ws
-   * subexpressionconstraint)+;
-   */
   visitDisjunctionexpressionconstraint(
     ctx: DisjunctionexpressionconstraintContext
   ): VisualExpressionType {
-    return this.visitLogicStatement(ctx, ctx.disjunction(), "disjunction");
+    return this.renderLogicStatement(ctx, ctx.disjunction(), "disjunction");
   }
 
-  /**
-   * subexpressionconstraint: (constraintoperator ws)? ( ( (memberof ws)? (eclfocusconcept |
-   * (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) (ws memberfilterconstraint)*) |
-   * (eclfocusconcept | (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) ) (ws
-   * (descriptionfilterconstraint | conceptfilterconstraint))* (ws historysupplement)?;
-   */
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext
   ): VisualExpressionType {
@@ -60,7 +46,15 @@ export default class CompoundVisitor extends BaseEclVisitor {
     );
   }
 
-  private visitLogicStatement(
+  visitConjunction(): VisualExpressionType {
+    return <LogicOperator type="conjunction" />;
+  }
+
+  visitDisjunction(): VisualExpressionType {
+    return <LogicOperator type="disjunction" />;
+  }
+
+  private renderLogicStatement(
     ctx:
       | ConjunctionexpressionconstraintContext
       | DisjunctionexpressionconstraintContext,
@@ -100,20 +94,5 @@ export default class CompoundVisitor extends BaseEclVisitor {
         {result}
       </LogicStatement>
     );
-  }
-
-  /**
-   * conjunction : (((CAP_A | A)|(CAP_A | A)) ((CAP_N | N)|(CAP_N | N)) ((CAP_D | D)|(CAP_D | D))
-   *  mws) | COMMA;
-   */
-  visitConjunction(): VisualExpressionType {
-    return <LogicOperator type="conjunction" />;
-  }
-
-  /**
-   * disjunction : ((CAP_O | O)|(CAP_O | O)) ((CAP_R | R)|(CAP_R | R)) mws;
-   */
-  visitDisjunction(): VisualExpressionType {
-    return <LogicOperator type="disjunction" />;
   }
 }

@@ -37,19 +37,20 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     this.refinement = options.refinement ?? false;
   }
 
-  /**
-   * subexpressionconstraint: (constraintoperator ws)? ( ( (memberof ws)? (eclfocusconcept |
-   * (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) (ws memberfilterconstraint)*) |
-   * (eclfocusconcept | (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) ) (ws
-   * (descriptionfilterconstraint | conceptfilterconstraint))* (ws historysupplement)?;
-   */
+  visitCompoundexpressionconstraint(
+    ctx: CompoundexpressionconstraintContext
+  ): VisualExpressionType {
+    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
+  }
+
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext
   ): VisualExpressionType {
     // If the expression contains a nested expression, we don't bother rendering a sub-expression
     // wrapper. We effectively merge these two levels together from a UI perspective.
-    const content = ctx.expressionconstraint() ? (
-      this.visitChildren(ctx.expressionconstraint())
+    const expressionConstraint = ctx.expressionconstraint();
+    const content = expressionConstraint ? (
+      this.visitChildren(expressionConstraint)
     ) : (
       <SubExpression
         constraint={!!ctx.constraintoperator()}
@@ -62,9 +63,9 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
           )
         }
         onRemoveConstraint={() => {
-          const constraintoperator = ctx.constraintoperator();
-          if (constraintoperator) {
-            this.transformer.remove(constraintoperator, {
+          const constraintOperator = ctx.constraintoperator();
+          if (constraintOperator) {
+            this.transformer.remove(constraintOperator, {
               collapseWhiteSpaceRight: true,
             });
           } else {
@@ -73,13 +74,18 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
             );
           }
         }}
-        onAddMemberOf={() =>
-          this.transformer.prepend(ctx.eclfocusconcept(), MEMBER_OF_OPERATOR)
-        }
+        onAddMemberOf={() => {
+          const eclFocusConcept = ctx.eclfocusconcept();
+          if (eclFocusConcept) {
+            this.transformer.prepend(eclFocusConcept, MEMBER_OF_OPERATOR);
+          } else {
+            console.warn("Passed nullish eclfocusconcept to onAddMemberOf");
+          }
+        }}
         onRemoveMemberOf={() => {
-          const memberof = ctx.memberof();
-          if (memberof) {
-            this.transformer.remove(memberof, {
+          const memberOf = ctx.memberof();
+          if (memberOf) {
+            this.transformer.remove(memberOf, {
               collapseWhiteSpaceRight: true,
             });
           } else {
@@ -119,35 +125,10 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
-  /**
-   * compoundexpressionconstraint : conjunctionexpressionconstraint |
-   * disjunctionexpressionconstraint | exclusionexpressionconstraint;
-   */
-  visitCompoundexpressionconstraint(
-    ctx: CompoundexpressionconstraintContext
-  ): VisualExpressionType {
-    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
+  visitMemberof(): VisualExpressionType {
+    return <MemberOfOperator />;
   }
 
-  /**
-   * constraintoperator : childof | childorselfof | descendantorselfof | descendantof | parentof |
-   * parentorselfof | ancestororselfof | ancestorof;
-   */
-  visitConstraintoperator(
-    ctx: ConstraintoperatorContext
-  ): VisualExpressionType {
-    return (
-      <ConstraintOperator
-        constraint={operatorToConstraintName[ctx.getText()]}
-        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-      />
-    );
-  }
-
-  /**
-   * constraintoperator : childof | childorselfof | descendantorselfof | descendantof | parentof |
-   * parentorselfof | ancestororselfof | ancestorof;
-   */
   visitEclconceptreference(
     ctx: EclconceptreferenceContext
   ): VisualExpressionType {
@@ -163,20 +144,21 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
-  /**
-   * CARAT ( ws LEFT_BRACE ws (refsetfieldset | wildcard) ws RIGHT_BRACE )?;
-   */
-  visitMemberof(): VisualExpressionType {
-    return <MemberOfOperator />;
-  }
-
-  /**
-   * wildcard : ASTERISK;
-   */
   visitWildcard(ctx: WildcardContext): VisualExpressionType {
     return (
       <ConceptReference
         concept={{ type: "ANY_CONCEPT" }}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+      />
+    );
+  }
+
+  visitConstraintoperator(
+    ctx: ConstraintoperatorContext
+  ): VisualExpressionType {
+    return (
+      <ConstraintOperator
+        constraint={operatorToConstraintName[ctx.getText()]}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
       />
     );

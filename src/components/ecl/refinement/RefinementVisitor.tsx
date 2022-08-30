@@ -13,6 +13,7 @@ import {
   EclattributeContext,
   EclattributenameContext,
   EclattributesetContext,
+  EclrefinementContext,
   ExpressioncomparisonoperatorContext,
   RefinedexpressionconstraintContext,
   SubexpressionconstraintContext,
@@ -27,14 +28,12 @@ import { VisualExpressionType } from "../ExpressionVisitor";
 import ConceptSearchScope from "../sub/ConceptSearchScope";
 import SubExpressionVisitor from "../sub/SubExpressionVisitor";
 import Attribute from "./Attribute";
+import AttributeGroup from "./AttributeGroup";
 import AttributeSet from "./AttributeSet";
 import ComparisonOperator from "./ComparisonOperator";
 import RefinedExpression from "./RefinedExpression";
 
 export default class RefinementVisitor extends BaseEclVisitor {
-  /**
-   * refinedexpressionconstraint : subexpressionconstraint ws COLON ws eclrefinement;
-   */
   visitRefinedexpressionconstraint(
     ctx: RefinedexpressionconstraintContext
   ): VisualExpressionType {
@@ -54,12 +53,6 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
-  /**
-   * subexpressionconstraint: (constraintoperator ws)? ( ( (memberof ws)? (eclfocusconcept |
-   * (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) (ws memberfilterconstraint)*) |
-   * (eclfocusconcept | (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) ) (ws
-   * (descriptionfilterconstraint | conceptfilterconstraint))* (ws historysupplement)?;
-   */
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext
   ): VisualExpressionType {
@@ -70,20 +63,58 @@ export default class RefinementVisitor extends BaseEclVisitor {
     }).visit(ctx);
   }
 
-  /**
-   * eclattributeset : subattributeset ws (conjunctionattributeset | disjunctionattributeset)?;
-   */
+  visitConjunction(ctx: ConjunctionContext): VisualExpressionType {
+    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
+  }
+
+  visitDisjunction(ctx: DisjunctionContext): VisualExpressionType {
+    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
+  }
+
+  visitEclrefinement(ctx: EclrefinementContext): VisualExpressionType {
+    // If there are nested attribute groups, we render a grouping to wrap them.
+    if (
+      ctx.subrefinement().eclattributegroup() ||
+      ctx
+        .conjunctionrefinementset()
+        ?.subrefinement()
+        .find((sr) => sr.eclattributegroup()) ||
+      ctx
+        .disjunctionrefinementset()
+        ?.subrefinement()
+        .find((sr) => sr.eclattributegroup())
+    ) {
+      const conjunctionRefinementSet = ctx.conjunctionrefinementset(),
+        disjunctionRefinementSet = ctx.disjunctionrefinementset();
+      if (disjunctionRefinementSet) {
+        return this.renderRefinementSet(
+          ctx,
+          disjunctionRefinementSet.disjunction(),
+          "disjunction"
+        );
+      } else {
+        return this.renderRefinementSet(
+          ctx,
+          conjunctionRefinementSet?.conjunction() ?? [],
+          "conjunction"
+        );
+      }
+    } else {
+      return this.visitChildren(ctx);
+    }
+  }
+
   visitEclattributeset(ctx: EclattributesetContext): VisualExpressionType {
     const conjunctionAttributeSet = ctx.conjunctionattributeset(),
       disjunctionAttributeSet = ctx.disjunctionattributeset();
     if (disjunctionAttributeSet) {
-      return this.visitAttributeSet(
+      return this.renderAttributeSet(
         ctx,
         disjunctionAttributeSet.disjunction(),
         "disjunction"
       );
     } else {
-      return this.visitAttributeSet(
+      return this.renderAttributeSet(
         ctx,
         conjunctionAttributeSet?.conjunction() ?? [],
         "conjunction"
@@ -91,10 +122,41 @@ export default class RefinementVisitor extends BaseEclVisitor {
     }
   }
 
-  /**
-   * eclattributeset : subattributeset ws (conjunctionattributeset | disjunctionattributeset)?;
-   */
-  visitAttributeSet(
+  visitEclattribute(ctx: EclattributeContext): VisualExpressionType {
+    return (
+      <Attribute
+        onRemove={() => this.transformer.removeAllSpans(this.removalContext)}
+      >
+        {this.visitChildren(ctx)}
+      </Attribute>
+    );
+  }
+
+  visitEclattributename(ctx: EclattributenameContext): VisualExpressionType {
+    return (
+      <ConceptSearchScope.Provider
+        value={{
+          valueSet: ATTRIBUTE_VALUE_SET_URI,
+          label: "Search for an attribute",
+        }}
+      >
+        {this.visitChildren(ctx)}
+      </ConceptSearchScope.Provider>
+    );
+  }
+
+  visitExpressioncomparisonoperator(
+    ctx: ExpressioncomparisonoperatorContext
+  ): VisualExpressionType {
+    return (
+      <ComparisonOperator
+        type={ctx.EXCLAMATION() ? "!=" : "="}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+      />
+    );
+  }
+
+  renderAttributeSet(
     ctx: EclattributesetContext,
     operatorCtx: ParserRuleContext[],
     type: LogicStatementType
@@ -142,64 +204,99 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
-  /**
-   * eclattribute : (LEFT_BRACE cardinality RIGHT_BRACE ws)? (reverseflag ws)? eclattributename ws
-   * ((expressioncomparisonoperator ws subexpressionconstraint) | (numericcomparisonoperator ws HASH
-   * numericvalue) | (stringcomparisonoperator ws (typedsearchterm | typedsearchtermset)) |
-   * (booleancomparisonoperator ws booleanvalue));
-   */
-  visitEclattribute(ctx: EclattributeContext): VisualExpressionType {
-    return (
-      <Attribute
-        onRemove={() => this.transformer.removeAllSpans(this.removalContext)}
-      >
-        {this.visitChildren(ctx)}
-      </Attribute>
-    );
-  }
-
-  /**
-   * expressioncomparisonoperator : EQUALS | (EXCLAMATION EQUALS);
-   */
-  visitExpressioncomparisonoperator(
-    ctx: ExpressioncomparisonoperatorContext
+  renderRefinementSet(
+    ctx: EclrefinementContext,
+    operatorCtx: ParserRuleContext[],
+    type: LogicStatementType
   ): VisualExpressionType {
+    let result: VisualExpressionType;
+    const logicalRefinementSet =
+      ctx.conjunctionrefinementset() ?? ctx.disjunctionrefinementset();
+    const subRefinementSets = [
+      ctx.subrefinement(),
+      ...(logicalRefinementSet?.subrefinement() ?? []),
+    ];
+    if (subRefinementSets.length > 1) {
+      const children = interleave(subRefinementSets, operatorCtx);
+      result = [];
+      for (let i = 0; i < children.length; i++) {
+        const removalContext = this.transformer.getBinaryOperatorRemovalContext(
+          children,
+          i
+        );
+        result = (result as ReactNode[]).concat(
+          new RefinementVisitor({
+            transformer: this.transformer,
+            removalContext,
+          }).visit(children[i])
+        );
+      }
+    } else {
+      result = this.visitChildren(ctx);
+    }
     return (
-      <ComparisonOperator
-        type={ctx.EXCLAMATION() ? "!=" : "="}
-        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-      />
+      <AttributeGroup
+        type={type}
+        onChangeType={(type) =>
+          this.transformer.applyUpdates(
+            operatorCtx,
+            logicStatementTypeToOperator[type]
+          )
+        }
+        onAddAttribute={(expression) =>
+          this.transformer.append(ctx, expression)
+        }
+      >
+        {result}
+      </AttributeGroup>
     );
   }
 
-  /**
-   * conjunction : (((CAP_A | A)|(CAP_A | A)) ((CAP_N | N)|(CAP_N | N)) ((CAP_D | D)|(CAP_D | D))
-   *  mws) | COMMA;
-   */
-  visitConjunction(ctx: ConjunctionContext): VisualExpressionType {
-    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
-  }
-
-  /**
-   * disjunction : ((CAP_O | O)|(CAP_O | O)) ((CAP_R | R)|(CAP_R | R)) mws;
-   */
-  visitDisjunction(ctx: DisjunctionContext): VisualExpressionType {
-    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
-  }
-
-  /**
-   * eclattributename : subexpressionconstraint;
-   */
-  visitEclattributename(ctx: EclattributenameContext): VisualExpressionType {
+  renderAttributeGroup(
+    ctx: EclattributesetContext,
+    operatorCtx: ParserRuleContext[],
+    type: LogicStatementType
+  ): VisualExpressionType {
+    let result: VisualExpressionType;
+    const logicalAttributeSet =
+      ctx.conjunctionattributeset() ?? ctx.disjunctionattributeset();
+    const subAttributeSets = [
+      ctx.subattributeset(),
+      ...(logicalAttributeSet?.subattributeset() ?? []),
+    ];
+    if (subAttributeSets.length > 1) {
+      const children = interleave(subAttributeSets, operatorCtx);
+      result = [];
+      for (let i = 0; i < children.length; i++) {
+        const removalContext = this.transformer.getBinaryOperatorRemovalContext(
+          children,
+          i
+        );
+        result = (result as ReactNode[]).concat(
+          new RefinementVisitor({
+            transformer: this.transformer,
+            removalContext,
+          }).visit(children[i])
+        );
+      }
+    } else {
+      result = this.visitChildren(ctx);
+    }
     return (
-      <ConceptSearchScope.Provider
-        value={{
-          valueSet: ATTRIBUTE_VALUE_SET_URI,
-          label: "Search for an attribute",
-        }}
+      <AttributeGroup
+        type={type}
+        onChangeType={(type) =>
+          this.transformer.applyUpdates(
+            operatorCtx,
+            logicStatementTypeToOperator[type]
+          )
+        }
+        onAddAttribute={(expression) =>
+          this.transformer.append(ctx, expression)
+        }
       >
-        {this.visitChildren(ctx)}
-      </ConceptSearchScope.Provider>
+        {result}
+      </AttributeGroup>
     );
   }
 }

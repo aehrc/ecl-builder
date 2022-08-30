@@ -10,32 +10,17 @@ export default class ECLParser extends Parser {
   expressionconstraint(): ExpressionconstraintContext;
 }
 
+/**
+ * expressionconstraint : ws ( refinedexpressionconstraint | compoundexpressionconstraint |
+ * dottedexpressionconstraint | subexpressionconstraint ) ws;
+ */
 export class ExpressionconstraintContext extends ParserRuleContext {
-  subexpressionconstraint(): SubexpressionconstraintContext[];
+  subexpressionconstraint(): SubexpressionconstraintContext | null | undefined;
 }
 
-export class SubexpressionconstraintContext extends ParserRuleContext {
-  constraintoperator(): ConstraintoperatorContext | null | undefined;
-
-  memberof(): MemberofContext | null | undefined;
-
-  eclfocusconcept(): EclfocusconceptContext;
-
-  expressionconstraint(): ExpressionconstraintContext;
-}
-
-export class CompoundexpressionconstraintContext extends ParserRuleContext {
-  conjunctionexpressionconstraint(): ConjunctionexpressionconstraintContext;
-
-  disjunctionexpressionconstraint(): DisjunctionexpressionconstraintContext;
-}
-
-export class ConstraintoperatorContext extends ParserRuleContext {}
-
-export class MemberofContext extends ParserRuleContext {}
-
-export class EclfocusconceptContext extends ParserRuleContext {}
-
+/**
+ * refinedexpressionconstraint : subexpressionconstraint ws COLON ws eclrefinement;
+ */
 export class RefinedexpressionconstraintContext extends ParserRuleContext {
   subexpressionconstraint(): SubexpressionconstraintContext;
 
@@ -44,14 +29,156 @@ export class RefinedexpressionconstraintContext extends ParserRuleContext {
   eclrefinement(): EclrefinementContext;
 }
 
+/**
+ * compoundexpressionconstraint : conjunctionexpressionconstraint | disjunctionexpressionconstraint
+ * | exclusionexpressionconstraint;
+ */
+export class CompoundexpressionconstraintContext extends ParserRuleContext {
+  conjunctionexpressionconstraint():
+    | ConjunctionexpressionconstraintContext
+    | null
+    | undefined;
+
+  disjunctionexpressionconstraint():
+    | DisjunctionexpressionconstraintContext
+    | null
+    | undefined;
+}
+
+/**
+ * conjunctionexpressionconstraint : subexpressionconstraint (ws conjunction ws
+ * subexpressionconstraint)+;
+ */
+export class ConjunctionexpressionconstraintContext extends ParserRuleContext {
+  subexpressionconstraint(): SubexpressionconstraintContext[];
+
+  conjunction(): ConjunctionContext[];
+}
+
+/**
+ * disjunctionexpressionconstraint : subexpressionconstraint (ws disjunction ws
+ * subexpressionconstraint)+;
+ */
+export class DisjunctionexpressionconstraintContext extends ParserRuleContext {
+  subexpressionconstraint(): SubexpressionconstraintContext[];
+
+  disjunction(): DisjunctionContext[];
+}
+
+/**
+ * subexpressionconstraint: (constraintoperator ws)? ( ( (memberof ws)? (eclfocusconcept |
+ * (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) (ws memberfilterconstraint)*) |
+ * (eclfocusconcept | (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) ) (ws
+ * (descriptionfilterconstraint | conceptfilterconstraint))* (ws historysupplement)?;
+ */
+export class SubexpressionconstraintContext extends ParserRuleContext {
+  constraintoperator(): ConstraintoperatorContext | null | undefined;
+
+  memberof(): MemberofContext | null | undefined;
+
+  eclfocusconcept(): EclfocusconceptContext | null | undefined;
+
+  expressionconstraint(): ExpressionconstraintContext | null | undefined;
+}
+
+/**
+ * eclfocusconcept : eclconceptreference | wildcard;
+ */
+export class EclfocusconceptContext extends ParserRuleContext {}
+
+/**
+ * memberof : CARAT ( ws LEFT_BRACE ws (refsetfieldset | wildcard) ws RIGHT_BRACE )?;
+ */
+export class MemberofContext extends ParserRuleContext {}
+
+/**
+ * eclconceptreference : conceptid (ws PIPE ws term ws PIPE)?;
+ */
+export class EclconceptreferenceContext extends ParserRuleContext {
+  conceptid(): ConceptidContext;
+
+  term(): TermContext | null | undefined;
+}
+
+/**
+ * conceptid : sctid;
+ */
+export class ConceptidContext extends ParserRuleContext {}
+
+/**
+ * term : nonwsnonpipe+ ( sp+ nonwsnonpipe+ )*;
+ */
+export class TermContext extends ParserRuleContext {}
+
+/**
+ * wildcard : ASTERISK;
+ */
+export class WildcardContext extends ParserRuleContext {}
+
+/**
+ * constraintoperator : childof | childorselfof | descendantorselfof | descendantof | parentof |
+ * parentorselfof | ancestororselfof | ancestorof;
+ */
+export class ConstraintoperatorContext extends ParserRuleContext {}
+
+/**
+ * conjunction : (((CAP_A | A)|(CAP_A | A)) ((CAP_N | N)|(CAP_N | N)) ((CAP_D | D)|(CAP_D | D)) mws)
+ * | COMMA;
+ */
+export class ConjunctionContext extends ParserRuleContext {}
+
+/**
+ * disjunction : ((CAP_O | O)|(CAP_O | O)) ((CAP_R | R)|(CAP_R | R)) mws;
+ */
+export class DisjunctionContext extends ParserRuleContext {}
+
+/**
+ * eclrefinement : subrefinement ws (conjunctionrefinementset | disjunctionrefinementset)?;
+ */
 export class EclrefinementContext extends ParserRuleContext {
   subrefinement(): SubrefinementContext;
+
+  conjunctionrefinementset():
+    | ConjunctionrefinementsetContext
+    | null
+    | undefined;
+
+  disjunctionrefinementset():
+    | DisjunctionrefinementsetContext
+    | null
+    | undefined;
 }
 
+/**
+ * conjunctionrefinementset : (ws conjunction ws subrefinement)+;
+ */
+export class ConjunctionrefinementsetContext extends ParserRuleContext {
+  subrefinement(): SubrefinementContext[];
+
+  conjunction(): ConjunctionContext[];
+}
+
+/**
+ * disjunctionrefinementset : (ws disjunction ws subrefinement)+;
+ */
+export class DisjunctionrefinementsetContext extends ParserRuleContext {
+  subrefinement(): SubrefinementContext[];
+
+  disjunction(): DisjunctionContext[];
+}
+
+/**
+ * subrefinement : eclattributeset | eclattributegroup | (LEFT_PAREN ws eclrefinement ws RIGHT_PAREN);
+ */
 export class SubrefinementContext extends ParserRuleContext {
   eclattributeset(): EclattributesetContext | null | undefined;
+
+  eclattributegroup(): EclattributegroupContext | null | undefined;
 }
 
+/**
+ * eclattributeset : subattributeset ws (conjunctionattributeset | disjunctionattributeset)?;
+ */
 export class EclattributesetContext extends ParserRuleContext {
   subattributeset(): SubattributesetContext;
 
@@ -60,52 +187,51 @@ export class EclattributesetContext extends ParserRuleContext {
   disjunctionattributeset(): DisjunctionattributesetContext | null | undefined;
 }
 
-export class ConjunctionexpressionconstraintContext extends ParserRuleContext {
-  subexpressionconstraint(): SubexpressionconstraintContext[];
-
-  conjunction(): ConjunctionContext[];
-}
-
-export class DisjunctionexpressionconstraintContext extends ParserRuleContext {
-  subexpressionconstraint(): SubexpressionconstraintContext[];
-
-  disjunction(): DisjunctionContext[];
-}
-
-export class SubattributesetContext extends ParserRuleContext {}
-
+/**
+ * conjunctionattributeset : (ws conjunction ws subattributeset)+;
+ */
 export class ConjunctionattributesetContext extends ParserRuleContext {
   subattributeset(): SubattributesetContext[];
 
   conjunction(): ConjunctionContext[];
 }
 
+/**
+ * disjunctionattributeset : (ws disjunction ws subattributeset)+;
+ */
 export class DisjunctionattributesetContext extends ParserRuleContext {
   subattributeset(): SubattributesetContext[];
 
   disjunction(): DisjunctionContext[];
 }
 
-export class ConjunctionContext extends ParserRuleContext {}
+/**
+ * subattributeset : eclattribute | (LEFT_PAREN ws eclattributeset ws RIGHT_PAREN);
+ */
+export class SubattributesetContext extends ParserRuleContext {}
 
-export class DisjunctionContext extends ParserRuleContext {}
+/**
+ * eclattributegroup : (LEFT_BRACE cardinality RIGHT_BRACE ws)? LEFT_CURLY_BRACE ws eclattributeset
+ * ws RIGHT_CURLY_BRACE;
+ */
+export class EclattributegroupContext extends ParserRuleContext {}
 
+/**
+ * eclattribute : (LEFT_BRACE cardinality RIGHT_BRACE ws)? (reverseflag ws)? eclattributename ws
+ * ((expressioncomparisonoperator ws subexpressionconstraint) | (numericcomparisonoperator ws HASH
+ * numericvalue) | (stringcomparisonoperator ws (typedsearchterm | typedsearchtermset)) |
+ * (booleancomparisonoperator ws booleanvalue));
+ */
 export class EclattributeContext extends ParserRuleContext {}
 
-export class EclconceptreferenceContext extends ParserRuleContext {
-  conceptid(): ConceptidContext;
-
-  term(): TermContext | null | undefined;
-}
-
-export class ConceptidContext extends ParserRuleContext {}
-
-export class TermContext extends ParserRuleContext {}
-
-export class ExpressioncomparisonoperatorContext extends ParserRuleContext {
-  EXCLAMATION(): TerminalNode | undefined;
-}
-
+/**
+ * eclattributename : subexpressionconstraint;
+ */
 export class EclattributenameContext extends ParserRuleContext {}
 
-export class WildcardContext extends ParserRuleContext {}
+/**
+ * expressioncomparisonoperator : EQUALS | (EXCLAMATION EQUALS);
+ */
+export class ExpressioncomparisonoperatorContext extends ParserRuleContext {
+  EXCLAMATION(): TerminalNode | null | undefined;
+}

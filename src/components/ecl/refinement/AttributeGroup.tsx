@@ -15,45 +15,49 @@ import {
 import ExpressionGrouping from "../ExpressionGrouping";
 import NeatRow from "../NeatRow";
 
-export interface AttributeSetProps extends PropsWithChildren {
+export interface AttributeGroupProps extends PropsWithChildren {
   type: LogicStatementType;
   onChangeType: (type: LogicStatementType) => unknown;
   onAddAttribute: (expression: string) => unknown;
 }
 
-export default function AttributeSet({
+export default function AttributeGroup({
   type,
   onChangeType,
   onAddAttribute,
   children,
-}: AttributeSetProps) {
+}: AttributeGroupProps) {
   function handleSelectType(event: SelectChangeEvent<LogicStatementType>) {
     onChangeType(event.target.value as LogicStatementType);
   }
 
-  function handleAddAttribute() {
+  function handleAddAttributeGroup() {
     onAddAttribute(
-      `${logicStatementTypeToOperator[type]} ${DEFAULT_REFINEMENT}`
+      `${logicStatementTypeToOperator[type]}{ ${DEFAULT_REFINEMENT} }`
     );
   }
 
   function renderHeading() {
     return (
-      <NeatRow className="attribute-set-heading">
+      <NeatRow className="attribute-group-heading">
         <Select
           value={type}
           onChange={handleSelectType}
           sx={{ backgroundColor: "background.default" }}
         >
-          <MenuItem value="conjunction">with all of these attributes</MenuItem>
-          <MenuItem value="disjunction">with any of these attributes</MenuItem>
+          <MenuItem value="conjunction">
+            with all of these attribute groups
+          </MenuItem>
+          <MenuItem value="disjunction">
+            with any of these attribute groups
+          </MenuItem>
         </Select>
         <Actions
           actions={[
             {
               type: "item",
-              label: "Add attribute",
-              onClick: handleAddAttribute,
+              label: "Add attribute group",
+              onClick: handleAddAttributeGroup,
             },
           ]}
           icon={Add}
@@ -64,7 +68,7 @@ export default function AttributeSet({
 
   return (
     <ExpressionGrouping
-      className={`${type}-attribute-set`}
+      className={`${type}-attribute-group`}
       heading={renderHeading()}
     >
       {children}

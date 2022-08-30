@@ -20,7 +20,14 @@ export default function RefinedExpression({
       {subExpression}
       <Stack className="refinement" direction="row">
         <RefinementConnector />
-        {children}
+        <Stack
+          className="refinement-content"
+          direction="row"
+          flexGrow={1}
+          sx={{ pt: 2 }}
+        >
+          {children}
+        </Stack>
       </Stack>
     </Stack>
   );
