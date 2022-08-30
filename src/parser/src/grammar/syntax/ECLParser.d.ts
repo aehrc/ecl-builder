@@ -107,3 +107,5 @@ export class ExpressioncomparisonoperatorContext extends ParserRuleContext {
 }
 
 export class EclattributenameContext extends ParserRuleContext {}
+
+export class WildcardContext extends ParserRuleContext {}

@@ -10,6 +10,7 @@ import {
   ConstraintoperatorContext,
   EclconceptreferenceContext,
   SubexpressionconstraintContext,
+  WildcardContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
 import BaseEclVisitor, { BaseEclVisitorOptions } from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
@@ -23,7 +24,6 @@ import ConstraintOperator, {
 } from "./ConstraintOperator";
 import MemberOfOperator, { MEMBER_OF_OPERATOR } from "./MemberOfOperator";
 import SubExpression from "./SubExpression";
-import Wildcard from "./Wildcard";
 
 export interface SubExpressionVisitorOptions extends BaseEclVisitorOptions {
   refinement?: boolean;
@@ -154,6 +154,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     return (
       <ConceptReference
         concept={{
+          type: "SPECIFIC_CONCEPT",
           id: ctx.conceptid().getText(),
           display: ctx.term()?.getText(),
         }}
@@ -172,7 +173,12 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   /**
    * wildcard : ASTERISK;
    */
-  visitWildcard(): VisualExpressionType {
-    return <Wildcard />;
+  visitWildcard(ctx: WildcardContext): VisualExpressionType {
+    return (
+      <ConceptReference
+        concept={{ type: "ANY_CONCEPT" }}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+      />
+    );
   }
 }
