@@ -13,7 +13,7 @@ export default function RefinementConnector() {
     <hr
       className="refinement-connector"
       style={{
-        width: theme.spacing(2),
+        minWidth: theme.spacing(2),
         height: theme.spacing(8),
         margin: 0,
         border: 0,
