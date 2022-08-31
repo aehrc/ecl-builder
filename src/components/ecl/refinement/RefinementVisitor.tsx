@@ -141,7 +141,11 @@ export default class RefinementVisitor extends BaseEclVisitor {
   visitEclattribute(ctx: EclattributeContext): VisualExpressionType {
     return (
       <Attribute
-        onRemove={() => this.transformer.removeAllSpans(this.removalContext)}
+        onRemove={() =>
+          this.transformer.removeAllSpans(this.removalContext, {
+            collapseWhiteSpaceLeft: true,
+          })
+        }
       >
         {this.visitChildren(ctx)}
       </Attribute>

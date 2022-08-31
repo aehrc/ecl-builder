@@ -35,13 +35,13 @@ export default function AttributeSet({
 
   function handleAddAttribute() {
     onAddAttribute(
-      `${logicStatementTypeToOperator[type]} ${DEFAULT_REFINEMENT}`
+      `${logicStatementTypeToOperator[type]}${DEFAULT_REFINEMENT}`
     );
   }
 
   function handleAddAttributeGroup() {
     onAddAttribute(
-      `${logicStatementTypeToOperator[type]} { ${DEFAULT_REFINEMENT} }`
+      `${logicStatementTypeToOperator[type]}{ ${DEFAULT_REFINEMENT} }`
     );
   }
 
