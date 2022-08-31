@@ -177,32 +177,17 @@ export default class RefinementVisitor extends BaseEclVisitor {
     operatorCtx: ParserRuleContext[],
     type: LogicStatementType
   ): VisualExpressionType {
-    let result: VisualExpressionType;
     const logicalAttributeSet =
       ctx.conjunctionattributeset() ?? ctx.disjunctionattributeset();
     const subAttributeSets = [
       ctx.subattributeset(),
       ...(logicalAttributeSet?.subattributeset() ?? []),
     ];
-    if (subAttributeSets.length > 1) {
-      const children = interleave(subAttributeSets, operatorCtx);
-      result = [];
-      for (let i = 0; i < children.length; i++) {
-        const removalContext = this.transformer.getBinaryOperatorRemovalContext(
-          children,
-          i
-        );
-        result = (result as ReactNode[]).concat(
-          new RefinementVisitor({
-            transformer: this.transformer,
-            attributeGrouping: this.attributeGrouping,
-            removalContext,
-          }).visit(children[i])
-        );
-      }
-    } else {
-      result = this.visitChildren(ctx);
-    }
+    const children = this.renderBinaryOperatorChildren(
+      ctx,
+      subAttributeSets,
+      operatorCtx
+    );
     return (
       <AttributeSet
         type={type}
@@ -217,7 +202,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
           this.transformer.append(ctx, expression)
         }
       >
-        {result}
+        {children}
       </AttributeSet>
     );
   }
@@ -227,32 +212,17 @@ export default class RefinementVisitor extends BaseEclVisitor {
     operatorCtx: ParserRuleContext[],
     type: LogicStatementType
   ): VisualExpressionType {
-    let result: VisualExpressionType;
     const logicalRefinementSet =
       ctx.conjunctionrefinementset() ?? ctx.disjunctionrefinementset();
     const subRefinementSets = [
       ctx.subrefinement(),
       ...(logicalRefinementSet?.subrefinement() ?? []),
     ];
-    if (subRefinementSets.length > 1) {
-      const children = interleave(subRefinementSets, operatorCtx);
-      result = [];
-      for (let i = 0; i < children.length; i++) {
-        const removalContext = this.transformer.getBinaryOperatorRemovalContext(
-          children,
-          i
-        );
-        result = (result as ReactNode[]).concat(
-          new RefinementVisitor({
-            transformer: this.transformer,
-            attributeGrouping: this.attributeGrouping,
-            removalContext,
-          }).visit(children[i])
-        );
-      }
-    } else {
-      result = this.visitChildren(ctx);
-    }
+    const children = this.renderBinaryOperatorChildren(
+      ctx,
+      subRefinementSets,
+      operatorCtx
+    );
     return (
       <AttributeGroup
         type={type}
@@ -266,8 +236,35 @@ export default class RefinementVisitor extends BaseEclVisitor {
           this.transformer.append(ctx, expression)
         }
       >
-        {result}
+        {children}
       </AttributeGroup>
     );
+  }
+
+  private renderBinaryOperatorChildren(
+    ctx: ParserRuleContext,
+    subCtxs: ParserRuleContext[],
+    operatorCtx: ParserRuleContext[]
+  ) {
+    if (subCtxs.length > 1) {
+      const children = interleave(subCtxs, operatorCtx);
+      let result: ReactNode[] = [];
+      for (let i = 0; i < children.length; i++) {
+        const removalContext = this.transformer.getBinaryOperatorRemovalContext(
+          children,
+          i
+        );
+        result = result.concat(
+          new RefinementVisitor({
+            transformer: this.transformer,
+            attributeGrouping: this.attributeGrouping,
+            removalContext,
+          }).visit(children[i])
+        );
+      }
+      return result;
+    } else {
+      return this.visitChildren(ctx);
+    }
   }
 }
