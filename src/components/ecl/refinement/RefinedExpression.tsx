@@ -16,7 +16,7 @@ export default function RefinedExpression({
   children,
 }: RefinedExpressionProps) {
   return (
-    <Stack className="refined-expression" alignItems="stretch">
+    <Stack className="refined-expression" alignItems="stretch" flexGrow={1}>
       {subExpression}
       <Stack className="refinement" direction="row">
         <RefinementConnector />

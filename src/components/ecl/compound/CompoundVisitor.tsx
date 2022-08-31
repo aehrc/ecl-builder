@@ -9,10 +9,11 @@ import { interleave } from "../../../array";
 import {
   ConjunctionexpressionconstraintContext,
   DisjunctionexpressionconstraintContext,
+  ExpressionconstraintContext,
   SubexpressionconstraintContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
 import BaseEclVisitor from "../BaseEclVisitor";
-import { VisualExpressionType } from "../ExpressionVisitor";
+import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
 import SubExpressionVisitor from "../sub/SubExpressionVisitor";
 import LogicOperator from "./LogicOperator";
 import LogicStatement, {
@@ -22,6 +23,12 @@ import LogicStatement, {
 import LogicStatementSubExpression from "./LogicStatementSubExpression";
 
 export default class CompoundVisitor extends BaseEclVisitor {
+  visitExpressionconstraint(
+    ctx: ExpressionconstraintContext
+  ): VisualExpressionType {
+    return new ExpressionVisitor(this.options).visit(ctx);
+  }
+
   visitConjunctionexpressionconstraint(
     ctx: ConjunctionexpressionconstraintContext
   ): VisualExpressionType {
@@ -39,9 +46,11 @@ export default class CompoundVisitor extends BaseEclVisitor {
   ): VisualExpressionType {
     return (
       <LogicStatementSubExpression
-        onRemove={() => this.transformer.removeAllSpans(this.removalContext)}
+        onRemove={() =>
+          this.transformer.removeAllSpans(this.options.removalContext)
+        }
       >
-        {new SubExpressionVisitor({ transformer: this.transformer }).visit(ctx)}
+        {new SubExpressionVisitor(this.options).visit(ctx)}
       </LogicStatementSubExpression>
     );
   }
@@ -72,7 +81,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
         );
         result = (result as ReactNode[]).concat(
           new CompoundVisitor({
-            transformer: this.transformer,
+            ...this.options,
             removalContext,
           }).visit(children[i])
         );

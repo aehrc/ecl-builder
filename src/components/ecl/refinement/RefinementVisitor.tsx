@@ -15,6 +15,9 @@ import {
   EclattributesetContext,
   EclrefinementContext,
   ExpressioncomparisonoperatorContext,
+  ExpressionconstraintContext,
+  NumericcomparisonoperatorContext,
+  NumericvalueContext,
   RefinedexpressionconstraintContext,
   SubexpressionconstraintContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
@@ -24,32 +27,51 @@ import {
   LogicStatementType,
   logicStatementTypeToOperator,
 } from "../compound/LogicStatement";
-import { VisualExpressionType } from "../ExpressionVisitor";
+import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
 import ConceptSearchScope from "../sub/ConceptSearchScope";
 import SubExpressionVisitor from "../sub/SubExpressionVisitor";
 import Attribute from "./Attribute";
 import AttributeGroup from "./AttributeGroup";
 import AttributeSet from "./AttributeSet";
 import ComparisonOperator from "./ComparisonOperator";
+import NumericValue from "./NumericValue";
 import RefinedExpression from "./RefinedExpression";
 
 export interface RefinementVisitorOptions extends BaseEclVisitorOptions {
-  attributeGrouping?: boolean;
+  attributeGrouping: boolean;
 }
 
-export default class RefinementVisitor extends BaseEclVisitor {
-  private readonly attributeGrouping: boolean;
+export const EXPRESSION_COMPARISON_OPERATORS: Record<string, string> = {
+  "=": "is equal to",
+  "!=": "is not equal to",
+};
 
+export const NUMERIC_COMPARISON_OPERATORS: Record<string, string> = {
+  "=": "=",
+  "!=": "!=",
+  "<": "<",
+  "<=": "<=",
+  ">": ">",
+  ">=": ">=",
+};
+
+export default class RefinementVisitor extends BaseEclVisitor {
   constructor(options: RefinementVisitorOptions) {
     super(options);
-    this.attributeGrouping = options.attributeGrouping ?? false;
+  }
+
+  visitExpressionconstraint(
+    ctx: ExpressionconstraintContext
+  ): VisualExpressionType {
+    return new ExpressionVisitor(this.options).visit(ctx);
   }
 
   visitRefinedexpressionconstraint(
     ctx: RefinedexpressionconstraintContext
   ): VisualExpressionType {
     const visitor = new RefinementVisitor({
-      transformer: this.transformer,
+      ...this.options,
+      refinement: true,
       removalContext: [
         this.transformer.spanFromTerminalNode(ctx.COLON()),
         this.transformer.spanFromContext(ctx.eclrefinement()),
@@ -67,19 +89,15 @@ export default class RefinementVisitor extends BaseEclVisitor {
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext
   ): VisualExpressionType {
-    return new SubExpressionVisitor({
-      transformer: this.transformer,
-      removalContext: this.removalContext,
-      refinement: true,
-    }).visit(ctx);
+    return new SubExpressionVisitor(this.options).visit(ctx);
   }
 
   visitConjunction(ctx: ConjunctionContext): VisualExpressionType {
-    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
+    return new CompoundVisitor(this.options).visit(ctx);
   }
 
   visitDisjunction(ctx: DisjunctionContext): VisualExpressionType {
-    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
+    return new CompoundVisitor(this.options).visit(ctx);
   }
 
   visitEclrefinement(ctx: EclrefinementContext): VisualExpressionType {
@@ -96,9 +114,8 @@ export default class RefinementVisitor extends BaseEclVisitor {
         .find((sr) => sr.eclattributegroup())
     ) {
       const visitor = new RefinementVisitor({
-          transformer: this.transformer,
+          ...this.options,
           attributeGrouping: true,
-          removalContext: this.removalContext,
         }),
         conjunctionRefinementSet = ctx.conjunctionrefinementset(),
         disjunctionRefinementSet = ctx.disjunctionrefinementset();
@@ -142,7 +159,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
     return (
       <Attribute
         onRemove={() =>
-          this.transformer.removeAllSpans(this.removalContext, {
+          this.transformer.removeAllSpans(this.options.removalContext, {
             collapseWhiteSpaceLeft: true,
           })
         }
@@ -171,6 +188,28 @@ export default class RefinementVisitor extends BaseEclVisitor {
     return (
       <ComparisonOperator
         type={ctx.EXCLAMATION() ? "!=" : "="}
+        typeLabelMap={EXPRESSION_COMPARISON_OPERATORS}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+      />
+    );
+  }
+
+  visitNumericcomparisonoperator(
+    ctx: NumericcomparisonoperatorContext
+  ): VisualExpressionType {
+    return (
+      <ComparisonOperator
+        type={ctx.getText()}
+        typeLabelMap={NUMERIC_COMPARISON_OPERATORS}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+      />
+    );
+  }
+
+  visitNumericvalue(ctx: NumericvalueContext): VisualExpressionType {
+    return (
+      <NumericValue
+        value={ctx.getText()}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
       />
     );
@@ -195,7 +234,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
     return (
       <AttributeSet
         type={type}
-        hideAddGroup={this.attributeGrouping}
+        hideAddGroup={this.options.attributeGrouping}
         onChangeType={(type) =>
           this.transformer.applyUpdates(
             operatorCtx,
@@ -260,11 +299,11 @@ export default class RefinementVisitor extends BaseEclVisitor {
         );
         result = result.concat(
           new RefinementVisitor({
-            transformer: this.transformer,
-            attributeGrouping: this.attributeGrouping,
+            ...this.options,
             removalContext,
           }).visit(children[i])
         );
+        result = this.addKeys(result);
       }
       return result;
     } else {

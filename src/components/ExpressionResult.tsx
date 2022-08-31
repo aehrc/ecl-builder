@@ -10,6 +10,7 @@ import { SCT_URI } from "../constants";
 import useValueSetExpansion from "../hooks/useValueSetExpansion";
 import { formatNumber } from "../number";
 import { queryClient } from "../queryClient";
+import ErrorBoundary from "./ErrorBoundary";
 import ExpressionResultTable from "./ExpressionResultTable";
 import Loading from "./Loading";
 
@@ -40,12 +41,14 @@ export default function ExpressionResult({
   const resolvedOptions = applyDefaultOptions(options);
   return (
     <QueryClientProvider client={queryClient}>
-      <Loading delay={resolvedOptions.loadingDelay}>
-        <ExpressionResultContent
-          expression={expression}
-          options={resolvedOptions}
-        />
-      </Loading>
+      <ErrorBoundary>
+        <Loading delay={resolvedOptions.loadingDelay}>
+          <ExpressionResultContent
+            expression={expression}
+            options={resolvedOptions}
+          />
+        </Loading>
+      </ErrorBoundary>
     </QueryClientProvider>
   );
 }
@@ -54,14 +57,11 @@ function ExpressionResultContent({
   expression,
   options: { terminologyServerUrl, maxSearchResults },
 }: ResultContentProps) {
-  const { data, error } = useValueSetExpansion(
+  const { data } = useValueSetExpansion(
     terminologyServerUrl,
     buildExpandParams(expression, maxSearchResults),
     { suspense: true, keepPreviousData: false }
   );
-  if (error) {
-    return <Alert severity="error">{error.message}</Alert>;
-  }
   if (!data) {
     console.warn("No error, but also no data");
     return null;

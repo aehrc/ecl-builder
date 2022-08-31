@@ -14,7 +14,12 @@ export interface AttributeProps extends PropsWithChildren {
 export default function Attribute({ children, onRemove }: AttributeProps) {
   return (
     <Stack className="attribute" direction="row" spacing={1}>
-      <Stack className="attribute-removal-context" direction="row" flexGrow={1}>
+      <Stack
+        className="attribute-removal-context"
+        direction="row"
+        flexGrow={1}
+        alignItems="flex-start"
+      >
         {children}
       </Stack>
       {onRemove ? (

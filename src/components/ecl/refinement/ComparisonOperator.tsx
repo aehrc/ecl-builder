@@ -8,27 +8,21 @@ import React from "react";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 import HorizontalLink from "../HorizontalLink";
 
-export interface ExpressionComparisonOperatorProps extends ChangeReporterProps {
-  type: ComparisonOperatorType;
+export interface ComparisonOperatorProps<T extends string>
+  extends ChangeReporterProps {
+  type: T;
+  typeLabelMap: Record<T, string>;
 }
 
-export const comparisonOperatorToLabel = {
-  "=": "is equal to",
-  "!=": "is not equal to",
-};
-
-export type ComparisonOperatorType = keyof typeof comparisonOperatorToLabel;
-
-export default function ComparisonOperator({
+export default function ComparisonOperator<T extends string>({
   type,
+  typeLabelMap,
   onChange,
-}: ExpressionComparisonOperatorProps) {
+}: ComparisonOperatorProps<T>) {
   const horizontalLinkStyle = { marginTop: "1.85em", alignSelf: "flex-start" };
 
-  function handleSelectOperator(
-    event: SelectChangeEvent<ComparisonOperatorType>
-  ) {
-    onChange(event.target.value as ComparisonOperatorType);
+  function handleSelectOperator(event: SelectChangeEvent<T>) {
+    onChange(event.target.value as T);
   }
 
   return (
@@ -45,9 +39,9 @@ export default function ComparisonOperator({
           borderRadius: 1,
         }}
       >
-        {Object.entries(comparisonOperatorToLabel).map(([operator, label]) => (
-          <MenuItem key={operator} value={operator}>
-            {label}
+        {Object.keys(typeLabelMap).map((type) => (
+          <MenuItem key={type} value={type}>
+            {typeLabelMap[type as T]}
           </MenuItem>
         ))}
       </Select>

@@ -9,13 +9,16 @@ import {
   CompoundexpressionconstraintContext,
   ConstraintoperatorContext,
   EclconceptreferenceContext,
+  ExpressionconstraintContext,
+  RefinedexpressionconstraintContext,
   SubexpressionconstraintContext,
   WildcardContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
 import BaseEclVisitor, { BaseEclVisitorOptions } from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
 import { logicStatementTypeToOperator } from "../compound/LogicStatement";
-import { VisualExpressionType } from "../ExpressionVisitor";
+import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
+import RefinementVisitor from "../refinement/RefinementVisitor";
 import ConceptReference from "./ConceptReference";
 import ConceptSearchScope from "./ConceptSearchScope";
 import ConstraintOperator, {
@@ -26,21 +29,26 @@ import MemberOfOperator, { MEMBER_OF_OPERATOR } from "./MemberOfOperator";
 import SubExpression from "./SubExpression";
 
 export interface SubExpressionVisitorOptions extends BaseEclVisitorOptions {
-  refinement?: boolean;
+  refinement: boolean;
 }
 
 export default class SubExpressionVisitor extends BaseEclVisitor {
-  private readonly refinement: boolean;
+  visitExpressionconstraint(
+    ctx: ExpressionconstraintContext
+  ): VisualExpressionType {
+    return new ExpressionVisitor(this.options).visit(ctx);
+  }
 
-  constructor(options: SubExpressionVisitorOptions) {
-    super(options);
-    this.refinement = options.refinement ?? false;
+  visitRefinedexpressionconstraint(
+    ctx: RefinedexpressionconstraintContext
+  ): VisualExpressionType {
+    return new RefinementVisitor(this.options).visit(ctx);
   }
 
   visitCompoundexpressionconstraint(
     ctx: CompoundexpressionconstraintContext
   ): VisualExpressionType {
-    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
+    return new CompoundVisitor(this.options).visit(ctx);
   }
 
   visitSubexpressionconstraint(
@@ -55,7 +63,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
       <SubExpression
         constraint={!!ctx.constraintoperator()}
         memberOf={!!ctx.memberof()}
-        refinement={this.refinement}
+        refinement={this.options.refinement}
         onAddConstraint={() =>
           this.transformer.prepend(
             ctx,
@@ -93,7 +101,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
           }
         }}
         onRemoveRefinement={() =>
-          this.transformer.removeAllSpans(this.removalContext)
+          this.transformer.removeAllSpans(this.options.removalContext)
         }
         // This gets called when the user adds a logic statement to the sub-expression, e.g. AND.
         onAddLogicStatement={(type, expression) =>

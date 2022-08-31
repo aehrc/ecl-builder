@@ -235,3 +235,14 @@ export class EclattributenameContext extends ParserRuleContext {}
 export class ExpressioncomparisonoperatorContext extends ParserRuleContext {
   EXCLAMATION(): TerminalNode | null | undefined;
 }
+
+/**
+ * numericcomparisonoperator : EQUALS | (EXCLAMATION EQUALS) | (LESS_THAN EQUALS) | LESS_THAN |
+ * (GREATER_THAN EQUALS) | GREATER_THAN;
+ */
+export class NumericcomparisonoperatorContext extends ParserRuleContext {}
+
+/**
+ * numericvalue : (DASH|PLUS)? (decimalvalue | integervalue);
+ */
+export class NumericvalueContext extends ParserRuleContext {}

@@ -4,6 +4,7 @@
  */
 
 import antlr4, { ParserRuleContext } from "antlr4";
+import { ErrorListener } from "antlr4/error";
 import React, { ReactNode } from "react";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser, {
@@ -12,10 +13,11 @@ import ECLParser, {
   RefinedexpressionconstraintContext,
   SubexpressionconstraintContext,
 } from "../../parser/src/grammar/syntax/ECLParser";
-import BaseEclVisitor from "./BaseEclVisitor";
+import BaseEclVisitor, { BaseEclVisitorOptions } from "./BaseEclVisitor";
 import BlankExpression from "./BlankExpression";
 import CompoundVisitor from "./compound/CompoundVisitor";
 import ExpressionConstraint from "./ExpressionConstraint";
+import ExpressionParserErrorListener from "./ExpressionParserErrorListener";
 import ExpressionTransformer from "./ExpressionTransformer";
 import RefinementVisitor from "./refinement/RefinementVisitor";
 import SubExpressionVisitor from "./sub/SubExpressionVisitor";
@@ -29,21 +31,19 @@ export interface ChangeReporterProps<T = string> {
   onChange: ChangeHandler<T>;
 }
 
+export type ExpressionVisitorOptions = BaseEclVisitorOptions;
+
 /**
  * This component implements an ANTLR visitor, delegating out to other components to render the
  * supported elements of the grammar.
  *
  * @author John Grimes
  */
-class ExpressionVisitor extends BaseEclVisitor {
-  constructor(expression: string, onChange: (expression: string) => unknown) {
-    super({ transformer: new ExpressionTransformer(expression, onChange) });
+export class ExpressionVisitor extends BaseEclVisitor {
+  constructor(options: ExpressionVisitorOptions) {
+    super(options);
   }
 
-  /**
-   * expressionconstraint : ws ( refinedexpressionconstraint | compoundexpressionconstraint |
-   * dottedexpressionconstraint | subexpressionconstraint ) ws;
-   */
   visitExpressionconstraint(
     ctx: ExpressionconstraintContext
   ): VisualExpressionType {
@@ -54,37 +54,22 @@ class ExpressionVisitor extends BaseEclVisitor {
     );
   }
 
-  /**
-   * subexpressionconstraint: (constraintoperator ws)? ( ( (memberof ws)? (eclfocusconcept |
-   * (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) (ws memberfilterconstraint)*) |
-   * (eclfocusconcept | (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) ) (ws
-   * (descriptionfilterconstraint | conceptfilterconstraint))* (ws historysupplement)?;
-   */
-  visitSubexpressionconstraint(
-    ctx: SubexpressionconstraintContext
-  ): VisualExpressionType {
-    return new SubExpressionVisitor({ transformer: this.transformer }).visit(
-      ctx
-    );
-  }
-
-  /**
-   * compoundexpressionconstraint : conjunctionexpressionconstraint |
-   * disjunctionexpressionconstraint | exclusionexpressionconstraint;
-   */
-  visitCompoundexpressionconstraint(
-    ctx: CompoundexpressionconstraintContext
-  ): VisualExpressionType {
-    return new CompoundVisitor({ transformer: this.transformer }).visit(ctx);
-  }
-
-  /**
-   * refinedexpressionconstraint : subexpressionconstraint ws COLON ws eclrefinement;
-   */
   visitRefinedexpressionconstraint(
     ctx: RefinedexpressionconstraintContext
   ): VisualExpressionType {
-    return new RefinementVisitor({ transformer: this.transformer }).visit(ctx);
+    return new RefinementVisitor(this.options).visit(ctx);
+  }
+
+  visitCompoundexpressionconstraint(
+    ctx: CompoundexpressionconstraintContext
+  ): VisualExpressionType {
+    return new CompoundVisitor(this.options).visit(ctx);
+  }
+
+  visitSubexpressionconstraint(
+    ctx: SubexpressionconstraintContext
+  ): VisualExpressionType {
+    return new SubExpressionVisitor(this.options).visit(ctx);
   }
 }
 
@@ -93,6 +78,8 @@ function getExpressionContext(expression: string): ExpressionconstraintContext {
     lexer = new ECLLexer(input),
     tokens = new antlr4.CommonTokenStream(lexer),
     parser = new ECLParser(tokens);
+  parser.removeErrorListeners();
+  parser.addErrorListener(new ExpressionParserErrorListener() as ErrorListener);
   return parser.expressionconstraint();
 }
 
@@ -112,7 +99,12 @@ export function visitExpressionTree(
   tree: ParserRuleContext,
   onChange: (expression: string) => unknown
 ): VisualExpressionType {
-  const visitor = new ExpressionVisitor(expression, onChange);
+  const visitor = new ExpressionVisitor({
+    transformer: new ExpressionTransformer(expression, onChange),
+    removalContext: [],
+    refinement: false,
+    attributeGrouping: false,
+  });
   // If there is nothing but whitespace in the expression, we render a blank concept reference
   // component to bootstrap the build.
   if (expression.trim().length === 0) {

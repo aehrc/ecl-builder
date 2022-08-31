@@ -12,17 +12,19 @@ import { VisualExpressionType } from "./ExpressionVisitor";
 
 export interface BaseEclVisitorOptions {
   transformer: ExpressionTransformer;
-  removalContext?: Span[];
+  removalContext: Span[];
+  refinement: boolean;
+  attributeGrouping: boolean;
 }
 
 export default class BaseEclVisitor extends ECLVisitor {
   readonly transformer: ExpressionTransformer;
-  readonly removalContext: Span[];
+  readonly options: BaseEclVisitorOptions;
 
   constructor(options: BaseEclVisitorOptions) {
     super();
     this.transformer = options.transformer;
-    this.removalContext = options.removalContext ?? [];
+    this.options = options;
   }
 
   visit(ctx: ParserRuleContext): VisualExpressionType {
@@ -32,15 +34,22 @@ export default class BaseEclVisitor extends ECLVisitor {
   visitChildren(ctx: ParserRuleContext): VisualExpressionType {
     const children = super.visitChildren(ctx);
     if (Array.isArray(children)) {
-      // This adds a unique key to each child element, to satisfy the requirement of React that all
-      // elements in a list must have a unique key prop.
-      // See: https://reactjs.org/docs/lists-and-keys.html#keys
-      return children.map((child: VisualExpressionType) =>
-        isValidElement(child) ? cloneElement(child, { key: uuid.v4() }) : child
-      );
+      return this.addKeys(children);
     } else {
       return children;
     }
+  }
+
+  /**
+   * This adds a unique key to each child element, to satisfy the requirement of React that all
+   * elements in a list must have a unique key prop.
+   *
+   * @see https://reactjs.org/docs/lists-and-keys.html#keys
+   */
+  addKeys(ctxs: VisualExpressionType[]): VisualExpressionType[] {
+    return ctxs.map((child) =>
+      isValidElement(child) ? cloneElement(child, { key: uuid.v4() }) : child
+    );
   }
 
   protected defaultResult(): never {

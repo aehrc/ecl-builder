@@ -6,8 +6,9 @@
 import { Box } from "@mui/material";
 import React from "react";
 import { visitExpression } from "./ecl/ExpressionVisitor";
+import ErrorBoundary from "./ErrorBoundary";
 
-interface Props {
+export interface VisualBuilderProps {
   expression: string;
   onChange: (expression: string) => unknown;
 }
@@ -17,10 +18,16 @@ interface Props {
  *
  * @author John Grimes
  */
-export default function VisualBuilder({ expression, onChange }: Props) {
+export default function VisualBuilder(props: VisualBuilderProps) {
   return (
     <Box className="visual-builder">
-      {visitExpression(expression, onChange)}
+      <ErrorBoundary>
+        <Expression {...props} />
+      </ErrorBoundary>
     </Box>
   );
+}
+
+function Expression({ expression, onChange }: VisualBuilderProps) {
+  return <>{visitExpression(expression, onChange)}</>;
 }

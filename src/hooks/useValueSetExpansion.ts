@@ -44,7 +44,8 @@ async function executeValueSetExpansion(
     `${endpoint}/ValueSet/$expand?${query.toString()}`
   );
   if (!response.ok) {
-    throw await extractError(response);
+    const error = await extractError(response);
+    throw error;
   }
   const valueSet = await parseJsonValueSet(response);
   return extractConceptsFromValueSet(valueSet);

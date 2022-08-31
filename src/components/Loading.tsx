@@ -20,7 +20,8 @@ export default function Loading({ delay, children }: LoadingProps) {
 function DelayedLoading({ delay }: { delay: number }) {
   const [ready, setReady] = useState(false);
   useEffect(() => {
-    setTimeout(() => setReady(true), delay);
+    const timeout = setTimeout(() => setReady(true), delay);
+    return () => clearTimeout(timeout);
   }, []);
   return ready ? <LinearProgress /> : null;
 }
