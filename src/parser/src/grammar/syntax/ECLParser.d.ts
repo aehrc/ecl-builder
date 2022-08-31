@@ -243,6 +243,23 @@ export class ExpressioncomparisonoperatorContext extends ParserRuleContext {
 export class NumericcomparisonoperatorContext extends ParserRuleContext {}
 
 /**
+ * stringcomparisonoperator : EQUALS | (EXCLAMATION EQUALS);
+ */
+export class StringcomparisonoperatorContext extends ParserRuleContext {}
+
+/**
+ * matchsearchterm : (nonwsnonescapedchar | escapedchar)+;
+ */
+export class MatchsearchtermContext extends ParserRuleContext {}
+
+/**
+ * matchsearchtermset : qm ws matchsearchterm (mws matchsearchterm)* ws qm;
+ */
+export class MatchsearchtermsetContext extends ParserRuleContext {
+  matchsearchterm(): MatchsearchtermContext[];
+}
+
+/**
  * numericvalue : (DASH|PLUS)? (decimalvalue | integervalue);
  */
 export class NumericvalueContext extends ParserRuleContext {}

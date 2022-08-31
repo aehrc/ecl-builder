@@ -7,19 +7,21 @@ import { TextField } from "@mui/material";
 import React, { useState } from "react";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 
-export interface NumericValueProps extends ChangeReporterProps {
+export interface MatchSearchTermSetProps extends ChangeReporterProps {
   value: string;
 }
 
-export default function NumericValue({ value, onChange }: NumericValueProps) {
+export default function MatchSearchTermSet({
+  value,
+  onChange,
+}: MatchSearchTermSetProps) {
   const [currentValue, setCurrentValue] = useState(value);
   return (
     <TextField
       value={currentValue}
       onChange={(e) => setCurrentValue(e.target.value)}
       onBlur={(e) => onChange(e.target.value)}
-      type="number"
-      sx={{ flexGrow: 1, flexBasis: "6em" }}
+      sx={{ flexGrow: 1, flexBasis: "8em" }}
     />
   );
 }

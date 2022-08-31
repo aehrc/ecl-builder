@@ -16,9 +16,11 @@ import {
   EclrefinementContext,
   ExpressioncomparisonoperatorContext,
   ExpressionconstraintContext,
+  MatchsearchtermsetContext,
   NumericcomparisonoperatorContext,
   NumericvalueContext,
   RefinedexpressionconstraintContext,
+  StringcomparisonoperatorContext,
   SubexpressionconstraintContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
 import BaseEclVisitor, { BaseEclVisitorOptions } from "../BaseEclVisitor";
@@ -34,6 +36,7 @@ import Attribute from "./Attribute";
 import AttributeGroup from "./AttributeGroup";
 import AttributeSet from "./AttributeSet";
 import ComparisonOperator from "./ComparisonOperator";
+import MatchSearchTermSet from "./MatchSearchTermSet";
 import NumericValue from "./NumericValue";
 import RefinedExpression from "./RefinedExpression";
 
@@ -47,6 +50,15 @@ export const EXPRESSION_COMPARISON_OPERATORS: Record<string, string> = {
 };
 
 export const NUMERIC_COMPARISON_OPERATORS: Record<string, string> = {
+  "=": "=",
+  "!=": "!=",
+  "<": "<",
+  "<=": "<=",
+  ">": ">",
+  ">=": ">=",
+};
+
+export const STRING_COMPARISON_OPERATORS: Record<string, string> = {
   "=": "=",
   "!=": "!=",
   "<": "<",
@@ -202,6 +214,32 @@ export default class RefinementVisitor extends BaseEclVisitor {
         type={ctx.getText()}
         typeLabelMap={NUMERIC_COMPARISON_OPERATORS}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+      />
+    );
+  }
+
+  visitStringcomparisonoperator(
+    ctx: StringcomparisonoperatorContext
+  ): VisualExpressionType {
+    return (
+      <ComparisonOperator
+        type={ctx.getText()}
+        typeLabelMap={STRING_COMPARISON_OPERATORS}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+      />
+    );
+  }
+
+  visitMatchsearchtermset(
+    ctx: MatchsearchtermsetContext
+  ): VisualExpressionType {
+    return (
+      <MatchSearchTermSet
+        value={ctx
+          .matchsearchterm()
+          .map((m) => m.getText())
+          .join(" ")}
+        onChange={(e) => this.transformer.applyUpdate(ctx, `"${e}"`)}
       />
     );
   }
