@@ -7,7 +7,7 @@ import { Add } from "@mui/icons-material";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React, { PropsWithChildren } from "react";
 import { DEFAULT_REFINEMENT } from "../../../constants";
-import Actions from "../Actions";
+import Actions, { ActionItem } from "../Actions";
 import {
   LogicStatementType,
   logicStatementTypeToOperator,
@@ -17,12 +17,14 @@ import NeatRow from "../NeatRow";
 
 export interface AttributeSetProps extends PropsWithChildren {
   type: LogicStatementType;
+  hideAddGroup?: boolean;
   onChangeType: (type: LogicStatementType) => unknown;
   onAddAttribute: (expression: string) => unknown;
 }
 
 export default function AttributeSet({
   type,
+  hideAddGroup,
   onChangeType,
   onAddAttribute,
   children,
@@ -37,7 +39,18 @@ export default function AttributeSet({
     );
   }
 
+  function handleAddAttributeGroup() {
+    onAddAttribute(
+      `${logicStatementTypeToOperator[type]} { ${DEFAULT_REFINEMENT} }`
+    );
+  }
+
   function renderHeading() {
+    const addAttributeGroup: ActionItem = {
+      type: "item",
+      label: "Add attribute group",
+      onClick: handleAddAttributeGroup,
+    };
     return (
       <NeatRow className="attribute-set-heading">
         <Select
@@ -55,6 +68,7 @@ export default function AttributeSet({
               label: "Add attribute",
               onClick: handleAddAttribute,
             },
+            ...(hideAddGroup ? [] : [addAttributeGroup]),
           ]}
           icon={Add}
         />

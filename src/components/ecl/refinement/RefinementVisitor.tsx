@@ -18,7 +18,7 @@ import {
   RefinedexpressionconstraintContext,
   SubexpressionconstraintContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
-import BaseEclVisitor from "../BaseEclVisitor";
+import BaseEclVisitor, { BaseEclVisitorOptions } from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
 import {
   LogicStatementType,
@@ -33,7 +33,18 @@ import AttributeSet from "./AttributeSet";
 import ComparisonOperator from "./ComparisonOperator";
 import RefinedExpression from "./RefinedExpression";
 
+export interface RefinementVisitorOptions extends BaseEclVisitorOptions {
+  attributeGrouping?: boolean;
+}
+
 export default class RefinementVisitor extends BaseEclVisitor {
+  private readonly attributeGrouping: boolean;
+
+  constructor(options: RefinementVisitorOptions) {
+    super(options);
+    this.attributeGrouping = options.attributeGrouping ?? false;
+  }
+
   visitRefinedexpressionconstraint(
     ctx: RefinedexpressionconstraintContext
   ): VisualExpressionType {
@@ -84,16 +95,21 @@ export default class RefinementVisitor extends BaseEclVisitor {
         ?.subrefinement()
         .find((sr) => sr.eclattributegroup())
     ) {
-      const conjunctionRefinementSet = ctx.conjunctionrefinementset(),
+      const visitor = new RefinementVisitor({
+          transformer: this.transformer,
+          attributeGrouping: true,
+          removalContext: this.removalContext,
+        }),
+        conjunctionRefinementSet = ctx.conjunctionrefinementset(),
         disjunctionRefinementSet = ctx.disjunctionrefinementset();
       if (disjunctionRefinementSet) {
-        return this.renderRefinementSet(
+        return visitor.renderRefinementSet(
           ctx,
           disjunctionRefinementSet.disjunction(),
           "disjunction"
         );
       } else {
-        return this.renderRefinementSet(
+        return visitor.renderRefinementSet(
           ctx,
           conjunctionRefinementSet?.conjunction() ?? [],
           "conjunction"
@@ -179,6 +195,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
         result = (result as ReactNode[]).concat(
           new RefinementVisitor({
             transformer: this.transformer,
+            attributeGrouping: this.attributeGrouping,
             removalContext,
           }).visit(children[i])
         );
@@ -189,6 +206,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
     return (
       <AttributeSet
         type={type}
+        hideAddGroup={this.attributeGrouping}
         onChangeType={(type) =>
           this.transformer.applyUpdates(
             operatorCtx,
@@ -227,54 +245,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
         result = (result as ReactNode[]).concat(
           new RefinementVisitor({
             transformer: this.transformer,
-            removalContext,
-          }).visit(children[i])
-        );
-      }
-    } else {
-      result = this.visitChildren(ctx);
-    }
-    return (
-      <AttributeGroup
-        type={type}
-        onChangeType={(type) =>
-          this.transformer.applyUpdates(
-            operatorCtx,
-            logicStatementTypeToOperator[type]
-          )
-        }
-        onAddAttribute={(expression) =>
-          this.transformer.append(ctx, expression)
-        }
-      >
-        {result}
-      </AttributeGroup>
-    );
-  }
-
-  renderAttributeGroup(
-    ctx: EclattributesetContext,
-    operatorCtx: ParserRuleContext[],
-    type: LogicStatementType
-  ): VisualExpressionType {
-    let result: VisualExpressionType;
-    const logicalAttributeSet =
-      ctx.conjunctionattributeset() ?? ctx.disjunctionattributeset();
-    const subAttributeSets = [
-      ctx.subattributeset(),
-      ...(logicalAttributeSet?.subattributeset() ?? []),
-    ];
-    if (subAttributeSets.length > 1) {
-      const children = interleave(subAttributeSets, operatorCtx);
-      result = [];
-      for (let i = 0; i < children.length; i++) {
-        const removalContext = this.transformer.getBinaryOperatorRemovalContext(
-          children,
-          i
-        );
-        result = (result as ReactNode[]).concat(
-          new RefinementVisitor({
-            transformer: this.transformer,
+            attributeGrouping: this.attributeGrouping,
             removalContext,
           }).visit(children[i])
         );
