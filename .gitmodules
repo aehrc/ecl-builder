@@ -1,3 +1,3 @@
 [submodule "src/grammar"]
-	path = src/grammar
+	path = packages/ecl-builder/src/grammar
 	url = https://github.com/IHTSDO/snomed-expression-constraint-language.git
