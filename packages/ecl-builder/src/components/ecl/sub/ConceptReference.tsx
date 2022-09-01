@@ -92,19 +92,11 @@ export default function ConceptReference({
   }
 
   function getOptions(): ConceptReferenceOptionType[] {
-    if (selectedConcept && selectedConcept.type === "ANY_CONCEPT") {
-      return [selectedConcept];
-    } else if (selectedConcept && searchQuery.length < minQueryLength) {
-      // If a concept is selected, is it the only option until such time as the search is cleared.
-      return [selectedConcept, ANY_CONCEPT];
-    } else {
-      return selectedConcept
-        ? // If a concept is selected, it should be the first option, followed by the search results
-          // and then "any concept".
-          [selectedConcept, ...searchResults, ANY_CONCEPT]
-        : // If there is no concept selected, show the search results and then "any concept".
-          [...searchResults, ANY_CONCEPT];
-    }
+    return [
+      ...(selectedConcept ? [selectedConcept] : []),
+      ...(searchResults.length >= minQueryLength ? searchResults : []),
+      ...(selectedConcept?.type === "ANY_CONCEPT" ? [] : [ANY_CONCEPT]),
+    ];
   }
 
   function handleInputChange(
@@ -113,7 +105,7 @@ export default function ConceptReference({
   ): void {
     // A change to the value of the input updates the query sent to the
     // terminology server.
-    setSearchQuery(selectedConcept?.type === "ANY_CONCEPT" ? "" : value);
+    setSearchQuery(value);
   }
 
   function handleSelectConcept(
@@ -140,13 +132,10 @@ export default function ConceptReference({
     props: Object,
     option: ConceptReferenceOptionType
   ): ReactNode {
-    if (option.type === "ANY_CONCEPT") {
-      return renderAnyConceptOption(props);
-    } else if (
-      selectedConcept &&
-      isOptionEqualToValue(option, selectedConcept)
-    ) {
+    if (selectedConcept && isOptionEqualToValue(option, selectedConcept)) {
       return renderSelectedConceptOption(props, option);
+    } else if (option.type === "ANY_CONCEPT") {
+      return renderAnyConceptOption(props);
     } else {
       return renderSearchResultOption(props, option);
     }
@@ -178,6 +167,7 @@ export default function ConceptReference({
           : {};
     return (
       <Option
+        key="ANY_CONCEPT"
         props={props as Record<string, unknown>}
         listItemStyles={listItemStyles}
         display={display}
@@ -189,9 +179,12 @@ export default function ConceptReference({
   function renderSelectedConceptOption(
     // eslint-disable-next-line @typescript-eslint/ban-types
     props: Object,
-    option: ConceptSearchOption
+    option: ConceptSearchOption | AnyConceptOption
   ) {
-    const display = option.display ?? option.id,
+    const display =
+        option.type === "ANY_CONCEPT"
+          ? "any concept"
+          : option.display ?? option.id,
       semanticTag = (
         <Chip
           label="selected"
@@ -211,6 +204,7 @@ export default function ConceptReference({
       };
     return (
       <Option
+        key={option.type === "ANY_CONCEPT" ? option.type : option.id}
         props={props as Record<string, unknown>}
         listItemStyles={listItemStyles}
         display={display}
@@ -239,6 +233,7 @@ export default function ConceptReference({
       );
     return (
       <Option
+        key={option.id}
         props={props as Record<string, unknown>}
         display={display}
         semanticTag={semanticTag}
