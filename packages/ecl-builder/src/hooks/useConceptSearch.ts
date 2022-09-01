@@ -49,6 +49,9 @@ function buildExpandParams(
       "expansion.contains.fullySpecifiedName," +
       "expansion.contains.active"
   );
+  // Only active concepts are included in the results.
+  searchParams.set("activeOnly", "true");
+  // Limit the number of results.
   searchParams.set("count", limit.toString(10));
   return searchParams;
 }
