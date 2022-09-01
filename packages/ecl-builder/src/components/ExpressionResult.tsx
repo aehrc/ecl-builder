@@ -3,9 +3,9 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Alert, Stack } from "@mui/material";
+import { Alert, Box, FormControlLabel, Stack, Switch } from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
-import React from "react";
+import React, { useState } from "react";
 import { SCT_URI } from "../constants";
 import useValueSetExpansion from "../hooks/useValueSetExpansion";
 import { formatNumber } from "../number";
@@ -57,11 +57,12 @@ function ExpressionResultContent({
   expression,
   options: { terminologyServerUrl, maxSearchResults },
 }: ResultContentProps) {
-  const { data } = useValueSetExpansion(
-    terminologyServerUrl,
-    buildExpandParams(expression, maxSearchResults),
-    { suspense: true, keepPreviousData: false }
-  );
+  const [includeInactives, setIncludeInactives] = useState(false),
+    { data } = useValueSetExpansion(
+      terminologyServerUrl,
+      buildExpandParams(expression, maxSearchResults, includeInactives),
+      { suspense: true, keepPreviousData: false }
+    );
   if (!data) {
     console.warn("No error, but also no data");
     return null;
@@ -70,13 +71,31 @@ function ExpressionResultContent({
     return <Alert severity="info">No results returned.</Alert>;
   }
   return (
-    <Stack className="expression-result">
+    <Stack className="expression-result" spacing={2}>
       {data.total && data.total > maxSearchResults ? (
         <Alert severity="info">
           Showing {formatNumber(maxSearchResults)} of {formatNumber(data.total)}{" "}
           results total.
         </Alert>
       ) : null}
+      <Box sx={{ px: 2 }}>
+        <FormControlLabel
+          control={
+            <Switch
+              size="small"
+              onChange={(e) => setIncludeInactives(e.target.checked)}
+            />
+          }
+          label="Include inactive concepts"
+          sx={{
+            "& .MuiFormControlLabel-label": {
+              fontSize: "0.9em",
+              ml: 1,
+              userSelect: "none",
+            },
+          }}
+        />
+      </Box>
       <ExpressionResultTable results={data} />
     </Stack>
   );
@@ -96,8 +115,13 @@ function applyDefaultOptions(
   };
 }
 
-function buildExpandParams(expression: string, limit: number): URLSearchParams {
-  const searchParams = new URLSearchParams();
+function buildExpandParams(
+  expression: string,
+  limit: number,
+  includeInactives: boolean
+): URLSearchParams {
+  const searchParams = new URLSearchParams(),
+    activeOnly = !includeInactives;
   searchParams.set(
     "url",
     `${SCT_URI}?fhir_vs=ecl/${encodeURIComponent(expression)}`
@@ -112,6 +136,9 @@ function buildExpandParams(expression: string, limit: number): URLSearchParams {
       "expansion.contains.fullySpecifiedName," +
       "expansion.contains.active"
   );
+  // Only active concepts are included in the results.
+  searchParams.set("activeOnly", activeOnly.toString());
+  // Limit the number of results.
   searchParams.set("count", limit.toString(10));
   return searchParams;
 }
