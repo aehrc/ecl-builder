@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "compile": "tsc",
+    "watch": "tsc --watch",
     "prepare": "npm run compile",
     "test": "jest",
     "lint": "eslint .",
