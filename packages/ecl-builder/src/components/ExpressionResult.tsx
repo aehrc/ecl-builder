@@ -9,7 +9,6 @@ import {
   CircularProgress,
   FormControlLabel,
   Stack,
-  Switch,
 } from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
 import React, { useState } from "react";
@@ -20,6 +19,7 @@ import { queryClient } from "../queryClient";
 import DelayedLoading from "./DelayedLoading";
 import ErrorBoundary from "./ErrorBoundary";
 import ExpressionResultTable from "./ExpressionResultTable";
+import IncludeInactives from "./IncludeInactives";
 
 export interface ResultProps {
   // The expression to display results for.
@@ -88,12 +88,11 @@ function ExpressionResultContent({
       <Box sx={{ px: 2 }}>
         <FormControlLabel
           control={
-            <Switch
-              size="small"
+            <IncludeInactives
               checked={includeInactives}
-              onChange={(e) => {
+              onChange={(checked) => {
                 if (!isFetching) {
-                  setIncludeInactives(e.target.checked);
+                  setIncludeInactives(checked);
                 }
               }}
             />
