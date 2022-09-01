@@ -65,9 +65,9 @@ export default function ExpressionGrouping({
           borderRadius: "4px",
           backgroundColor: grey(theme, 1),
           position: "relative",
-          mt: heading ? "1.75em" : undefined,
+          mt: heading ? "1em" : undefined,
           mb: 0,
-          pt: heading ? "2.8em" : undefined,
+          pt: heading ? "3.55em" : undefined,
           pb: 2,
           "& > *": {
             clear: "both",

@@ -13,7 +13,7 @@ export default function GroupingHeading({ children }: GroupingHeadingProps) {
     <Stack
       className="grouping-heading"
       direction="row"
-      sx={{ position: "absolute", top: "-1.8em" }}
+      sx={{ position: "absolute", top: "-1.05em" }}
     >
       {children}
     </Stack>
