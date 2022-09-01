@@ -22,7 +22,6 @@ export default class ErrorBoundary extends Component<
   }
 
   static getDerivedStateFromError(error: Error) {
-    console.log("getDerivedStateFromError", error);
     return { error };
   }
 
@@ -33,10 +32,8 @@ export default class ErrorBoundary extends Component<
     } = this;
 
     if (error) {
-      console.log("rendering error", error);
       return <Alert severity="error">{error.message}</Alert>;
     } else {
-      console.log("rendering children");
       return children;
     }
   }

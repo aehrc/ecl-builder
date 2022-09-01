@@ -3,9 +3,9 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import antlr4, { ParserRuleContext } from "antlr4";
-import { ErrorListener } from "antlr4/error";
-import React, { ReactNode } from "react";
+import antlr4 from "antlr4";
+import {ErrorListener} from "antlr4/error";
+import React, {ReactNode} from "react";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser, {
   CompoundexpressionconstraintContext,
@@ -13,7 +13,7 @@ import ECLParser, {
   RefinedexpressionconstraintContext,
   SubexpressionconstraintContext,
 } from "../../parser/src/grammar/syntax/ECLParser";
-import BaseEclVisitor, { BaseEclVisitorOptions } from "./BaseEclVisitor";
+import BaseEclVisitor, {BaseEclVisitorOptions} from "./BaseEclVisitor";
 import BlankExpression from "./BlankExpression";
 import CompoundVisitor from "./compound/CompoundVisitor";
 import ExpressionConstraint from "./ExpressionConstraint";
@@ -87,18 +87,6 @@ export function visitExpression(
   expression: string,
   onChange: (expression: string) => unknown
 ): VisualExpressionType {
-  return visitExpressionTree(
-    expression,
-    getExpressionContext(expression),
-    onChange
-  );
-}
-
-export function visitExpressionTree(
-  expression: string,
-  tree: ParserRuleContext,
-  onChange: (expression: string) => unknown
-): VisualExpressionType {
   const visitor = new ExpressionVisitor({
     transformer: new ExpressionTransformer(expression, onChange),
     removalContext: [],
@@ -110,6 +98,7 @@ export function visitExpressionTree(
   if (expression.trim().length === 0) {
     return <BlankExpression onChange={(e) => visitor.transformer.replace(e)} />;
   } else {
-    return visitor.visit(tree);
+    const expressionContext = getExpressionContext(expression);
+    return visitor.visit(expressionContext);
   }
 }
