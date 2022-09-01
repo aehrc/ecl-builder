@@ -4,6 +4,7 @@
  */
 
 import { createTheme, Theme } from "@mui/material";
+import { grey } from "./color";
 
 export function extendTheme(theme: Theme): Theme {
   return createTheme(theme, {
@@ -25,6 +26,9 @@ export function extendTheme(theme: Theme): Theme {
         styleOverrides: {
           root: {
             backgroundColor: theme.palette.background.paper,
+          },
+          notchedOutline: {
+            borderColor: grey(theme, 4),
           },
         },
       },
