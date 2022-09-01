@@ -3,9 +3,7 @@ import ExpressionBuilder from "ecl-builder";
 import ExpressionResult from "ecl-builder/lib/components/ExpressionResult";
 import React, { useState } from "react";
 
-const theme = createTheme({
-  palette: { mode: "dark" },
-});
+const theme = createTheme();
 
 function App() {
   const [currentExpression, setCurrentExpression] =
