@@ -4,6 +4,7 @@
  */
 
 import {
+  SxProps,
   Table,
   TableBody,
   TableCell,
@@ -16,13 +17,15 @@ import { ConceptSearchResult } from "../hooks/useValueSetExpansion";
 
 export interface ExpressionResultTableProps {
   results: ConceptSearchResult;
+  sx?: SxProps;
 }
 
 export default function ExpressionResultTable({
   results,
+  sx,
 }: ExpressionResultTableProps) {
   return (
-    <TableContainer>
+    <TableContainer sx={sx}>
       <Table>
         <TableHead>
           <TableRow>

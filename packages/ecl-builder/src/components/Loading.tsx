@@ -4,24 +4,8 @@
  */
 
 import { LinearProgress } from "@mui/material";
-import React, { PropsWithChildren, Suspense, useEffect, useState } from "react";
+import React from "react";
 
-export interface LoadingProps extends PropsWithChildren {
-  // The delay (in milliseconds) before the loading indicator is displayed.
-  delay: number;
-}
-
-export default function Loading({ delay, children }: LoadingProps) {
-  return (
-    <Suspense fallback={<DelayedLoading delay={delay} />}>{children}</Suspense>
-  );
-}
-
-function DelayedLoading({ delay }: { delay: number }) {
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    const timeout = setTimeout(() => setReady(true), delay);
-    return () => clearTimeout(timeout);
-  }, []);
-  return ready ? <LinearProgress /> : null;
+export default function Loading() {
+  return <LinearProgress />;
 }

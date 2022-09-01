@@ -3,16 +3,23 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Alert, Box, FormControlLabel, Stack, Switch } from "@mui/material";
+import {
+  Alert,
+  Box,
+  CircularProgress,
+  FormControlLabel,
+  Stack,
+  Switch,
+} from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { SCT_URI } from "../constants";
 import useValueSetExpansion from "../hooks/useValueSetExpansion";
 import { formatNumber } from "../number";
 import { queryClient } from "../queryClient";
+import DelayedLoading from "./DelayedLoading";
 import ErrorBoundary from "./ErrorBoundary";
 import ExpressionResultTable from "./ExpressionResultTable";
-import Loading from "./Loading";
 
 export interface ResultProps {
   // The expression to display results for.
@@ -42,12 +49,12 @@ export default function ExpressionResult({
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
-        <Loading delay={resolvedOptions.loadingDelay}>
+        <DelayedLoading delay={resolvedOptions.loadingDelay}>
           <ExpressionResultContent
             expression={expression}
             options={resolvedOptions}
           />
-        </Loading>
+        </DelayedLoading>
       </ErrorBoundary>
     </QueryClientProvider>
   );
@@ -58,10 +65,10 @@ function ExpressionResultContent({
   options: { terminologyServerUrl, maxSearchResults },
 }: ResultContentProps) {
   const [includeInactives, setIncludeInactives] = useState(false),
-    { data } = useValueSetExpansion(
+    { data, isFetching } = useValueSetExpansion(
       terminologyServerUrl,
       buildExpandParams(expression, maxSearchResults, includeInactives),
-      { suspense: true, keepPreviousData: false }
+      { suspense: true }
     );
   if (!data) {
     console.warn("No error, but also no data");
@@ -73,7 +80,7 @@ function ExpressionResultContent({
   return (
     <Stack className="expression-result" spacing={2}>
       {data.total && data.total > maxSearchResults ? (
-        <Alert severity="info">
+        <Alert severity="info" sx={isFetching ? { opacity: 0.5 } : {}}>
           Showing {formatNumber(maxSearchResults)} of {formatNumber(data.total)}{" "}
           results total.
         </Alert>
@@ -83,10 +90,22 @@ function ExpressionResultContent({
           control={
             <Switch
               size="small"
-              onChange={(e) => setIncludeInactives(e.target.checked)}
+              checked={includeInactives}
+              onChange={(e) => {
+                if (!isFetching) {
+                  setIncludeInactives(e.target.checked);
+                }
+              }}
             />
           }
-          label="Include inactive concepts"
+          label={
+            <>
+              <span>Include inactive concepts</span>
+              {isFetching ? (
+                <CircularProgress size={14} sx={{ ml: 1 }} />
+              ) : null}
+            </>
+          }
           sx={{
             "& .MuiFormControlLabel-label": {
               fontSize: "0.9em",
@@ -96,7 +115,10 @@ function ExpressionResultContent({
           }}
         />
       </Box>
-      <ExpressionResultTable results={data} />
+      <ExpressionResultTable
+        results={data}
+        sx={isFetching ? { opacity: 0.5 } : {}}
+      />
     </Stack>
   );
 }
