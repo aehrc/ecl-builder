@@ -4,17 +4,11 @@
  */
 
 import { Code, Visibility } from "@mui/icons-material";
-import {
-  createTheme,
-  CssBaseline,
-  Tab,
-  Tabs,
-  ThemeProvider,
-} from "@mui/material";
+import { CssBaseline, Tab, Tabs, Theme, ThemeProvider } from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
 import React, { createContext, useState } from "react";
 import { queryClient } from "../queryClient";
-import { theme } from "../themes/expressionBuilderTheme";
+import { extendTheme } from "../themes/extendTheme";
 import CodeEditor from "./CodeEditor";
 import TabPanel from "./TabPanel";
 import VisualBuilder from "./VisualBuilder";
@@ -63,7 +57,7 @@ export default function ExpressionBuilder({
   }
 
   return (
-    <ThemeProvider theme={(base) => createTheme(base, theme)}>
+    <ThemeProvider theme={(base: Theme) => extendTheme(base)}>
       <QueryClientProvider client={queryClient}>
         <OptionsContext.Provider value={applyDefaultOptions(options)}>
           <CssBaseline />

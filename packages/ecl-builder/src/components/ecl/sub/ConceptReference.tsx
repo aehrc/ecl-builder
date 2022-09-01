@@ -12,11 +12,12 @@ import {
   TextField,
   Theme,
   Typography,
+  useTheme,
 } from "@mui/material";
 import React, { ReactNode, SyntheticEvent, useContext, useState } from "react";
 import useConceptSearch from "../../../hooks/useConceptSearch";
 import { Concept } from "../../../hooks/useValueSetExpansion";
-import { theme } from "../../../themes/expressionBuilderTheme";
+import { grey } from "../../../themes/color";
 import { OptionsContext } from "../../ExpressionBuilder";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 import ConceptSearchScope from "./ConceptSearchScope";
@@ -54,6 +55,7 @@ export default function ConceptReference({
 }: ConceptReferenceProps) {
   const { terminologyServerUrl, maxSearchResults, minQueryLength } =
       useContext(OptionsContext),
+    theme = useTheme(),
     { valueSet, label } = useContext(ConceptSearchScope),
     [selectedConcept, setSelectedConcept] =
       useState<ConceptReferenceOptionType | undefined>(concept),
@@ -160,7 +162,7 @@ export default function ConceptReference({
           sx={{
             ...commonSemanticTagStyles,
             fontSize: "1.2em",
-            color: theme.palette.grey[500],
+            color: grey(theme, 5),
             position: "relative",
             top: "0.2em",
           }}
@@ -169,7 +171,7 @@ export default function ConceptReference({
       listItemStyles =
         options.length > 1
           ? {
-              borderTopColor: theme.palette.grey[300],
+              borderTopColor: grey(theme, 3),
               borderTopWidth: 1,
               borderTopStyle: "solid",
             }
@@ -201,7 +203,7 @@ export default function ConceptReference({
         "&.MuiAutocomplete-option": { pr: 1 },
         ...(options.length > 2
           ? {
-              borderBottomColor: theme.palette.grey[300],
+              borderBottomColor: grey(theme, 3),
               borderBottomWidth: 1,
               borderBottomStyle: "solid",
             }

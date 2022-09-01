@@ -3,8 +3,9 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { MenuItem, Select, SelectChangeEvent, useTheme } from "@mui/material";
 import React from "react";
+import { grey } from "../../../themes/color";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 import HorizontalLink from "../HorizontalLink";
 
@@ -19,7 +20,8 @@ export default function ComparisonOperator<T extends string>({
   typeLabelMap,
   onChange,
 }: ComparisonOperatorProps<T>) {
-  const horizontalLinkStyle = { marginTop: "1.85em", alignSelf: "flex-start" };
+  const theme = useTheme(),
+    horizontalLinkStyle = { marginTop: "1.85em", alignSelf: "flex-start" };
 
   function handleSelectOperator(event: SelectChangeEvent<T>) {
     onChange(event.target.value as T);
@@ -34,7 +36,7 @@ export default function ComparisonOperator<T extends string>({
         sx={{
           alignSelf: "flex-start",
           borderWidth: 1,
-          borderColor: "grey.400",
+          borderColor: grey(theme, 4),
           borderStyle: "solid",
           borderRadius: 1,
         }}

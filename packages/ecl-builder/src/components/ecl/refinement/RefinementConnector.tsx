@@ -5,6 +5,7 @@
 
 import { useTheme } from "@mui/material";
 import React from "react";
+import { grey } from "../../../themes/color";
 
 export default function RefinementConnector() {
   const theme = useTheme();
@@ -17,10 +18,10 @@ export default function RefinementConnector() {
         height: theme.spacing(8),
         margin: 0,
         border: 0,
-        borderLeftColor: theme.palette.grey[400],
+        borderLeftColor: grey(theme, 4),
         borderLeftStyle: "solid",
         borderLeftWidth: 1,
-        borderBottomColor: theme.palette.grey[400],
+        borderBottomColor: grey(theme, 4),
         borderBottomStyle: "solid",
         borderBottomWidth: 1,
         marginLeft: theme.spacing(2),

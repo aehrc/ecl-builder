@@ -3,8 +3,9 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Box, SxProps, Theme } from "@mui/material";
+import { Box, SxProps, Theme, useTheme } from "@mui/material";
 import React, { PropsWithChildren, ReactNode } from "react";
+import { grey } from "../../themes/color";
 import GroupingHeading from "./GroupingHeading";
 
 export interface ExpressionGroupingProps extends PropsWithChildren {
@@ -16,7 +17,10 @@ export interface ExpressionGroupingProps extends PropsWithChildren {
 /**
  * Creates a set of styles that "stripes" nested expression groups to ensure adequate contrast.
  */
-function getStripingStyle(levels: number): Record<string, unknown> {
+function getStripingStyle(
+  theme: Theme,
+  levels: number
+): Record<string, unknown> {
   let style = {};
   for (let i = 0; i < levels; i++) {
     style = {
@@ -24,7 +28,7 @@ function getStripingStyle(levels: number): Record<string, unknown> {
       [Array(i + 1)
         .fill(".expression-grouping")
         .join(" ") + " &"]: {
-        backgroundColor: i % 2 === 0 ? "background.default" : "grey.100",
+        backgroundColor: i % 2 === 0 ? "background.default" : grey(theme, 1),
       },
     };
   }
@@ -41,7 +45,8 @@ export default function ExpressionGrouping({
   className,
   sx,
 }: ExpressionGroupingProps) {
-  const stripingStyle = getStripingStyle(10);
+  const theme = useTheme(),
+    stripingStyle = getStripingStyle(theme, 10);
 
   return (
     // We need this additional level of element to prevent margins being collapsed when used inside
@@ -55,10 +60,10 @@ export default function ExpressionGrouping({
           gap: 1,
           p: 2,
           borderWidth: 1,
-          borderColor: "grey.400",
+          borderColor: grey(theme, 4),
           borderStyle: "solid",
           borderRadius: "4px",
-          backgroundColor: "grey.100",
+          backgroundColor: grey(theme, 1),
           position: "relative",
           mt: heading ? "1.75em" : undefined,
           mb: 0,

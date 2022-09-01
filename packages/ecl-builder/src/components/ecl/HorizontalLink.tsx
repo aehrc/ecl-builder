@@ -5,6 +5,7 @@
 
 import { useTheme } from "@mui/material";
 import React from "react";
+import { grey } from "../../themes/color";
 
 export interface HorizontalLinkProps {
   style?: React.CSSProperties | undefined;
@@ -22,7 +23,7 @@ export default function HorizontalLink({ style = {} }: HorizontalLinkProps) {
     <hr
       style={{
         width: theme.spacing(2),
-        borderTop: `1px solid ${theme.palette.grey[400]}`,
+        borderTop: `1px solid ${grey(theme, 4)}`,
         borderLeft: 0,
         borderRight: 0,
         borderBottom: 0,

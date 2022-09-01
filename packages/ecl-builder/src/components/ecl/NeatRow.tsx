@@ -5,6 +5,7 @@
 
 import { Stack } from "@mui/material";
 import React, { PropsWithChildren } from "react";
+import { grey } from "../../themes/color";
 
 export interface NeatRowProps extends PropsWithChildren {
   className?: string;
@@ -20,7 +21,7 @@ export default function NeatRow({ className, children }: NeatRowProps) {
       flexGrow={1}
       spacing="1px"
       sx={(theme) => ({
-        backgroundColor: theme.palette.grey[400],
+        backgroundColor: grey(theme, 4),
         p: "1px",
         borderRadius: "4px",
         "& > *:first-of-type": {

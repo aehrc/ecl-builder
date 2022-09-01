@@ -12,6 +12,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import React, { PropsWithChildren, ReactNode, useRef, useState } from "react";
+import { grey } from "../../themes/color";
 
 export interface ActionsProps extends PropsWithChildren {
   actions: Action[];
@@ -75,7 +76,7 @@ export default function Actions({ actions, icon }: ActionsProps) {
           alignSelf: "stretch",
           backgroundColor: menuOpen
             ? theme.palette.primary.main
-            : theme.palette.grey[200],
+            : grey(theme, 1),
           color: menuOpen ? theme.palette.primary.contrastText : "inherit",
           "&:hover": {
             backgroundColor: theme.palette.primary.main,

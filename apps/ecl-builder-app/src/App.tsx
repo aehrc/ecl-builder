@@ -1,14 +1,42 @@
-import {createTheme, ThemeProvider} from "@mui/material";
+import { Box, createTheme, Grid, ThemeProvider } from "@mui/material";
 import ExpressionBuilder from "ecl-builder";
-import React from "react";
-import "./App.css";
+import ExpressionResult from "ecl-builder/lib/components/ExpressionResult";
+import React, { useState } from "react";
 
-const theme = createTheme();
+const theme = createTheme({
+  palette: { mode: "dark" },
+});
 
 function App() {
-  return <ThemeProvider theme={theme}>
-    <ExpressionBuilder />
-  </ThemeProvider>;
+  const [currentExpression, setCurrentExpression] =
+    useState<string | undefined>(undefined);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <Box
+        component="main"
+        sx={(theme) => ({
+          backgroundColor: theme.palette.background.default,
+          height: "100vh",
+          p: 8,
+        })}
+      >
+        <Grid container spacing={4} columnSpacing={12}>
+          <Grid item xs={12} xl={6}>
+            <ExpressionBuilder
+              expression={currentExpression}
+              onChange={setCurrentExpression}
+            />
+          </Grid>
+          {currentExpression ? (
+            <Grid item xs={12} xl={6}>
+              <ExpressionResult expression={currentExpression} />
+            </Grid>
+          ) : null}
+        </Grid>
+      </Box>
+    </ThemeProvider>
+  );
 }
 
 export default App;
