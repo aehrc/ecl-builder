@@ -87,12 +87,14 @@ export default function ConceptReference({
   }
 
   function handleInputChange(
-    event: SyntheticEvent<Element, Event>,
+    event: SyntheticEvent<Element, Event> | null,
     value: string
   ): void {
     // A change to the value of the input updates the query sent to the
     // terminology server.
-    setSearchQuery(value);
+    if (event && event.type === "change") {
+      setSearchQuery(value);
+    }
   }
 
   function handleSelectConcept(
