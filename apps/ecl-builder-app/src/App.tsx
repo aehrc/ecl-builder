@@ -17,7 +17,7 @@ function App() {
           backgroundColor: theme.palette.background.default,
           height: "100vh",
           p: 8,
-          [theme.breakpoints.down("md")]: {
+          [theme.breakpoints.down("lg")]: {
             p: 2,
           },
         })}
