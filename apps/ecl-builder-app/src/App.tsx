@@ -17,6 +17,9 @@ function App() {
           backgroundColor: theme.palette.background.default,
           height: "100vh",
           p: 8,
+          [theme.breakpoints.down("md")]: {
+            p: 2,
+          },
         })}
       >
         <Grid container spacing={4} columnSpacing={12}>
