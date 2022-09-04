@@ -24,6 +24,6 @@ function SuspendedLoading({ delay }: { delay: number }) {
   useEffect(() => {
     const timeout = setTimeout(() => setReady(true), delay);
     return () => clearTimeout(timeout);
-  }, []);
+  }, [delay]);
   return ready ? <Loading /> : null;
 }
