@@ -3,24 +3,17 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { PushPin } from "@mui/icons-material";
-import {
-  Autocomplete,
-  Chip,
-  ListItem,
-  SxProps,
-  TextField,
-  Theme,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Autocomplete } from "@mui/material";
 import React, { ReactNode, SyntheticEvent, useContext, useState } from "react";
 import useConceptSearch from "../../../hooks/useConceptSearch";
 import { Concept } from "../../../hooks/useValueSetExpansion";
-import { grey } from "../../../themes/color";
 import { OptionsContext } from "../../ExpressionBuilder";
 import { ChangeReporterProps } from "../ExpressionVisitor";
+import AnyConcept from "./AnyConcept";
+import ConceptSearchInput from "./ConceptSearchInput";
 import ConceptSearchScope from "./ConceptSearchScope";
+import SelectedConcept from "./SelectedConcept";
+import SuggestedConcept from "./SuggestedConcept";
 
 export interface ConceptReferenceProps extends ChangeReporterProps {
   // The currently selected concept.
@@ -55,7 +48,6 @@ export default function ConceptReference({
 }: ConceptReferenceProps) {
   const { terminologyServerUrl, maxSearchResults, minQueryLength } =
       useContext(OptionsContext),
-    theme = useTheme(),
     { valueSet, label } = useContext(ConceptSearchScope),
     [selectedConcept, setSelectedConcept] =
       useState<ConceptReferenceOptionType | undefined>(concept),
@@ -68,12 +60,7 @@ export default function ConceptReference({
       minQueryLength
     ),
     searchResults = getSearchResults(),
-    options = getOptions(),
-    commonSemanticTagStyles = {
-      marginLeft: 1,
-      lineHeight: 1.83,
-      alignSelf: "flex-start",
-    };
+    options = getOptions();
 
   function getSearchResults(): ConceptReferenceOptionType[] {
     return searchQuery.length >= minQueryLength && data?.concepts
@@ -121,174 +108,33 @@ export default function ConceptReference({
     }
   }
 
-  function buildExpression(concept: ConceptReferenceOptionType): string {
-    return concept.type === "ANY_CONCEPT"
-      ? "*"
-      : `${concept.id}${concept.display ? ` |${concept.display}|` : ""}`;
-  }
-
   function renderOption(
     // eslint-disable-next-line @typescript-eslint/ban-types
-    props: Object,
+    rawProps: Object,
     option: ConceptReferenceOptionType
   ): ReactNode {
+    const props = rawProps as Record<string, unknown>;
     if (selectedConcept && isOptionEqualToValue(option, selectedConcept)) {
-      return renderSelectedConceptOption(props, option);
-    } else if (option.type === "ANY_CONCEPT") {
-      return renderAnyConceptOption(props);
-    } else {
-      return renderSearchResultOption(props, option);
-    }
-  }
-
-  function renderAnyConceptOption(
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    props: Object
-  ) {
-    const display = "any concept",
-      semanticTag = (
-        <PushPin
-          sx={{
-            ...commonSemanticTagStyles,
-            fontSize: "1.2em",
-            color: grey(theme, 5),
-            position: "relative",
-            top: "0.2em",
-          }}
+      return (
+        <SelectedConcept
+          props={props}
+          option={option}
+          separator={options.length > 2}
         />
-      ),
-      listItemStyles =
-        options.length > 1
-          ? {
-              borderTopColor: grey(theme, 3),
-              borderTopWidth: 1,
-              borderTopStyle: "solid",
-            }
-          : {};
-    return (
-      <Option
-        key="ANY_CONCEPT"
-        props={props as Record<string, unknown>}
-        listItemStyles={listItemStyles}
-        display={display}
-        semanticTag={semanticTag}
-      />
-    );
-  }
-
-  function renderSelectedConceptOption(
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    props: Object,
-    option: ConceptSearchOption | AnyConceptOption
-  ) {
-    const display =
-        option.type === "ANY_CONCEPT"
-          ? "any concept"
-          : option.display ?? option.id,
-      semanticTag = (
-        <Chip
-          label="selected"
-          size="small"
-          sx={{ ...commonSemanticTagStyles, mr: 0 }}
-        />
-      ),
-      listItemStyles = {
-        "&.MuiAutocomplete-option": { pr: 1 },
-        ...(options.length > 2
-          ? {
-              borderBottomColor: grey(theme, 3),
-              borderBottomWidth: 1,
-              borderBottomStyle: "solid",
-            }
-          : {}),
-      };
-    return (
-      <Option
-        key={option.type === "ANY_CONCEPT" ? option.type : option.id}
-        props={props as Record<string, unknown>}
-        listItemStyles={listItemStyles}
-        display={display}
-        semanticTag={semanticTag}
-      />
-    );
-  }
-
-  function renderSearchResultOption(
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    props: Object,
-    option: ConceptSearchOption
-  ) {
-    const display = option.display ?? option.id,
-      semanticTag = (
-        <Typography
-          flexShrink={0}
-          variant="body2"
-          sx={{
-            ...commonSemanticTagStyles,
-            fontStyle: "italic",
-          }}
-        >
-          {option.semanticTag}
-        </Typography>
       );
-    return (
-      <Option
-        key={option.id}
-        props={props as Record<string, unknown>}
-        display={display}
-        semanticTag={semanticTag}
-      />
-    );
-  }
-
-  function getOptionLabel(option: ConceptReferenceOptionType) {
-    if (option.type === "ANY_CONCEPT") {
-      return "any concept";
+    } else if (option.type === "ANY_CONCEPT") {
+      return <AnyConcept props={props} separator={options.length > 1} />;
     } else {
-      return option.display ?? option.id;
-    }
-  }
-
-  function isOptionEqualToValue(
-    option: ConceptReferenceOptionType,
-    value: ConceptReferenceOptionType
-  ) {
-    if (option.type === "ANY_CONCEPT" && value.type === "ANY_CONCEPT") {
-      return true;
-    } else if (
-      option.type === "SPECIFIC_CONCEPT" &&
-      value.type === "SPECIFIC_CONCEPT"
-    ) {
-      return option.id === value.id;
-    } else {
-      return false;
+      return <SuggestedConcept props={props} option={option} />;
     }
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
   function renderInput(params: Object): ReactNode {
-    const resolvedLabel =
-      selectedConcept?.type === "ANY_CONCEPT"
-        ? "*"
-        : selectedConcept?.id ?? label;
     return (
-      <TextField
-        {...params}
-        variant="filled"
-        label={resolvedLabel}
-        sx={(theme) => ({
-          "& .MuiInputBase-root, & .MuiInputBase-root.MuiFilledInput-root.Mui-focused, & .MuiAutocomplete-inputFocused":
-            {
-              border: 0,
-              borderRadius: 0,
-              backgroundColor: theme.palette.background.paper,
-              fontSize: "0.95rem",
-              "&:hover": {
-                backgroundColor: theme.palette.background.paper,
-              },
-            },
-          "& .MuiFilledInput-root::before": { border: 0 },
-        })}
+      <ConceptSearchInput
+        props={params as Record<string, unknown>}
+        label={label}
       />
     );
   }
@@ -312,25 +158,32 @@ export default function ConceptReference({
   );
 }
 
-interface OptionProps {
-  props: Record<string, unknown>;
-  listItemStyles?: SxProps<Theme>;
-  display: ReactNode;
-  semanticTag: ReactNode;
+function buildExpression(concept: ConceptReferenceOptionType): string {
+  return concept.type === "ANY_CONCEPT"
+    ? "*"
+    : `${concept.id}${concept.display ? ` |${concept.display}|` : ""}`;
 }
 
-function Option({
-  props,
-  listItemStyles = {},
-  display,
-  semanticTag,
-}: OptionProps) {
-  return (
-    <ListItem {...props} sx={listItemStyles}>
-      <Typography sx={{ fontSize: "0.95em" }} flexGrow={1}>
-        {display}
-      </Typography>
-      {semanticTag ?? null}
-    </ListItem>
-  );
+function getOptionLabel(option: ConceptReferenceOptionType) {
+  if (option.type === "ANY_CONCEPT") {
+    return "any concept";
+  } else {
+    return option.display ?? option.id;
+  }
+}
+
+function isOptionEqualToValue(
+  option: ConceptReferenceOptionType,
+  value: ConceptReferenceOptionType
+) {
+  if (option.type === "ANY_CONCEPT" && value.type === "ANY_CONCEPT") {
+    return true;
+  } else if (
+    option.type === "SPECIFIC_CONCEPT" &&
+    value.type === "SPECIFIC_CONCEPT"
+  ) {
+    return option.id === value.id;
+  } else {
+    return false;
+  }
 }
