@@ -11,13 +11,14 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Theme,
 } from "@mui/material";
 import React from "react";
 import { ConceptSearchResult } from "../hooks/useValueSetExpansion";
 
 export interface ExpressionResultTableProps {
   results: ConceptSearchResult;
-  sx?: SxProps;
+  sx?: SxProps<Theme>;
 }
 
 export default function ExpressionResultTable({

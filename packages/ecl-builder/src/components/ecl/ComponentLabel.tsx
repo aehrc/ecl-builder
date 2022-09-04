@@ -3,11 +3,11 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Box, SxProps } from "@mui/material";
+import { Box, SxProps, Theme } from "@mui/material";
 import React, { PropsWithChildren } from "react";
 
 export interface ComponentLabelProps extends PropsWithChildren {
-  sx?: SxProps;
+  sx?: SxProps<Theme>;
 }
 
 /**

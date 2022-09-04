@@ -25,6 +25,10 @@ export default function Attribute({ children, onRemove }: AttributeProps) {
       {onRemove ? (
         <RemoveButton
           tooltip="Remove this attribute from the refinement"
+          sx={{
+            position: "relative",
+            left: "4px",
+          }}
           onClick={onRemove}
         />
       ) : null}

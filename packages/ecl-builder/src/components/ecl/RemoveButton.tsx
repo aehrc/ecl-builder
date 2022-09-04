@@ -4,21 +4,26 @@
  */
 
 import { Clear } from "@mui/icons-material";
-import { IconButton } from "@mui/material";
+import { IconButton, SxProps, Theme } from "@mui/material";
 import React from "react";
 
 export interface RemoveButtonProps {
   tooltip?: string;
+  sx?: SxProps<Theme>;
   onClick?: () => unknown;
 }
 
-export default function RemoveButton({ tooltip, onClick }: RemoveButtonProps) {
+export default function RemoveButton({
+  tooltip,
+  sx = {},
+  onClick,
+}: RemoveButtonProps) {
   return (
     <IconButton
       className="remove-button"
       size="small"
       title={tooltip ?? "Remove this expression"}
-      sx={{ alignSelf: "center", "&:hover": { color: "warning.main" } }}
+      sx={{ ...sx, alignSelf: "center", "&:hover": { color: "warning.main" } }}
       onClick={onClick}
     >
       <Clear />
