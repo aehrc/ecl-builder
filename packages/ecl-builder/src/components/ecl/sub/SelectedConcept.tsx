@@ -4,13 +4,13 @@
  */
 
 import { Chip, useTheme } from "@mui/material";
-import React from "react";
+import React, { HTMLAttributes } from "react";
 import { grey } from "../../../themes/color";
 import ConceptOption from "./ConceptOption";
 import { AnyConceptOption, ConceptSearchOption } from "./ConceptReference";
 
 export interface SelectedConceptProps {
-  props: Record<string, unknown>;
+  props: HTMLAttributes<HTMLLIElement>;
   option: ConceptSearchOption | AnyConceptOption;
   separator: boolean;
 }
@@ -38,7 +38,6 @@ export default function SelectedConcept({
     };
   return (
     <ConceptOption
-      key={option.type === "ANY_CONCEPT" ? option.type : option.id}
       props={props as Record<string, unknown>}
       listItemStyles={listItemStyles}
       display={display}

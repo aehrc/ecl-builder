@@ -5,12 +5,12 @@
 
 import { PushPin } from "@mui/icons-material";
 import { useTheme } from "@mui/material";
-import React from "react";
+import React, { HTMLAttributes } from "react";
 import { grey } from "../../../themes/color";
 import ConceptOption from "./ConceptOption";
 
 export interface AnyConcept {
-  props: Record<string, unknown>;
+  props: HTMLAttributes<HTMLLIElement>;
   separator: boolean;
 }
 
@@ -36,7 +36,6 @@ export default function AnyConcept({ props, separator }: AnyConcept) {
       : {};
   return (
     <ConceptOption
-      key="ANY_CONCEPT"
       props={props as Record<string, unknown>}
       listItemStyles={listItemStyles}
       display={display}

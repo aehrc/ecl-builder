@@ -4,7 +4,14 @@
  */
 
 import { Autocomplete } from "@mui/material";
-import React, { ReactNode, SyntheticEvent, useContext, useState } from "react";
+import React, {
+  HTMLAttributes,
+  Key,
+  ReactNode,
+  SyntheticEvent,
+  useContext,
+  useState,
+} from "react";
 import useConceptSearch from "../../../hooks/useConceptSearch";
 import { Concept } from "../../../hooks/useValueSetExpansion";
 import { OptionsContext } from "../../ExpressionBuilder";
@@ -112,22 +119,26 @@ export default function ConceptReference({
 
   function renderOption(
     // eslint-disable-next-line @typescript-eslint/ban-types
-    rawProps: Object,
-    option: ConceptReferenceOptionType
+    props: HTMLAttributes<HTMLLIElement>,
+    option: ConceptReferenceOptionType,
+    { selected }: { selected?: boolean }
   ): ReactNode {
-    const props = rawProps as Record<string, unknown>;
-    if (selectedConcept && isOptionEqualToValue(option, selectedConcept)) {
+    const key = (props as { key?: Key }).key;
+    if (selected) {
       return (
         <SelectedConcept
+          key={key}
           props={props}
           option={option}
           separator={options.length > 2}
         />
       );
     } else if (option.type === "ANY_CONCEPT") {
-      return <AnyConcept props={props} separator={options.length > 1} />;
+      return (
+        <AnyConcept key={key} props={props} separator={options.length > 1} />
+      );
     } else {
-      return <SuggestedConcept props={props} option={option} />;
+      return <SuggestedConcept key={key} props={props} option={option} />;
     }
   }
 

@@ -4,12 +4,12 @@
  */
 
 import { Typography } from "@mui/material";
-import React from "react";
+import React, { HTMLAttributes } from "react";
 import ConceptOption from "./ConceptOption";
 import { ConceptSearchOption } from "./ConceptReference";
 
 export interface SuggestedConceptProps {
-  props: Record<string, unknown>;
+  props: HTMLAttributes<HTMLLIElement>;
   option: ConceptSearchOption;
 }
 
@@ -31,7 +31,6 @@ export default function SuggestedConcept({
     );
   return (
     <ConceptOption
-      key={option.id}
       props={props as Record<string, unknown>}
       display={display}
       semanticTag={semanticTag}
