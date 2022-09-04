@@ -147,7 +147,9 @@ export default function ConceptReference({
     return (
       <ConceptSearchInput
         props={params as Record<string, unknown>}
-        label={label}
+        label={
+          selectedConcept ? getInputLabelForOption(selectedConcept) : label
+        }
       />
     );
   }
@@ -182,6 +184,14 @@ function getOptionLabel(option: ConceptReferenceOptionType) {
     return "any concept";
   } else {
     return option.display ?? option.id;
+  }
+}
+
+function getInputLabelForOption(option: ConceptReferenceOptionType): string {
+  if (option.type === "ANY_CONCEPT") {
+    return "*";
+  } else {
+    return option.id;
   }
 }
 
