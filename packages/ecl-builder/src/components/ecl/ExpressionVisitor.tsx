@@ -29,9 +29,12 @@ export type VisualExpressionType = ReactNode;
 
 export type ChangeHandler<T = string> = (expression: T) => unknown;
 
-export interface ChangeReporterProps<T = string> {
+export interface ChangeReporterProps<T = string> extends FocusManagementProps {
   // Invoked when expression is updated.
   onChange: ChangeHandler<T>;
+}
+
+export interface FocusManagementProps {
   // Set this to focus this component upon mounting it.
   focus?: boolean;
   // This reports when the component receives focus.

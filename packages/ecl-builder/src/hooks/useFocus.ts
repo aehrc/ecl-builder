@@ -15,7 +15,7 @@ export default function useFocus(focus?: boolean): RefObject<HTMLElement> {
   const focusRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (focus && focusRef.current) {
+    if (focus === true && focusRef.current) {
       focusRef.current.focus();
     }
   }, [focus]);

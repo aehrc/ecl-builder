@@ -12,10 +12,12 @@ parserOptions:
     jsx: true
   ecmaVersion: latest
   sourceType: module
+  project: ./tsconfig.json
 plugins:
   - react
   - '@typescript-eslint'
 settings:
   react:
     version: "17"
-rules: { }
+rules:
+  "@typescript-eslint/strict-boolean-expressions": warn

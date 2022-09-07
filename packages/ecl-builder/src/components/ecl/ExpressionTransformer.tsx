@@ -214,9 +214,10 @@ export default class ExpressionTransformer {
 
       // After each update, move the after update position to one character beyond the span of
       // updated characters.
-      afterUpdate = afterUpdate
-        ? afterUpdate + prefix.length + replacement.length
-        : prefix.length + replacement.length;
+      afterUpdate =
+        afterUpdate === undefined
+          ? prefix.length + replacement.length
+          : afterUpdate + prefix.length + replacement.length;
       return acc.concat(prefix, replacement);
     }, []);
 
@@ -247,7 +248,10 @@ export default class ExpressionTransformer {
         afterUpdate !== undefined
       ) {
         position = afterUpdate;
-      } else if (focusUpdateStrategy === "START_OF_UPDATE" && updateStart) {
+      } else if (
+        focusUpdateStrategy === "START_OF_UPDATE" &&
+        updateStart !== undefined
+      ) {
         position = updateStart;
       }
       if (position !== undefined) {

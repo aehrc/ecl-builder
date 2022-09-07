@@ -6,18 +6,25 @@
 import { Add } from "@mui/icons-material";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React, { PropsWithChildren, useState } from "react";
+import useFocus from "../../../hooks/useFocus";
 import Actions from "../Actions";
 import ExpressionGrouping from "../ExpressionGrouping";
-import { ChangeHandler } from "../ExpressionVisitor";
+import { ChangeHandler, FocusManagementProps } from "../ExpressionVisitor";
 import NeatRow from "../NeatRow";
 import ConceptReference from "../sub/ConceptReference";
 import LogicOperator from "./LogicOperator";
 
+// The type of logic statement, either "conjunction" or "disjunction".
 export type LogicStatementType = "conjunction" | "disjunction";
 
-export interface LogicStatementProps extends PropsWithChildren {
+export interface LogicStatementProps
+  extends FocusManagementProps,
+    PropsWithChildren {
+  // The type of logic statement, either "conjunction" or "disjunction".
   type: LogicStatementType;
+  // Invoked when the user changes the type of logic statement.
   onChangeType: (type: LogicStatementType) => unknown;
+  // Invoked when the user adds a new conjunction or disjunction to the statement.
   onAddCondition: ChangeHandler;
 }
 
@@ -35,11 +42,14 @@ export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
  */
 export default function LogicStatement({
   type,
+  focus,
   onChangeType,
   onAddCondition,
+  onFocus,
   children,
 }: LogicStatementProps) {
-  const [addCondition, setAddCondition] = useState(false);
+  const [addCondition, setAddCondition] = useState(false),
+    focusRef = useFocus(focus);
 
   function handleSelectType(event: SelectChangeEvent<LogicStatementType>) {
     onChangeType(event.target.value as LogicStatementType);
@@ -54,8 +64,10 @@ export default function LogicStatement({
     return (
       <NeatRow className="logic-statement-heading">
         <Select
+          inputRef={focusRef}
           value={type}
           onChange={handleSelectType}
+          onFocus={onFocus}
           sx={{ backgroundColor: "background.default", border: 0 }}
         >
           <MenuItem value="conjunction">
