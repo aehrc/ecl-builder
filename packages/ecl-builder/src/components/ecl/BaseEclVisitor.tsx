@@ -10,13 +10,29 @@ import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
 import ExpressionTransformer, { Span } from "./ExpressionTransformer";
 import { VisualExpressionType } from "./ExpressionVisitor";
 
+// Reports an update to the focus, along with a position within the current expression.
+export type PositionedFocusHandler = (position?: number) => unknown;
+
 export interface BaseEclVisitorOptions {
+  // A transformer that is used to transform the expression in response to updates.
   transformer: ExpressionTransformer;
+  // The current position within the expression that is the focus of user input.
+  focusPosition: number | undefined;
+  // A set of spans that is the current context for removal.
   removalContext: Span[];
+  // Set to true if the current context is within a refinement.
   refinement: boolean;
+  // Set to true if the current context is within an attribute grouping.
   attributeGrouping: boolean;
+  // Called when the focus position changes.
+  onFocus: PositionedFocusHandler;
 }
 
+/**
+ * The base class from which all other visitors are derived.
+ *
+ * @author John Grimes
+ */
 export default class BaseEclVisitor extends ECLVisitor {
   readonly transformer: ExpressionTransformer;
   readonly options: BaseEclVisitorOptions;
@@ -25,10 +41,6 @@ export default class BaseEclVisitor extends ECLVisitor {
     super();
     this.transformer = options.transformer;
     this.options = options;
-  }
-
-  visit(ctx: ParserRuleContext): VisualExpressionType {
-    return super.visit(ctx);
   }
 
   visitChildren(ctx: ParserRuleContext): VisualExpressionType {
@@ -49,12 +61,6 @@ export default class BaseEclVisitor extends ECLVisitor {
   addKeys(ctxs: VisualExpressionType[]): VisualExpressionType[] {
     return ctxs.map((child) =>
       isValidElement(child) ? cloneElement(child, { key: uuid.v4() }) : child
-    );
-  }
-
-  protected defaultResult(): never {
-    throw new Error(
-      "ExpressionVisitor: visitation fell through to default result"
     );
   }
 }

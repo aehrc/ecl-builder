@@ -47,7 +47,8 @@ export default function ExpressionBuilder({
   options = {},
 }: ExpressionBuilderProps) {
   const [tab, setTab] = useState("visual"),
-    [expression, setExpression] = useState(initialExpression);
+    [expression, setExpression] = useState(initialExpression),
+    [focusPosition, setFocusPosition] = useState<number | undefined>(undefined);
 
   function handleChange(newExpression: string) {
     setExpression(newExpression);
@@ -78,7 +79,9 @@ export default function ExpressionBuilder({
           <TabPanel id="visual" key="visual" selectedId={tab}>
             <VisualBuilder
               expression={expression ?? ""}
+              focusPosition={focusPosition}
               onChange={handleChange}
+              setFocusPosition={setFocusPosition}
             />
           </TabPanel>
           <TabPanel id="code" key="code" selectedId={tab}>

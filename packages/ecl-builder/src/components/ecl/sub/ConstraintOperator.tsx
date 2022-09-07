@@ -5,6 +5,7 @@
 
 import { MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
 import React from "react";
+import useFocus from "../../../hooks/useFocus";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 
 export interface ConstraintOperatorProps extends ChangeReporterProps {
@@ -32,14 +33,18 @@ export const operatorToConstraintName: Record<string, ConstraintType> =
 export type ConstraintType = keyof typeof constraintNameToOperator;
 
 /**
- * Represents a constraint operator, that modifies the scope of a subexpression.
+ * Represents an operator that modifies the scope of a subexpression.
  *
  * @author John Grimes
  */
 export default function ConstraintOperator({
   constraint,
+  focus,
   onChange,
+  onFocus,
 }: ConstraintOperatorProps) {
+  const focusRef = useFocus(focus);
+
   function handleSelectConstraint(
     event: SelectChangeEvent<ConstraintType>
   ): void {
@@ -55,8 +60,10 @@ export default function ConstraintOperator({
   return (
     <Stack className="constraint-operator" direction="row">
       <Select
+        inputRef={focusRef}
         value={constraint || "descendantorselfof"}
         onChange={handleSelectConstraint}
+        onFocus={onFocus}
       >
         <MenuItem value="descendantorselfof">self and descendants of</MenuItem>
         <MenuItem value="ancestororselfof">self and ancestors of</MenuItem>

@@ -4,8 +4,8 @@
  */
 
 import antlr4 from "antlr4";
-import {ErrorListener} from "antlr4/error";
-import React, {ReactNode} from "react";
+import { ErrorListener } from "antlr4/error";
+import React, { ReactNode } from "react";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser, {
   CompoundexpressionconstraintContext,
@@ -13,7 +13,10 @@ import ECLParser, {
   RefinedexpressionconstraintContext,
   SubexpressionconstraintContext,
 } from "../../parser/src/grammar/syntax/ECLParser";
-import BaseEclVisitor, {BaseEclVisitorOptions} from "./BaseEclVisitor";
+import BaseEclVisitor, {
+  BaseEclVisitorOptions,
+  PositionedFocusHandler,
+} from "./BaseEclVisitor";
 import BlankExpression from "./BlankExpression";
 import CompoundVisitor from "./compound/CompoundVisitor";
 import ExpressionConstraint from "./ExpressionConstraint";
@@ -29,6 +32,10 @@ export type ChangeHandler<T = string> = (expression: T) => unknown;
 export interface ChangeReporterProps<T = string> {
   // Invoked when expression is updated.
   onChange: ChangeHandler<T>;
+  // Set this to focus this component upon mounting it.
+  focus?: boolean;
+  // This reports when the component receives focus.
+  onFocus?: () => unknown;
 }
 
 export type ExpressionVisitorOptions = BaseEclVisitorOptions;
@@ -78,26 +85,36 @@ function getExpressionContext(expression: string): ExpressionconstraintContext {
     lexer = new ECLLexer(input),
     tokens = new antlr4.CommonTokenStream(lexer),
     parser = new ECLParser(tokens);
+
+  // Remove the default error listener and add a custom implementation.
   parser.removeErrorListeners();
   parser.addErrorListener(new ExpressionParserErrorListener() as ErrorListener);
+
   return parser.expressionconstraint();
 }
 
 export function visitExpression(
   expression: string,
-  onChange: (expression: string) => unknown
+  focusPosition: number | undefined,
+  onChange: (expression: string) => unknown,
+  onFocus: PositionedFocusHandler
 ): VisualExpressionType {
+  // Create a new visitor capable of parsing the expression and outputting a visual representation.
   const visitor = new ExpressionVisitor({
-    transformer: new ExpressionTransformer(expression, onChange),
+    transformer: new ExpressionTransformer(expression, onChange, onFocus),
+    focusPosition,
     removalContext: [],
     refinement: false,
     attributeGrouping: false,
+    onFocus,
   });
+
   // If there is nothing but whitespace in the expression, we render a blank concept reference
   // component to bootstrap the build.
   if (expression.trim().length === 0) {
     return <BlankExpression onChange={(e) => visitor.transformer.replace(e)} />;
   } else {
+    // Otherwise, we parse the expression and visit it.
     const expressionContext = getExpressionContext(expression);
     return visitor.visit(expressionContext);
   }

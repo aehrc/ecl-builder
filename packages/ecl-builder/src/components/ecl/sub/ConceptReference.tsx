@@ -3,7 +3,7 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Autocomplete } from "@mui/material";
+import { Autocomplete, TextFieldProps } from "@mui/material";
 import React, {
   HTMLAttributes,
   Key,
@@ -13,6 +13,7 @@ import React, {
   useState,
 } from "react";
 import useConceptSearch from "../../../hooks/useConceptSearch";
+import useFocus from "../../../hooks/useFocus";
 import { Concept } from "../../../hooks/useValueSetExpansion";
 import { OptionsContext } from "../../ExpressionBuilder";
 import { ChangeReporterProps } from "../ExpressionVisitor";
@@ -31,14 +32,17 @@ export interface BaseOptionType {
   type: string;
 }
 
+// Represents a concept that has been returned from a search on the terminology server.
 export interface ConceptSearchOption extends Concept, BaseOptionType {
   type: "SPECIFIC_CONCEPT";
 }
 
+// Represents the special "Any concept" option.
 export interface AnyConceptOption extends BaseOptionType {
   type: "ANY_CONCEPT";
 }
 
+// An option displayed as part of the autocomplete.
 export type ConceptReferenceOptionType = ConceptSearchOption | AnyConceptOption;
 
 const ANY_CONCEPT: AnyConceptOption = { type: "ANY_CONCEPT" };
@@ -51,7 +55,9 @@ const ANY_CONCEPT: AnyConceptOption = { type: "ANY_CONCEPT" };
  */
 export default function ConceptReference({
   concept,
+  focus,
   onChange,
+  onFocus,
 }: ConceptReferenceProps) {
   const { terminologyServerUrl, maxSearchResults, minQueryLength } =
       useContext(OptionsContext),
@@ -66,9 +72,13 @@ export default function ConceptReference({
       maxSearchResults,
       minQueryLength
     ),
+    focusRef = useFocus(focus),
     searchResults = getSearchResults(),
     options = getOptions();
 
+  /**
+   * Map the raw search results into a set of options for the autocomplete.
+   */
   function getSearchResults(): ConceptReferenceOptionType[] {
     return searchQuery.length >= minQueryLength && data?.concepts
       ? data.concepts
@@ -85,6 +95,9 @@ export default function ConceptReference({
       : [];
   }
 
+  /**
+   * Get the full set of options, including "any concept" and the currently selected concept.
+   */
   function getOptions(): ConceptReferenceOptionType[] {
     return [
       ...(selectedConcept ? [selectedConcept] : []),
@@ -146,10 +159,12 @@ export default function ConceptReference({
   function renderInput(params: Object): ReactNode {
     return (
       <ConceptSearchInput
-        props={params as Record<string, unknown>}
+        ref={focusRef}
+        props={params as TextFieldProps}
         label={
           selectedConcept ? getInputLabelForOption(selectedConcept) : label
         }
+        onFocus={onFocus}
       />
     );
   }
@@ -173,12 +188,18 @@ export default function ConceptReference({
   );
 }
 
+/**
+ * Builds the new expression that would result, should the given concept be selected.
+ */
 function buildExpression(concept: ConceptReferenceOptionType): string {
   return concept.type === "ANY_CONCEPT"
     ? "*"
     : `${concept.id}${concept.display ? ` |${concept.display}|` : ""}`;
 }
 
+/**
+ * Determine the label for each item within the autocomplete.
+ */
 function getOptionLabel(option: ConceptReferenceOptionType) {
   if (option.type === "ANY_CONCEPT") {
     return "any concept";
@@ -187,6 +208,9 @@ function getOptionLabel(option: ConceptReferenceOptionType) {
   }
 }
 
+/**
+ * Determine the label within the input field, based on the concept that has been selected.
+ */
 function getInputLabelForOption(option: ConceptReferenceOptionType): string {
   if (option.type === "ANY_CONCEPT") {
     return "*";
@@ -195,6 +219,9 @@ function getInputLabelForOption(option: ConceptReferenceOptionType): string {
   }
 }
 
+/**
+ * Used for determining equality between options.
+ */
 function isOptionEqualToValue(
   option: ConceptReferenceOptionType,
   value: ConceptReferenceOptionType

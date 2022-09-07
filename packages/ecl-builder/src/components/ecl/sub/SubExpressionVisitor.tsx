@@ -5,6 +5,7 @@
 
 import React from "react";
 import { REFERENCE_SET_VALUE_SET_URI } from "../../../constants";
+import { focusHandler, isFocused } from "../../../hooks/useFocus";
 import {
   CompoundexpressionconstraintContext,
   ConstraintoperatorContext,
@@ -14,7 +15,7 @@ import {
   SubexpressionconstraintContext,
   WildcardContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
-import BaseEclVisitor, { BaseEclVisitorOptions } from "../BaseEclVisitor";
+import BaseEclVisitor from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
 import { logicStatementTypeToOperator } from "../compound/LogicStatement";
 import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
@@ -28,10 +29,11 @@ import ConstraintOperator, {
 import MemberOfOperator, { MEMBER_OF_OPERATOR } from "./MemberOfOperator";
 import SubExpression from "./SubExpression";
 
-export interface SubExpressionVisitorOptions extends BaseEclVisitorOptions {
-  refinement: boolean;
-}
-
+/**
+ * This component implements an ANTLR visitor specialised to the task of rendering sub-expressions.
+ *
+ * @author John Grimes
+ */
 export default class SubExpressionVisitor extends BaseEclVisitor {
   visitExpressionconstraint(
     ctx: ExpressionconstraintContext
@@ -75,6 +77,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
           if (constraintOperator) {
             this.transformer.remove(constraintOperator, {
               collapseWhiteSpaceRight: true,
+              focusUpdateStrategy: "AFTER_UPDATE",
             });
           } else {
             console.warn(
@@ -85,7 +88,9 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         onAddMemberOf={() => {
           const eclFocusConcept = ctx.eclfocusconcept();
           if (eclFocusConcept) {
-            this.transformer.prepend(eclFocusConcept, MEMBER_OF_OPERATOR);
+            this.transformer.prepend(eclFocusConcept, MEMBER_OF_OPERATOR, {
+              focusUpdateStrategy: "AFTER_UPDATE",
+            });
           } else {
             console.warn("Passed nullish eclfocusconcept to onAddMemberOf");
           }
@@ -95,6 +100,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
           if (memberOf) {
             this.transformer.remove(memberOf, {
               collapseWhiteSpaceRight: true,
+              focusUpdateStrategy: "AFTER_UPDATE",
             });
           } else {
             console.warn("Passed nullish memberof to onRemoveMemberOf");
@@ -147,7 +153,9 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
           id: ctx.conceptid().getText(),
           display: ctx.term()?.getText(),
         }}
+        focus={isFocused(this.options.focusPosition, ctx)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(this.options.onFocus, ctx)}
       />
     );
   }
@@ -167,7 +175,9 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     return (
       <ConstraintOperator
         constraint={operatorToConstraintName[ctx.getText()]}
+        focus={isFocused(this.options.focusPosition, ctx)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(this.options.onFocus, ctx)}
       />
     );
   }
