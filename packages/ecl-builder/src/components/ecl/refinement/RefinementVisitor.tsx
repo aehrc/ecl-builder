@@ -215,8 +215,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     return (
       <ComparisonOperator
         type={ctx.getText()}
+        focus={isFocused(ctx, this.options.focusPosition)}
         typeLabelMap={NUMERIC_COMPARISON_OPERATORS}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -227,8 +229,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     return (
       <ComparisonOperator
         type={ctx.getText()}
+        focus={isFocused(ctx, this.options.focusPosition)}
         typeLabelMap={STRING_COMPARISON_OPERATORS}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
