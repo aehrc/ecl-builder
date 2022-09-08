@@ -5,6 +5,7 @@
 
 import { Box } from "@mui/material";
 import React, { useContext } from "react";
+import { PositionedFocusHandler } from "./ecl/BaseEclVisitor";
 import { visitExpression } from "./ecl/ExpressionVisitor";
 import { FocusContext } from "./ecl/FocusProvider";
 import ErrorBoundary from "./ErrorBoundary";
@@ -25,21 +26,32 @@ export default function VisualBuilder({
   expression,
   onChange,
 }: VisualBuilderProps) {
-  const { position: focusPosition, onFocus: setFocusPosition } =
-    useContext(FocusContext);
+  const { position: focusPosition, onFocus } = useContext(FocusContext);
 
   return (
     <Box className="visual-builder">
       <ErrorBoundary>
-        <>
-          {visitExpression(
-            expression,
-            focusPosition,
-            onChange,
-            setFocusPosition
-          )}
-        </>
+        <Expression
+          expression={expression}
+          onChange={onChange}
+          focusPosition={focusPosition}
+          onFocus={onFocus}
+        />
       </ErrorBoundary>
     </Box>
   );
+}
+
+interface ExpressionProps extends VisualBuilderProps {
+  focusPosition?: number;
+  onFocus?: PositionedFocusHandler;
+}
+
+function Expression({
+  expression,
+  onChange,
+  focusPosition,
+  onFocus,
+}: ExpressionProps) {
+  return <>{visitExpression(expression, focusPosition, onChange, onFocus)}</>;
 }

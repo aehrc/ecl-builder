@@ -3,8 +3,9 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Alert, TextField, Typography } from "@mui/material";
+import { Alert, TextField, Typography, useTheme } from "@mui/material";
 import React, { useState } from "react";
+import { grey } from "../../themes/color";
 import { ChangeReporterProps } from "./ExpressionVisitor";
 import { useFocus } from "./FocusProvider";
 
@@ -22,11 +23,20 @@ export default function Fallback({
   onChange,
   onFocus,
 }: FallbackProps) {
-  const [currentValue, setCurrentValue] = useState(expression),
+  const theme = useTheme(),
+    [currentValue, setCurrentValue] = useState(expression),
     focusRef = useFocus(focus);
 
   return (
-    <Alert severity="warning">
+    <Alert
+      severity="warning"
+      sx={{
+        borderColor: grey(theme, 4),
+        borderWidth: 1,
+        borderStyle: "solid",
+        flexGrow: 1,
+      }}
+    >
       <Typography variant="body2">
         <span>&ldquo;{name}&rdquo;</span> expressions are not currently
         supported in the visual builder.
@@ -37,7 +47,13 @@ export default function Fallback({
         onChange={(e) => setCurrentValue(e.target.value)}
         onFocus={onFocus}
         onBlur={(e) => onChange(e.target.value)}
-        sx={{ mt: 2 }}
+        sx={{
+          mt: 2,
+          "& .MuiInputBase-input": {
+            fontSize: "0.8em",
+            fontFamily: "monospace",
+          },
+        }}
         size="small"
         fullWidth
       />

@@ -4,7 +4,9 @@
  */
 
 import { Stack } from "@mui/material";
-import React, { PropsWithChildren } from "react";
+import React, { Children, PropsWithChildren } from "react";
+import { interleave } from "../../../array";
+import HorizontalLink from "../HorizontalLink";
 import RemoveButton from "../RemoveButton";
 
 export interface AttributeProps extends PropsWithChildren {
@@ -12,6 +14,16 @@ export interface AttributeProps extends PropsWithChildren {
 }
 
 export default function Attribute({ children, onRemove }: AttributeProps) {
+  const childrenArray = Children.toArray(children),
+    interleavedChildren = interleave(
+      childrenArray,
+      new Array(childrenArray.length - 1).fill(
+        <HorizontalLink
+          style={{ marginTop: "1.85em", alignSelf: "flex-start" }}
+        />
+      )
+    );
+
   return (
     <Stack className="attribute" direction="row" spacing={1}>
       <Stack
@@ -20,7 +32,7 @@ export default function Attribute({ children, onRemove }: AttributeProps) {
         flexGrow={1}
         alignItems="flex-start"
       >
-        {children}
+        {interleavedChildren}
       </Stack>
       {onRemove ? (
         <RemoveButton

@@ -8,7 +8,6 @@ import React from "react";
 import { grey } from "../../../themes/color";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
-import HorizontalLink from "../HorizontalLink";
 
 export interface ComparisonOperatorProps<T extends string>
   extends ChangeReporterProps {
@@ -29,36 +28,31 @@ export default function ComparisonOperator<T extends string>({
   onFocus,
 }: ComparisonOperatorProps<T>) {
   const theme = useTheme(),
-    focusRef = useFocus(focus),
-    horizontalLinkStyle = { marginTop: "1.85em", alignSelf: "flex-start" };
+    focusRef = useFocus(focus);
 
   function handleSelectOperator(event: SelectChangeEvent<T>) {
     onChange(event.target.value as T);
   }
 
   return (
-    <>
-      <HorizontalLink style={horizontalLinkStyle} />
-      <Select
-        inputRef={focusRef}
-        value={type}
-        onChange={handleSelectOperator}
-        onFocus={onFocus}
-        sx={{
-          alignSelf: "flex-start",
-          borderWidth: 1,
-          borderColor: grey(theme, 4),
-          borderStyle: "solid",
-          borderRadius: 1,
-        }}
-      >
-        {Object.keys(typeLabelMap).map((type) => (
-          <MenuItem key={type} value={type}>
-            {typeLabelMap[type as T]}
-          </MenuItem>
-        ))}
-      </Select>
-      <HorizontalLink style={horizontalLinkStyle} />
-    </>
+    <Select
+      inputRef={focusRef}
+      value={type}
+      onChange={handleSelectOperator}
+      onFocus={onFocus}
+      sx={{
+        alignSelf: "flex-start",
+        borderWidth: 1,
+        borderColor: grey(theme, 4),
+        borderStyle: "solid",
+        borderRadius: 1,
+      }}
+    >
+      {Object.keys(typeLabelMap).map((type) => (
+        <MenuItem key={type} value={type}>
+          {typeLabelMap[type as T]}
+        </MenuItem>
+      ))}
+    </Select>
   );
 }

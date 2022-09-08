@@ -7,9 +7,13 @@ import React from "react";
 import { REFERENCE_SET_VALUE_SET_URI } from "../../../constants";
 import {
   CompoundexpressionconstraintContext,
+  ConceptfilterconstraintContext,
   ConstraintoperatorContext,
+  DescriptionfilterconstraintContext,
   EclconceptreferenceContext,
   ExpressionconstraintContext,
+  HistorysupplementContext,
+  MemberfilterconstraintContext,
   RefinedexpressionconstraintContext,
   SubexpressionconstraintContext,
   WildcardContext,
@@ -17,7 +21,9 @@ import {
 import BaseEclVisitor from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
 import { logicStatementTypeToOperator } from "../compound/LogicStatement";
+import ExpressionGrouping from "../ExpressionGrouping";
 import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
+import Fallback from "../Fallback";
 import { focusHandler, isFocused } from "../FocusProvider";
 import RefinementVisitor from "../refinement/RefinementVisitor";
 import ConceptReference from "./ConceptReference";
@@ -38,7 +44,11 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   visitExpressionconstraint(
     ctx: ExpressionconstraintContext
   ): VisualExpressionType {
-    return new ExpressionVisitor(this.options).visit(ctx);
+    return (
+      <ExpressionGrouping>
+        {new ExpressionVisitor(this.options).visit(ctx)}
+      </ExpressionGrouping>
+    );
   }
 
   visitRefinedexpressionconstraint(
@@ -60,7 +70,13 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     // wrapper. We effectively merge these two levels together from a UI perspective.
     const expressionConstraint = ctx.expressionconstraint();
     const content = expressionConstraint ? (
-      this.visitChildren(expressionConstraint)
+      <Fallback
+        name="Nested within sub-expression"
+        expression={ctx.getText()}
+        focus={isFocused(ctx, this.options.focusPosition)}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
+      />
     ) : (
       <SubExpression
         constraint={!!ctx.constraintoperator()}
@@ -175,6 +191,60 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     return (
       <ConstraintOperator
         constraint={operatorToConstraintName[ctx.getText()]}
+        focus={isFocused(ctx, this.options.focusPosition)}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
+      />
+    );
+  }
+
+  visitDescriptionfilterconstraint(
+    ctx: DescriptionfilterconstraintContext
+  ): VisualExpressionType {
+    return (
+      <Fallback
+        name="Description filter"
+        expression={ctx.getText()}
+        focus={isFocused(ctx, this.options.focusPosition)}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
+      />
+    );
+  }
+
+  visitConceptfilterconstraint(
+    ctx: ConceptfilterconstraintContext
+  ): VisualExpressionType {
+    return (
+      <Fallback
+        name="Concept filter"
+        expression={ctx.getText()}
+        focus={isFocused(ctx, this.options.focusPosition)}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
+      />
+    );
+  }
+
+  visitMemberfilterconstraint(
+    ctx: MemberfilterconstraintContext
+  ): VisualExpressionType {
+    return (
+      <Fallback
+        name="Member filter"
+        expression={ctx.getText()}
+        focus={isFocused(ctx, this.options.focusPosition)}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
+      />
+    );
+  }
+
+  visitHistorysupplement(ctx: HistorysupplementContext): VisualExpressionType {
+    return (
+      <Fallback
+        name="History supplement"
+        expression={ctx.getText()}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
         onFocus={focusHandler(ctx, this.options.onFocus)}

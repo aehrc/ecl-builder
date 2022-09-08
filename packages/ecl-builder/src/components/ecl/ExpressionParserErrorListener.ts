@@ -5,6 +5,7 @@
 
 import { Recognizer, Token } from "antlr4";
 
+// noinspection JSUnusedGlobalSymbols
 export default class ExpressionParserErrorListener {
   syntaxError(
     recognizer: Recognizer,

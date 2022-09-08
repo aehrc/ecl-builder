@@ -9,6 +9,7 @@ import React, { ReactNode } from "react";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser, {
   CompoundexpressionconstraintContext,
+  DottedexpressionconstraintContext,
   ExpressionconstraintContext,
   RefinedexpressionconstraintContext,
   SubexpressionconstraintContext,
@@ -22,6 +23,8 @@ import CompoundVisitor from "./compound/CompoundVisitor";
 import ExpressionConstraint from "./ExpressionConstraint";
 import ExpressionParserErrorListener from "./ExpressionParserErrorListener";
 import ExpressionTransformer from "./ExpressionTransformer";
+import Fallback from "./Fallback";
+import { focusHandler, isFocused } from "./FocusProvider";
 import RefinementVisitor from "./refinement/RefinementVisitor";
 import SubExpressionVisitor from "./sub/SubExpressionVisitor";
 
@@ -74,6 +77,20 @@ export class ExpressionVisitor extends BaseEclVisitor {
     ctx: CompoundexpressionconstraintContext
   ): VisualExpressionType {
     return new CompoundVisitor(this.options).visit(ctx);
+  }
+
+  visitDottedexpressionconstraint(
+    ctx: DottedexpressionconstraintContext
+  ): VisualExpressionType {
+    return (
+      <Fallback
+        name="Dotted"
+        expression={ctx.getText()}
+        focus={isFocused(ctx, this.options.focusPosition)}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
+      />
+    );
   }
 
   visitSubexpressionconstraint(

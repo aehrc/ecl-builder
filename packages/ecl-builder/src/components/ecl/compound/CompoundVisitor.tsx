@@ -9,11 +9,13 @@ import { interleave } from "../../../array";
 import {
   ConjunctionexpressionconstraintContext,
   DisjunctionexpressionconstraintContext,
+  ExclusionexpressionconstraintContext,
   ExpressionconstraintContext,
   SubexpressionconstraintContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
 import BaseEclVisitor from "../BaseEclVisitor";
 import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
+import Fallback from "../Fallback";
 import { focusHandler, isFocused } from "../FocusProvider";
 import SubExpressionVisitor from "../sub/SubExpressionVisitor";
 import LogicOperator from "./LogicOperator";
@@ -44,6 +46,20 @@ export default class CompoundVisitor extends BaseEclVisitor {
     ctx: DisjunctionexpressionconstraintContext
   ): VisualExpressionType {
     return this.renderLogicStatement(ctx, ctx.disjunction(), "disjunction");
+  }
+
+  visitExclusionexpressionconstraint(
+    ctx: ExclusionexpressionconstraintContext
+  ): VisualExpressionType {
+    return (
+      <Fallback
+        name="Exclusion"
+        expression={ctx.getText()}
+        focus={isFocused(ctx, this.options.focusPosition)}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
+      />
+    );
   }
 
   visitSubexpressionconstraint(

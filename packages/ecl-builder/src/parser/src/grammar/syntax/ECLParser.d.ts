@@ -66,6 +66,16 @@ export class DisjunctionexpressionconstraintContext extends ParserRuleContext {
 }
 
 /**
+ * exclusionexpressionconstraint : subexpressionconstraint ws exclusion ws subexpressionconstraint;
+ */
+export class ExclusionexpressionconstraintContext extends ParserRuleContext {}
+
+/**
+ * dottedexpressionconstraint : subexpressionconstraint (ws dottedexpressionattribute)+;
+ */
+export class DottedexpressionconstraintContext extends ParserRuleContext {}
+
+/**
  * subexpressionconstraint: (constraintoperator ws)? ( ( (memberof ws)? (eclfocusconcept |
  * (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) (ws memberfilterconstraint)*) |
  * (eclfocusconcept | (LEFT_PAREN ws expressionconstraint ws RIGHT_PAREN)) ) (ws
@@ -168,7 +178,8 @@ export class DisjunctionrefinementsetContext extends ParserRuleContext {
 }
 
 /**
- * subrefinement : eclattributeset | eclattributegroup | (LEFT_PAREN ws eclrefinement ws RIGHT_PAREN);
+ * subrefinement : eclattributeset | eclattributegroup |
+ * (LEFT_PAREN ws eclrefinement ws RIGHT_PAREN);
  */
 export class SubrefinementContext extends ParserRuleContext {
   eclattributeset(): EclattributesetContext | null | undefined;
@@ -230,6 +241,11 @@ export class EclattributeContext extends ParserRuleContext {}
 export class CardinalityContext extends ParserRuleContext {}
 
 /**
+ * reverseflag : (CAP_R | R);
+ */
+export class ReverseflagContext extends ParserRuleContext {}
+
+/**
  * eclattributename : subexpressionconstraint;
  */
 export class EclattributenameContext extends ParserRuleContext {}
@@ -253,6 +269,13 @@ export class NumericcomparisonoperatorContext extends ParserRuleContext {}
 export class StringcomparisonoperatorContext extends ParserRuleContext {}
 
 /**
+ * descriptionfilterconstraint : (LEFT_CURLY_BRACE LEFT_CURLY_BRACE) ws
+ * ( (CAP_D | D) | (CAP_D | D) )? ws descriptionfilter (ws COMMA ws descriptionfilter)* ws
+ * (RIGHT_CURLY_BRACE RIGHT_CURLY_BRACE);
+ */
+export class DescriptionfilterconstraintContext extends ParserRuleContext {}
+
+/**
  * matchsearchterm : (nonwsnonescapedchar | escapedchar)+;
  */
 export class MatchsearchtermContext extends ParserRuleContext {}
@@ -263,6 +286,24 @@ export class MatchsearchtermContext extends ParserRuleContext {}
 export class MatchsearchtermsetContext extends ParserRuleContext {
   matchsearchterm(): MatchsearchtermContext[];
 }
+
+/**
+ * conceptfilterconstraint : (LEFT_CURLY_BRACE LEFT_CURLY_BRACE) ws ((CAP_C | C) | (CAP_C | C)) ws
+ * conceptfilter (ws COMMA ws conceptfilter)* ws (RIGHT_CURLY_BRACE RIGHT_CURLY_BRACE);
+ */
+export class ConceptfilterconstraintContext extends ParserRuleContext {}
+
+/**
+ * memberfilterconstraint : (LEFT_CURLY_BRACE LEFT_CURLY_BRACE) ws ((CAP_M | M) | (CAP_M | M)) ws
+ * memberfilter (ws COMMA ws memberfilter)* ws (RIGHT_CURLY_BRACE RIGHT_CURLY_BRACE);
+ */
+export class MemberfilterconstraintContext extends ParserRuleContext {}
+
+/**
+ * historysupplement : (LEFT_CURLY_BRACE LEFT_CURLY_BRACE) ws PLUS ws historykeyword
+ * ( historyprofilesuffix | (ws historysubset) )? ws (RIGHT_CURLY_BRACE RIGHT_CURLY_BRACE);
+ */
+export class HistorysupplementContext extends ParserRuleContext {}
 
 /**
  * numericvalue : (DASH|PLUS)? (decimalvalue | integervalue);

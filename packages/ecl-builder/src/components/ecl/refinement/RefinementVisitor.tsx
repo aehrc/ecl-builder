@@ -21,6 +21,7 @@ import {
   NumericcomparisonoperatorContext,
   NumericvalueContext,
   RefinedexpressionconstraintContext,
+  ReverseflagContext,
   StringcomparisonoperatorContext,
   SubexpressionconstraintContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
@@ -188,6 +189,18 @@ export default class RefinementVisitor extends BaseEclVisitor {
     return (
       <Fallback
         name="Cardinality"
+        expression={ctx.getText()}
+        focus={isFocused(ctx, this.options.focusPosition)}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
+      />
+    );
+  }
+
+  visitReverseflag(ctx: ReverseflagContext): VisualExpressionType {
+    return (
+      <Fallback
+        name="Reverse flag"
         expression={ctx.getText()}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
