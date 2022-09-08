@@ -155,7 +155,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         }}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(this.options.onFocus, ctx)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -177,7 +177,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         constraint={operatorToConstraintName[ctx.getText()]}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(this.options.onFocus, ctx)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }

@@ -109,7 +109,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
           )
         }
         onAddCondition={(e) => this.transformer.append(ctx, e)}
-        onFocus={focusHandler(this.options.onFocus, ctx)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
       >
         {result}
       </LogicStatement>

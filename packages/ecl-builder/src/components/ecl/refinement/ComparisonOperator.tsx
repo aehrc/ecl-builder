@@ -7,6 +7,7 @@ import { MenuItem, Select, SelectChangeEvent, useTheme } from "@mui/material";
 import React from "react";
 import { grey } from "../../../themes/color";
 import { ChangeReporterProps } from "../ExpressionVisitor";
+import { useFocus } from "../FocusProvider";
 import HorizontalLink from "../HorizontalLink";
 
 export interface ComparisonOperatorProps<T extends string>
@@ -15,12 +16,20 @@ export interface ComparisonOperatorProps<T extends string>
   typeLabelMap: Record<T, string>;
 }
 
+/**
+ * Represents an operator that compares an attribute name with an attribute value.
+ *
+ * @author John Grimes
+ */
 export default function ComparisonOperator<T extends string>({
   type,
   typeLabelMap,
+  focus,
   onChange,
+  onFocus,
 }: ComparisonOperatorProps<T>) {
   const theme = useTheme(),
+    focusRef = useFocus(focus),
     horizontalLinkStyle = { marginTop: "1.85em", alignSelf: "flex-start" };
 
   function handleSelectOperator(event: SelectChangeEvent<T>) {
@@ -31,8 +40,10 @@ export default function ComparisonOperator<T extends string>({
     <>
       <HorizontalLink style={horizontalLinkStyle} />
       <Select
+        inputRef={focusRef}
         value={type}
         onChange={handleSelectOperator}
+        onFocus={onFocus}
         sx={{
           alignSelf: "flex-start",
           borderWidth: 1,

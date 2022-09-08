@@ -30,6 +30,7 @@ import {
   logicStatementTypeToOperator,
 } from "../compound/LogicStatement";
 import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
+import { focusHandler, isFocused } from "../FocusProvider";
 import ConceptSearchScope from "../sub/ConceptSearchScope";
 import SubExpressionVisitor from "../sub/SubExpressionVisitor";
 import Attribute from "./Attribute";
@@ -201,7 +202,9 @@ export default class RefinementVisitor extends BaseEclVisitor {
       <ComparisonOperator
         type={ctx.EXCLAMATION() ? "!=" : "="}
         typeLabelMap={EXPRESSION_COMPARISON_OPERATORS}
+        focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }

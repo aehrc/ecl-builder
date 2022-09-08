@@ -80,8 +80,8 @@ export function isFocused(
  * Provides a focus handler that reports the focus position based upon the specified parser context.
  */
 export function focusHandler(
-  onFocus: PositionedFocusHandler | undefined,
-  ctx: ParserRuleContext
+  ctx: ParserRuleContext,
+  onFocus: PositionedFocusHandler | undefined
 ): () => unknown {
   return () => {
     if (onFocus !== undefined) {
