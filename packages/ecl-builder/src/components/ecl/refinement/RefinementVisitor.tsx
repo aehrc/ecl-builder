@@ -8,6 +8,7 @@ import React, { ReactNode } from "react";
 import { interleave } from "../../../array";
 import { ATTRIBUTE_VALUE_SET_URI } from "../../../constants";
 import {
+  CardinalityContext,
   ConjunctionContext,
   DisjunctionContext,
   EclattributeContext,
@@ -30,6 +31,7 @@ import {
   logicStatementTypeToOperator,
 } from "../compound/LogicStatement";
 import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
+import Fallback from "../Fallback";
 import { focusHandler, isFocused } from "../FocusProvider";
 import ConceptSearchScope from "../sub/ConceptSearchScope";
 import SubExpressionVisitor from "../sub/SubExpressionVisitor";
@@ -179,6 +181,18 @@ export default class RefinementVisitor extends BaseEclVisitor {
       >
         {this.visitChildren(ctx)}
       </Attribute>
+    );
+  }
+
+  visitCardinality(ctx: CardinalityContext): VisualExpressionType {
+    return (
+      <Fallback
+        name="Cardinality"
+        expression={ctx.getText()}
+        focus={isFocused(ctx, this.options.focusPosition)}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
+      />
     );
   }
 

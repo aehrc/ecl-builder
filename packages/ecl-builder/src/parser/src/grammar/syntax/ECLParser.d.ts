@@ -225,6 +225,11 @@ export class EclattributegroupContext extends ParserRuleContext {}
 export class EclattributeContext extends ParserRuleContext {}
 
 /**
+ * cardinality : minvalue to maxvalue;
+ */
+export class CardinalityContext extends ParserRuleContext {}
+
+/**
  * eclattributename : subexpressionconstraint;
  */
 export class EclattributenameContext extends ParserRuleContext {}
