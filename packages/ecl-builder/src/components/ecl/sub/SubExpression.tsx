@@ -124,6 +124,7 @@ export default function SubExpression({
                 {
                   type: "item",
                   label: "Replaced concepts",
+                  disabled: true,
                 },
                 {
                   type: "heading",
@@ -138,26 +139,32 @@ export default function SubExpression({
                 {
                   type: "item",
                   label: "Descriptions",
+                  disabled: true,
                 },
                 {
                   type: "item",
                   label: "Definition status",
+                  disabled: true,
                 },
                 {
                   type: "item",
                   label: "Module",
+                  disabled: true,
                 },
                 {
                   type: "item",
                   label: "Effective time",
+                  disabled: true,
                 },
                 {
                   type: "item",
                   label: "Active status",
+                  disabled: true,
                 },
                 {
                   type: "item",
                   label: "Reference set attributes",
+                  disabled: true,
                 },
                 {
                   type: "heading",

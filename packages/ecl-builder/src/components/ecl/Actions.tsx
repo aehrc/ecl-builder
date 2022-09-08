@@ -25,6 +25,7 @@ export interface ActionItem {
   type: "item";
   label: string;
   icon?: ReactNode;
+  disabled?: boolean;
   onClick?: () => void;
 }
 
@@ -48,9 +49,9 @@ export default function Actions({ actions, icon }: ActionsProps) {
 
   function renderAction(options: Action, key: number) {
     if (options.type === "item") {
-      const { label, icon, onClick } = options;
+      const { label, icon, disabled, onClick } = options;
       return (
-        <MenuItem key={key} onClick={onClick}>
+        <MenuItem key={key} onClick={onClick} disabled={disabled}>
           <ListItemText>{label}</ListItemText>
           <ListItemIcon>{icon}</ListItemIcon>
         </MenuItem>
@@ -58,7 +59,19 @@ export default function Actions({ actions, icon }: ActionsProps) {
     } else if (options.type === "heading") {
       const { label } = options;
       return (
-        <MenuItem key={key} disabled divider>
+        <MenuItem
+          key={key}
+          disabled
+          divider
+          sx={{
+            "&.Mui-disabled": {
+              opacity: 1,
+              "& .MuiTypography-root": {
+                fontWeight: "700",
+              },
+            },
+          }}
+        >
           <ListItemText>{label}</ListItemText>
         </MenuItem>
       );
