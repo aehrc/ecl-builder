@@ -5,7 +5,6 @@
 
 import React from "react";
 import { REFERENCE_SET_VALUE_SET_URI } from "../../../constants";
-import { focusHandler, isFocused } from "../../../hooks/useFocus";
 import {
   CompoundexpressionconstraintContext,
   ConstraintoperatorContext,
@@ -19,6 +18,7 @@ import BaseEclVisitor from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
 import { logicStatementTypeToOperator } from "../compound/LogicStatement";
 import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
+import { focusHandler, isFocused } from "../FocusProvider";
 import RefinementVisitor from "../refinement/RefinementVisitor";
 import ConceptReference from "./ConceptReference";
 import ConceptSearchScope from "./ConceptSearchScope";
@@ -153,7 +153,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
           id: ctx.conceptid().getText(),
           display: ctx.term()?.getText(),
         }}
-        focus={isFocused(this.options.focusPosition, ctx)}
+        focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
         onFocus={focusHandler(this.options.onFocus, ctx)}
       />
@@ -175,7 +175,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     return (
       <ConstraintOperator
         constraint={operatorToConstraintName[ctx.getText()]}
-        focus={isFocused(this.options.focusPosition, ctx)}
+        focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
         onFocus={focusHandler(this.options.onFocus, ctx)}
       />

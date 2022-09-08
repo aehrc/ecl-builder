@@ -13,10 +13,10 @@ import React, {
   useState,
 } from "react";
 import useConceptSearch from "../../../hooks/useConceptSearch";
-import useFocus from "../../../hooks/useFocus";
 import { Concept } from "../../../hooks/useValueSetExpansion";
 import { OptionsContext } from "../../ExpressionBuilder";
 import { ChangeReporterProps } from "../ExpressionVisitor";
+import { useFocus } from "../FocusProvider";
 import AnyConcept from "./AnyConcept";
 import ConceptSearchInput from "./ConceptSearchInput";
 import ConceptSearchScope from "./ConceptSearchScope";

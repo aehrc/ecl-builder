@@ -5,8 +5,8 @@
 
 import { MenuItem, Select, SelectChangeEvent, Stack } from "@mui/material";
 import React from "react";
-import useFocus from "../../../hooks/useFocus";
 import { ChangeReporterProps } from "../ExpressionVisitor";
+import { useFocus } from "../FocusProvider";
 
 export interface ConstraintOperatorProps extends ChangeReporterProps {
   // The currently selected constraint type.

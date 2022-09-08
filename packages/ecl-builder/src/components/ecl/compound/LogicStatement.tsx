@@ -6,10 +6,10 @@
 import { Add } from "@mui/icons-material";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import React, { PropsWithChildren, useState } from "react";
-import useFocus from "../../../hooks/useFocus";
 import Actions from "../Actions";
 import ExpressionGrouping from "../ExpressionGrouping";
 import { ChangeHandler, FocusManagementProps } from "../ExpressionVisitor";
+import { useFocus } from "../FocusProvider";
 import NeatRow from "../NeatRow";
 import ConceptReference from "../sub/ConceptReference";
 import LogicOperator from "./LogicOperator";

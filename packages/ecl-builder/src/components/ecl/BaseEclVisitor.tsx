@@ -16,8 +16,8 @@ export type PositionedFocusHandler = (position?: number) => unknown;
 export interface BaseEclVisitorOptions {
   // A transformer that is used to transform the expression in response to updates.
   transformer: ExpressionTransformer;
-  // The current position within the expression that is the focus of user input.
-  focusPosition: number | undefined;
+  // The current context within the expression that is the focus of user input.
+  focusPosition?: number;
   // A set of spans that is the current context for removal.
   removalContext: Span[];
   // Set to true if the current context is within a refinement.
@@ -25,7 +25,7 @@ export interface BaseEclVisitorOptions {
   // Set to true if the current context is within an attribute grouping.
   attributeGrouping: boolean;
   // Called when the focus position changes.
-  onFocus: PositionedFocusHandler;
+  onFocus?: PositionedFocusHandler;
 }
 
 /**

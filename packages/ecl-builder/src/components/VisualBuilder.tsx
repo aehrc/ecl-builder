@@ -4,19 +4,16 @@
  */
 
 import { Box } from "@mui/material";
-import React from "react";
+import React, { useContext } from "react";
 import { visitExpression } from "./ecl/ExpressionVisitor";
+import { FocusContext } from "./ecl/FocusProvider";
 import ErrorBoundary from "./ErrorBoundary";
 
 export interface VisualBuilderProps {
   // The current expression being built.
   expression: string;
-  // The current position within the expression that is the focus of user input.
-  focusPosition: number | undefined;
   // A callback that is invoked when the expression changes.
   onChange: (expression: string) => unknown;
-  // A callback that is invoked when the focus position changes.
-  setFocusPosition: (position: number | undefined) => unknown;
 }
 
 /**
@@ -26,10 +23,11 @@ export interface VisualBuilderProps {
  */
 export default function VisualBuilder({
   expression,
-  focusPosition,
   onChange,
-  setFocusPosition,
 }: VisualBuilderProps) {
+  const { position: focusPosition, onFocus: setFocusPosition } =
+    useContext(FocusContext);
+
   return (
     <Box className="visual-builder">
       <ErrorBoundary>

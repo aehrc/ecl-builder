@@ -100,25 +100,29 @@ export function visitExpression(
   expression: string,
   focusPosition: number | undefined,
   onChange: (expression: string) => unknown,
-  onFocus: PositionedFocusHandler
+  onFocus?: PositionedFocusHandler
 ): VisualExpressionType {
-  // Create a new visitor capable of parsing the expression and outputting a visual representation.
-  const visitor = new ExpressionVisitor({
-    transformer: new ExpressionTransformer(expression, onChange, onFocus),
-    focusPosition,
-    removalContext: [],
-    refinement: false,
-    attributeGrouping: false,
-    onFocus,
-  });
+  const transformer = new ExpressionTransformer(expression, onChange, onFocus);
 
-  // If there is nothing but whitespace in the expression, we render a blank concept reference
-  // component to bootstrap the build.
   if (expression.trim().length === 0) {
-    return <BlankExpression onChange={(e) => visitor.transformer.replace(e)} />;
+    // If there is nothing but whitespace in the expression, we render a blank concept reference
+    // component to bootstrap the build.
+    return <BlankExpression onChange={(e) => transformer.replace(e)} />;
   } else {
-    // Otherwise, we parse the expression and visit it.
+    // Parse the expression.
     const expressionContext = getExpressionContext(expression);
+
+    // Create a new visitor that outputs a visual representation.
+    const visitor = new ExpressionVisitor({
+      transformer: transformer,
+      focusPosition,
+      removalContext: [],
+      refinement: false,
+      attributeGrouping: false,
+      onFocus,
+    });
+
+    // Visit the expression context.
     return visitor.visit(expressionContext);
   }
 }

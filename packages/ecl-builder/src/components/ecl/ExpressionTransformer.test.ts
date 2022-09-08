@@ -15,7 +15,8 @@ describe("applyUpdates", () => {
           "< 19829001 |disorder of lung| OR < 301867009 |edema of trunk|\n"
         );
         done();
-      }
+      },
+      () => undefined
     );
     const contexts: ParserRuleContext[] = [
       {
@@ -32,7 +33,8 @@ describe("applyUpdates", () => {
       (expression) => {
         expect(expression).toEqual("404684003");
         done();
-      }
+      },
+      () => undefined
     );
     const contexts: ParserRuleContext[] = [
       {
@@ -49,7 +51,8 @@ describe("applyUpdates", () => {
       (expression) => {
         expect(expression).toEqual("404684003");
         done();
-      }
+      },
+      () => undefined
     );
     const contexts: ParserRuleContext[] = [
       {
@@ -66,7 +69,8 @@ describe("applyUpdates", () => {
       (expression) => {
         expect(expression).toEqual("<<  195967001 |Asthma|");
         done();
-      }
+      },
+      () => undefined
     );
     const contexts: ParserRuleContext[] = [
       {
@@ -83,7 +87,8 @@ describe("applyUpdates", () => {
       (expression) => {
         expect(expression).toEqual("<<  195967001 |Asthma|");
         done();
-      }
+      },
+      () => undefined
     );
     const contexts: ParserRuleContext[] = [
       {
@@ -102,7 +107,8 @@ describe("applyUpdates", () => {
           "< 19829001 |disorder of lung| OR  < 301867009 |edema of trunk| OR < 40733004 |Infection| "
         );
         done();
-      }
+      },
+      () => undefined
     );
     const contexts: ParserRuleContext[] = [
       {

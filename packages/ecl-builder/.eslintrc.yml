@@ -19,5 +19,4 @@ plugins:
 settings:
   react:
     version: "17"
-rules:
-  "@typescript-eslint/strict-boolean-expressions": warn
+rules: {}

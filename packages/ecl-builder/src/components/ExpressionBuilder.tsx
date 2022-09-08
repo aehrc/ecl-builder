@@ -10,6 +10,7 @@ import React, { createContext, useState } from "react";
 import { queryClient } from "../queryClient";
 import { extendTheme } from "../themes/extendTheme";
 import CodeEditor from "./CodeEditor";
+import FocusProvider from "./ecl/FocusProvider";
 import TabPanel from "./TabPanel";
 import VisualBuilder from "./VisualBuilder";
 
@@ -47,8 +48,7 @@ export default function ExpressionBuilder({
   options = {},
 }: ExpressionBuilderProps) {
   const [tab, setTab] = useState("visual"),
-    [expression, setExpression] = useState(initialExpression),
-    [focusPosition, setFocusPosition] = useState<number | undefined>(undefined);
+    [expression, setExpression] = useState(initialExpression);
 
   function handleChange(newExpression: string) {
     setExpression(newExpression);
@@ -77,12 +77,12 @@ export default function ExpressionBuilder({
             />
           </Tabs>
           <TabPanel id="visual" key="visual" selectedId={tab}>
-            <VisualBuilder
-              expression={expression ?? ""}
-              focusPosition={focusPosition}
-              onChange={handleChange}
-              setFocusPosition={setFocusPosition}
-            />
+            <FocusProvider>
+              <VisualBuilder
+                expression={expression ?? ""}
+                onChange={handleChange}
+              />
+            </FocusProvider>
           </TabPanel>
           <TabPanel id="code" key="code" selectedId={tab}>
             <CodeEditor expression={expression ?? ""} onChange={handleChange} />

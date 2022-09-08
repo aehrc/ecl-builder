@@ -47,12 +47,12 @@ export type FocusUpdateStrategy =
 export default class ExpressionTransformer {
   readonly expression: string;
   readonly onChange: ChangeHandler;
-  readonly onFocus: PositionedFocusHandler;
+  readonly onFocus?: PositionedFocusHandler;
 
   constructor(
     expression: string,
     onChange: ChangeHandler,
-    onFocus: PositionedFocusHandler
+    onFocus?: PositionedFocusHandler
   ) {
     this.expression = expression;
     this.onChange = onChange;
@@ -254,7 +254,7 @@ export default class ExpressionTransformer {
       ) {
         position = updateStart;
       }
-      if (position !== undefined) {
+      if (position !== undefined && this.onFocus !== undefined) {
         this.onFocus(position);
       }
     }

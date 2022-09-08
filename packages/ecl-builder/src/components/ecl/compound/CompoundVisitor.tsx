@@ -6,7 +6,6 @@
 import { ParserRuleContext } from "antlr4";
 import React, { ReactNode } from "react";
 import { interleave } from "../../../array";
-import { focusHandler, isFocused } from "../../../hooks/useFocus";
 import {
   ConjunctionexpressionconstraintContext,
   DisjunctionexpressionconstraintContext,
@@ -15,6 +14,7 @@ import {
 } from "../../../parser/src/grammar/syntax/ECLParser";
 import BaseEclVisitor from "../BaseEclVisitor";
 import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
+import { focusHandler, isFocused } from "../FocusProvider";
 import SubExpressionVisitor from "../sub/SubExpressionVisitor";
 import LogicOperator from "./LogicOperator";
 import LogicStatement, {
@@ -101,7 +101,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
     return (
       <LogicStatement
         type={type}
-        focus={isFocused(this.options.focusPosition, ctx)}
+        focus={isFocused(ctx, this.options.focusPosition)}
         onChangeType={(type) =>
           this.transformer.applyUpdates(
             operatorCtx,

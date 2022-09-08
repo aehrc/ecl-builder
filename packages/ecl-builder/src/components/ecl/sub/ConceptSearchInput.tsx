@@ -5,6 +5,7 @@
 
 import { TextField, TextFieldProps } from "@mui/material";
 import React, { ForwardedRef, forwardRef } from "react";
+import { FocusRefElementType } from "../FocusProvider";
 import { ConceptReferenceOptionType } from "./ConceptReference";
 
 export interface ConceptSearchInputProps {
@@ -25,7 +26,7 @@ export interface ConceptSearchInputProps {
  */
 function ConceptSearchInput(
   { props, selectedConcept, label, onFocus }: ConceptSearchInputProps,
-  ref: ForwardedRef<HTMLElement>
+  ref: ForwardedRef<FocusRefElementType>
 ) {
   const resolvedLabel =
     selectedConcept?.type === "ANY_CONCEPT"
