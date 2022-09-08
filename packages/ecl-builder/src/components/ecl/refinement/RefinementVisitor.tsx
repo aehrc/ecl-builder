@@ -37,8 +37,7 @@ import Attribute from "./Attribute";
 import AttributeGroup from "./AttributeGroup";
 import AttributeSet from "./AttributeSet";
 import ComparisonOperator from "./ComparisonOperator";
-import MatchSearchTermSet from "./MatchSearchTermSet";
-import NumericValue from "./NumericValue";
+import ConcreteValue from "./ConcreteValue";
 import RefinedExpression from "./RefinedExpression";
 
 export interface RefinementVisitorOptions extends BaseEclVisitorOptions {
@@ -241,21 +240,25 @@ export default class RefinementVisitor extends BaseEclVisitor {
     ctx: MatchsearchtermsetContext
   ): VisualExpressionType {
     return (
-      <MatchSearchTermSet
+      <ConcreteValue
         value={ctx
           .matchsearchterm()
           .map((m) => m.getText())
           .join(" ")}
+        focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, `"${e}"`)}
+        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
 
   visitNumericvalue(ctx: NumericvalueContext): VisualExpressionType {
     return (
-      <NumericValue
+      <ConcreteValue
         value={ctx.getText()}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        props={{ type: "number" }}
+        sx={{ flexBasis: "6em" }}
       />
     );
   }
