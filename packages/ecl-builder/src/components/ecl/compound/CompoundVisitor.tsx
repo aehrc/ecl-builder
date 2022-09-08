@@ -52,7 +52,10 @@ export default class CompoundVisitor extends BaseEclVisitor {
     return (
       <LogicStatementSubExpression
         onRemove={() =>
-          this.transformer.removeAllSpans(this.options.removalContext)
+          this.transformer.removeAllSpans(this.options.removalContext, {
+            focusUpdateStrategy: "BEFORE_UPDATE",
+            collapseWhiteSpaceLeft: true,
+          })
         }
       >
         {new SubExpressionVisitor(this.options).visit(ctx)}

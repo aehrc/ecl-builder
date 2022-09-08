@@ -204,7 +204,7 @@ export default class ExpressionTransformer {
       if (beforeUpdate === undefined) {
         // On the first update, record the position of the character before the update within the
         // final expression.
-        beforeUpdate = Math.min(0, prefix.length - 1);
+        beforeUpdate = Math.max(0, prefix.length - 1);
       }
       if (updateStart === undefined) {
         // On the first update, record the position of the first updated character within the final
@@ -233,7 +233,8 @@ export default class ExpressionTransformer {
     }
 
     // Report a changed expression, based on the concatenation of the accumulated parts.
-    this.onChange(newExpressionParts.join(""));
+    const newExpression = newExpressionParts.join("");
+    this.onChange(newExpression);
 
     // Work out the right focus position to report, based upon the strategy.
     if (reportFocusUpdate && spans.length > 0) {
@@ -247,7 +248,7 @@ export default class ExpressionTransformer {
         focusUpdateStrategy === "AFTER_UPDATE" &&
         afterUpdate !== undefined
       ) {
-        position = afterUpdate;
+        position = Math.min(afterUpdate, newExpression.length - 1);
       } else if (
         focusUpdateStrategy === "START_OF_UPDATE" &&
         updateStart !== undefined
