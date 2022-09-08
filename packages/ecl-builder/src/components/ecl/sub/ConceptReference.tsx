@@ -101,7 +101,7 @@ export default function ConceptReference({
   function getOptions(): ConceptReferenceOptionType[] {
     return [
       ...(selectedConcept ? [selectedConcept] : []),
-      ...(searchResults.length >= minQueryLength ? searchResults : []),
+      ...(searchQuery.length >= minQueryLength ? searchResults : []),
       ...(selectedConcept?.type === "ANY_CONCEPT" ? [] : [ANY_CONCEPT]),
     ];
   }
