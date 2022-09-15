@@ -19,7 +19,7 @@ const Template = ({
   type,
   typeLabelMap,
   onChange,
-}: ComparisonOperatorProps) => (
+}: ComparisonOperatorProps<keyof typeof EXPRESSION_COMPARISON_OPERATORS>) => (
   <ComparisonOperator
     type={type}
     typeLabelMap={typeLabelMap}
