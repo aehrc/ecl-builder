@@ -134,7 +134,7 @@ export default function ConceptReference({
     option: ConceptReferenceOptionType,
     { selected }: { selected?: boolean }
   ): ReactNode {
-    const key = props.key;
+    const key = option.type === "ANY_CONCEPT" ? option.type : option.id;
     if (selected) {
       return (
         <SelectedConcept
