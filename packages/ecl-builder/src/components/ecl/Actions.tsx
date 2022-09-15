@@ -34,14 +34,20 @@ export interface ActionHeading {
   label: string;
 }
 
+function isActionItem(action: Action): action is ActionItem {
+  return action.type === "item";
+}
+
 export default function Actions({ actions, icon }: ActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false),
     addButton = useRef(null),
-    numberOfItems = actions.filter((action) => action.type === "item").length,
-    firstItem: ActionItem | undefined = actions.find(
-      (action) => action.type === "item"
-    ) as ActionItem,
+    actionItems = actions.filter(isActionItem),
+    numberOfItems = actionItems.length,
     Icon = icon;
+
+  if (numberOfItems === 0) {
+    return null;
+  }
 
   function handleCloseMenu() {
     setMenuOpen(false);
@@ -100,9 +106,7 @@ export default function Actions({ actions, icon }: ActionsProps) {
           },
         })}
         onClick={
-          numberOfItems === 1
-            ? (firstItem as ActionItem).onClick
-            : () => setMenuOpen(true)
+          numberOfItems === 1 ? actionItems[0].onClick : () => setMenuOpen(true)
         }
       >
         <Icon fontSize="small" />

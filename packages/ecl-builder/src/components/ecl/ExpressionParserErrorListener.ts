@@ -4,9 +4,10 @@
  */
 
 import { Recognizer, Token } from "antlr4";
+import { ErrorListener } from "antlr4/error";
 
 // noinspection JSUnusedGlobalSymbols
-export default class ExpressionParserErrorListener {
+export default class ExpressionParserErrorListener implements ErrorListener {
   syntaxError(
     recognizer: Recognizer,
     offendingSymbol: Token,

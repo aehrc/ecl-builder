@@ -15,6 +15,16 @@ export default class ECLParser extends Parser {
  * dottedexpressionconstraint | subexpressionconstraint ) ws;
  */
 export class ExpressionconstraintContext extends ParserRuleContext {
+  refinedexpressionconstraint():
+    | RefinedexpressionconstraintContext
+    | null
+    | undefined;
+
+  compoundexpressionconstraint():
+    | CompoundexpressionconstraintContext
+    | null
+    | undefined;
+
   subexpressionconstraint(): SubexpressionconstraintContext | null | undefined;
 }
 
@@ -89,6 +99,10 @@ export class SubexpressionconstraintContext extends ParserRuleContext {
   eclfocusconcept(): EclfocusconceptContext | null | undefined;
 
   expressionconstraint(): ExpressionconstraintContext | null | undefined;
+
+  LEFT_PAREN(): TerminalNode | null | undefined;
+
+  RIGHT_PAREN(): TerminalNode | null | undefined;
 }
 
 /**

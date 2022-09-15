@@ -4,7 +4,6 @@
  */
 
 import antlr4 from "antlr4";
-import { ErrorListener } from "antlr4/error";
 import React, { ReactNode } from "react";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
 import ECLParser, {
@@ -76,7 +75,7 @@ export class ExpressionVisitor extends BaseEclVisitor {
   visitCompoundexpressionconstraint(
     ctx: CompoundexpressionconstraintContext
   ): VisualExpressionType {
-    return new CompoundVisitor(this.options).visit(ctx);
+    return new CompoundVisitor({ ...this.options, compound: true }).visit(ctx);
   }
 
   visitDottedexpressionconstraint(
@@ -108,7 +107,7 @@ function getExpressionContext(expression: string): ExpressionconstraintContext {
 
   // Remove the default error listener and add a custom implementation.
   parser.removeErrorListeners();
-  parser.addErrorListener(new ExpressionParserErrorListener() as ErrorListener);
+  parser.addErrorListener(new ExpressionParserErrorListener());
 
   return parser.expressionconstraint();
 }
@@ -133,8 +132,9 @@ export function visitExpression(
     const visitor = new ExpressionVisitor({
       transformer: transformer,
       focusPosition,
-      removalContext: [],
       refinement: false,
+      compound: false,
+      removalContext: [],
       attributeGrouping: false,
       onFocus,
     });

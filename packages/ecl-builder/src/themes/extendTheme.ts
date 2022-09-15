@@ -44,6 +44,9 @@ export function extendTheme(theme: Theme): Theme {
       },
       MuiAutocomplete: {
         styleOverrides: {
+          root: {
+            minWidth: "10em",
+          },
           option: {
             alignItems: "flex-start",
           },
@@ -98,6 +101,7 @@ export function extendTheme(theme: Theme): Theme {
             border: 0,
             borderRadius: 0,
             backgroundColor: theme.palette.background.paper,
+            overflow: "hidden",
             "&::before": { border: 0 },
             "&.Mui-focused": {
               backgroundColor: theme.palette.background.paper,

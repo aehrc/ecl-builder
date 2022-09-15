@@ -4,7 +4,7 @@
  */
 
 import { ParserRuleContext } from "antlr4";
-import React, { ReactNode } from "react";
+import React, { Children } from "react";
 import { interleave } from "../../../array";
 import {
   ConjunctionexpressionconstraintContext,
@@ -74,7 +74,9 @@ export default class CompoundVisitor extends BaseEclVisitor {
           })
         }
       >
-        {new SubExpressionVisitor(this.options).visit(ctx)}
+        {new SubExpressionVisitor({ ...this.options, compound: true }).visit(
+          ctx
+        )}
       </LogicStatementSubExpression>
     );
   }
@@ -106,7 +108,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
           children,
           i
         );
-        result = (result as ReactNode[]).concat(
+        result = Children.toArray(result).concat(
           new CompoundVisitor({
             ...this.options,
             removalContext,

@@ -3,6 +3,8 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
+import { ParserRuleContext } from "antlr4";
+import { TerminalNode } from "antlr4/tree/Tree";
 import React from "react";
 import { REFERENCE_SET_VALUE_SET_URI } from "../../../constants";
 import {
@@ -18,11 +20,12 @@ import {
   SubexpressionconstraintContext,
   WildcardContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
-import BaseEclVisitor from "../BaseEclVisitor";
+import { nonNullish } from "../../../types";
+import BaseEclVisitor, { BaseEclVisitorOptions } from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
 import { logicStatementTypeToOperator } from "../compound/LogicStatement";
-import ExpressionGrouping from "../ExpressionGrouping";
-import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
+import { Span } from "../ExpressionTransformer";
+import { VisualExpressionType } from "../ExpressionVisitor";
 import Fallback from "../Fallback";
 import { focusHandler, isFocused } from "../FocusProvider";
 import RefinementVisitor from "../refinement/RefinementVisitor";
@@ -33,7 +36,20 @@ import ConstraintOperator, {
   operatorToConstraintName,
 } from "./ConstraintOperator";
 import MemberOfOperator, { MEMBER_OF_OPERATOR } from "./MemberOfOperator";
+import NestedSubExpression from "./NestedSubExpression";
 import SubExpression from "./SubExpression";
+
+export interface SubExpressionVisitorOptions extends BaseEclVisitorOptions {
+  // Provides the parent sub-expression to inform rendering of nested expressions.
+  parent?: SubExpressionWithNestedExpression;
+}
+
+interface SubExpressionWithNestedExpression
+  extends SubexpressionconstraintContext {
+  expressionconstraint(): ExpressionconstraintContext;
+  LEFT_PAREN(): TerminalNode;
+  RIGHT_PAREN(): TerminalNode;
+}
 
 /**
  * This component implements an ANTLR visitor specialised to the task of rendering sub-expressions.
@@ -41,13 +57,77 @@ import SubExpression from "./SubExpression";
  * @author John Grimes
  */
 export default class SubExpressionVisitor extends BaseEclVisitor {
+  readonly options: SubExpressionVisitorOptions;
+
+  constructor(options: SubExpressionVisitorOptions) {
+    super(options);
+    this.options = options;
+  }
+
   visitExpressionconstraint(
     ctx: ExpressionconstraintContext
   ): VisualExpressionType {
+    const compoundExpression = ctx.compoundexpressionconstraint(),
+      refinementExpression = ctx.refinedexpressionconstraint();
+    if (
+      // If the expression is nested within a compound expression, skip the rendering of the grouping.
+      this.options.compound ||
+      // If the expression contains a refinement expression or a compound expression, we skip the
+      // rendering of the grouping as these expression types already render as a grouping.
+      !!compoundExpression ||
+      !!refinementExpression
+    ) {
+      return this.visitChildren(ctx);
+    }
+    const parent = this.options.parent;
+    if (!parent) {
+      throw new Error(
+        "Visited nested expression within sub-expression without parent being set"
+      );
+    }
+    const heading: VisualExpressionType = [
+      parent.constraintoperator(),
+      parent.memberof(),
+    ]
+      .filter(nonNullish)
+      .map((ctx: ParserRuleContext) => this.visit(ctx));
     return (
-      <ExpressionGrouping>
-        {new ExpressionVisitor(this.options).visit(ctx)}
-      </ExpressionGrouping>
+      <NestedSubExpression
+        heading={heading}
+        constraint={!!parent.constraintoperator()}
+        memberOf={!!parent.memberof()}
+        refinement={this.options.refinement}
+        onAddConstraint={() => {
+          const memberOf = parent.memberof();
+          this.handleAddConstraint(
+            memberOf
+              ? this.transformer.spanFromContext(memberOf)
+              : this.transformer.spanFromTerminalNode(parent.LEFT_PAREN())
+          );
+        }}
+        onRemoveConstraint={() => this.handleRemoveConstraint()}
+        onAddMemberOf={() => {
+          const leftSurroundingParenthesis = parent.LEFT_PAREN();
+          if (leftSurroundingParenthesis) {
+            this.handleAddMemberOf(
+              this.transformer.spanFromTerminalNode(leftSurroundingParenthesis)
+            );
+          }
+        }}
+        onRemoveMemberOf={() => this.handleRemoveMemberOf()}
+        onRemoveRefinement={() => this.handleRemoveRefinement()}
+        onAddLogicStatement={(type, expression) =>
+          this.handleAddLogicStatement(ctx, type, expression)
+        }
+        onAddRefinement={(e) =>
+          this.handleAddRefinement(
+            this.transformer.spanFromTerminalNode(parent.RIGHT_PAREN()),
+            e
+          )
+        }
+      >
+        {this.visitChildren(ctx)}
+      </NestedSubExpression>
     );
   }
 
@@ -66,79 +146,43 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext
   ): VisualExpressionType {
-    // If the expression contains a nested expression, we don't bother rendering a sub-expression
-    // wrapper. We effectively merge these two levels together from a UI perspective.
-    const expressionConstraint = ctx.expressionconstraint();
-    const content = expressionConstraint ? (
-      <Fallback
-        name="Nested within sub-expression"
-        expression={ctx.getText()}
-        focus={isFocused(ctx, this.options.focusPosition)}
-        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
-      />
-    ) : (
-      <SubExpression
-        constraint={!!ctx.constraintoperator()}
-        memberOf={!!ctx.memberof()}
-        refinement={this.options.refinement}
-        onAddConstraint={() =>
-          this.transformer.prepend(
-            ctx,
-            constraintNameToOperator["descendantorselfof"]
-          )
-        }
-        onRemoveConstraint={() => {
-          const constraintOperator = ctx.constraintoperator();
-          if (constraintOperator) {
-            this.transformer.remove(constraintOperator, {
-              collapseWhiteSpaceRight: true,
-              focusUpdateStrategy: "AFTER_UPDATE",
-            });
-          } else {
-            console.warn(
-              "Passed nullish constraintoperator to onRemoveConstraint"
-            );
+    // If the expression contains a nested expression, we render it differently using a grouping.
+    // The expression constraint visitor method within this class handles this alternate rendering.
+    const expressionConstraint = ctx.expressionconstraint(),
+      content = expressionConstraint ? (
+        new SubExpressionVisitor({
+          ...this.options,
+          parent: ctx as SubExpressionWithNestedExpression,
+        }).visit(expressionConstraint)
+      ) : (
+        <SubExpression
+          constraint={!!ctx.constraintoperator()}
+          memberOf={!!ctx.memberof()}
+          refinement={this.options.refinement}
+          onAddConstraint={() =>
+            this.handleAddConstraint(this.transformer.spanFromContext(ctx))
           }
-        }}
-        onAddMemberOf={() => {
-          const eclFocusConcept = ctx.eclfocusconcept();
-          if (eclFocusConcept) {
-            this.transformer.prepend(eclFocusConcept, MEMBER_OF_OPERATOR, {
-              focusUpdateStrategy: "AFTER_UPDATE",
-            });
-          } else {
-            console.warn("Passed nullish eclfocusconcept to onAddMemberOf");
+          onRemoveConstraint={() => this.handleRemoveConstraint()}
+          onAddMemberOf={() => {
+            const eclFocusConcept = ctx.eclfocusconcept();
+            if (eclFocusConcept) {
+              this.handleAddMemberOf(
+                this.transformer.spanFromContext(eclFocusConcept)
+              );
+            }
+          }}
+          onRemoveMemberOf={() => this.handleRemoveMemberOf()}
+          onRemoveRefinement={() => this.handleRemoveRefinement()}
+          onAddLogicStatement={(type, expression) =>
+            this.handleAddLogicStatement(ctx, type, expression)
           }
-        }}
-        onRemoveMemberOf={() => {
-          const memberOf = ctx.memberof();
-          if (memberOf) {
-            this.transformer.remove(memberOf, {
-              collapseWhiteSpaceRight: true,
-              focusUpdateStrategy: "AFTER_UPDATE",
-            });
-          } else {
-            console.warn("Passed nullish memberof to onRemoveMemberOf");
+          onAddRefinement={(e) =>
+            this.handleAddRefinement(this.transformer.spanFromContext(ctx), e)
           }
-        }}
-        onRemoveRefinement={() =>
-          this.transformer.removeAllSpans(this.options.removalContext)
-        }
-        // This gets called when the user adds a logic statement to the sub-expression, e.g. AND.
-        onAddLogicStatement={(type, expression) =>
-          this.transformer.append(
-            ctx,
-            logicStatementTypeToOperator[type] + expression,
-            { parenthesize: true }
-          )
-        }
-        // This gets called when the user adds an attribute refinement to the sub-expression.
-        onAddRefinement={(e) => this.transformer.append(ctx, `: ${e}`)}
-      >
-        {this.visitChildren(ctx)}
-      </SubExpression>
-    );
+        >
+          {this.visitChildren(ctx)}
+        </SubExpression>
+      );
     // If there is a "member of" operator within this sub-expression, we modify the scope of concept
     // search to only return reference set concepts.
     return ctx.memberof() ? (
@@ -250,5 +294,64 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
+  }
+
+  private handleAddConstraint(prependSubject: Span) {
+    this.transformer.prependToSpan(
+      prependSubject,
+      constraintNameToOperator["descendantorselfof"]
+    );
+  }
+
+  private handleRemoveConstraint() {
+    const constraintOperator = this.options.parent?.constraintoperator();
+    if (constraintOperator) {
+      this.transformer.remove(constraintOperator, {
+        collapseWhiteSpaceRight: true,
+        focusUpdateStrategy: "AFTER_UPDATE",
+      });
+    } else {
+      console.warn("Attempted to remove constraint, no constraint available");
+    }
+  }
+
+  private handleAddMemberOf(prependSubject: Span): void {
+    this.transformer.prependToSpan(prependSubject, MEMBER_OF_OPERATOR, {
+      focusUpdateStrategy: "AFTER_UPDATE",
+    });
+  }
+
+  private handleRemoveMemberOf() {
+    const memberOf = this.options.parent?.memberof();
+    if (memberOf) {
+      this.transformer.remove(memberOf, {
+        collapseWhiteSpaceRight: true,
+        focusUpdateStrategy: "AFTER_UPDATE",
+      });
+    } else {
+      console.warn(
+        "Attempted to remove member of operator, no member of operator found"
+      );
+    }
+  }
+
+  private handleRemoveRefinement() {
+    this.transformer.removeAllSpans(this.options.removalContext);
+  }
+
+  private handleAddLogicStatement(
+    ctx: ParserRuleContext,
+    type: "conjunction" | "disjunction",
+    expression: string
+  ) {
+    this.transformer.append(
+      ctx,
+      logicStatementTypeToOperator[type] + expression,
+      { parenthesize: true }
+    );
+  }
+
+  private handleAddRefinement(span: Span, e: string) {
+    this.transformer.appendToSpan(span, `: ${e}`);
   }
 }

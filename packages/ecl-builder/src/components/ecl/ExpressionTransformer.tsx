@@ -31,6 +31,7 @@ export interface SupplementOptions extends UpdateOptions {
 export interface Span {
   start: number;
   stop: number;
+  expression: string;
 }
 
 // Describes a strategy of updating the focus position following an update to the expression.
@@ -65,14 +66,25 @@ export default class ExpressionTransformer {
   prepend(
     ctx: ParserRuleContext,
     expression: string,
+    options: SupplementOptions = {}
+  ): void {
+    this.prependToSpan(this.spanFromContext(ctx), expression, options);
+  }
+
+  /**
+   * Prepends a new expression to the start of the existing expression, separated by a space.
+   */
+  prependToSpan(
+    span: Span,
+    expression: string,
     { parenthesize = false }: SupplementOptions = {}
   ): void {
-    const suffix = ctx.getText().trimStart(),
+    const suffix = span.expression.trimStart(),
       newExpression = expression + " " + suffix,
       parenthesizedExpression = parenthesize
         ? `(${newExpression})`
         : newExpression;
-    this.applyUpdate(ctx, parenthesizedExpression);
+    this.applyUpdateToSpan(span, parenthesizedExpression);
   }
 
   /**
@@ -81,14 +93,25 @@ export default class ExpressionTransformer {
   append(
     ctx: ParserRuleContext,
     expression: string,
+    options: SupplementOptions = {}
+  ): void {
+    this.appendToSpan(this.spanFromContext(ctx), expression, options);
+  }
+
+  /**
+   * Appends a new expression to the end of the existing expression, separated by a space.
+   */
+  appendToSpan(
+    span: Span,
+    expression: string,
     { parenthesize = false }: SupplementOptions = {}
   ): void {
-    const prefix = ctx.getText().trimEnd(),
+    const prefix = span.expression.trimEnd(),
       newExpression = prefix + " " + expression,
       parenthesizedExpression = parenthesize
         ? `(${newExpression})`
         : newExpression;
-    this.applyUpdate(ctx, parenthesizedExpression);
+    this.applyUpdateToSpan(span, parenthesizedExpression);
   }
 
   /**
@@ -139,6 +162,19 @@ export default class ExpressionTransformer {
     options: UpdateOptions = {}
   ): void {
     this.applyUpdates([ctx], expression, options);
+  }
+
+  /**
+   * Uses the parser rule context to identify the range of characters within the expression that
+   * have changed, and then substitutes those characters with the expression reported by the
+   * component.
+   */
+  applyUpdateToSpan(
+    span: Span,
+    expression: string,
+    options: UpdateOptions = {}
+  ): void {
+    this.applyUpdatesToSpans([span], expression, options);
   }
 
   /**
@@ -262,11 +298,19 @@ export default class ExpressionTransformer {
   }
 
   spanFromContext(ctx: ParserRuleContext): Span {
-    return { start: ctx.start.start, stop: ctx.stop.stop };
+    return {
+      start: ctx.start.start,
+      stop: ctx.stop.stop,
+      expression: ctx.getText(),
+    };
   }
 
   spanFromTerminalNode(node: TerminalNode): Span {
-    return { start: node.symbol.start, stop: node.symbol.stop };
+    return {
+      start: node.symbol.start,
+      stop: node.symbol.stop,
+      expression: node.getText(),
+    };
   }
 
   /**

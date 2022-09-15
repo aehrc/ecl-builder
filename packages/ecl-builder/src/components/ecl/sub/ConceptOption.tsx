@@ -29,6 +29,7 @@ export default function ConceptOption({
           marginLeft: 1,
           lineHeight: 1.83,
           alignSelf: "flex-start",
+          textAlign: "right",
         }}
       >
         {semanticTag ?? null}

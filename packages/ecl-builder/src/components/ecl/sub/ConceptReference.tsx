@@ -80,19 +80,17 @@ export default function ConceptReference({
    * Map the raw search results into a set of options for the autocomplete.
    */
   function getSearchResults(): ConceptReferenceOptionType[] {
-    return searchQuery.length >= minQueryLength && data?.concepts
-      ? data.concepts
-          .map(
-            (c) =>
-              ({
-                ...c,
-                type: "SPECIFIC_CONCEPT",
-              } as ConceptReferenceOptionType)
-          )
-          .filter(
-            (c) => !selectedConcept || !isOptionEqualToValue(c, selectedConcept)
-          )
-      : [];
+    if (searchQuery.length >= minQueryLength && data?.concepts) {
+      const map: ConceptReferenceOptionType[] = data.concepts.map((c) => ({
+        ...c,
+        type: "SPECIFIC_CONCEPT",
+      }));
+      return map.filter(
+        (c) => !selectedConcept || !isOptionEqualToValue(c, selectedConcept)
+      );
+    } else {
+      return [];
+    }
   }
 
   /**
@@ -132,11 +130,11 @@ export default function ConceptReference({
 
   function renderOption(
     // eslint-disable-next-line @typescript-eslint/ban-types
-    props: HTMLAttributes<HTMLLIElement>,
+    props: HTMLAttributes<HTMLLIElement> & { key?: Key },
     option: ConceptReferenceOptionType,
     { selected }: { selected?: boolean }
   ): ReactNode {
-    const key = (props as { key?: Key }).key;
+    const key = props.key;
     if (selected) {
       return (
         <SelectedConcept

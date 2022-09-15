@@ -61,12 +61,8 @@ async function parseJsonValueSet(response: Response): Promise<ValueSet> {
 async function extractError(response: Response): Promise<Error> {
   if (checkFhirJson(response)) {
     const parsedResponse = await response.json();
-    if (
-      parsedResponse.resourceType === "OperationOutcome" &&
-      parsedResponse.issue
-    ) {
-      const operationOutcome = parsedResponse as OperationOutcome;
-      return new Error(operationOutcome.issue[0].diagnostics);
+    if (isOperationOutcome(parsedResponse)) {
+      return new Error(parsedResponse.issue[0].diagnostics);
     } else {
       console.warn(
         "Received FHIR JSON error response that was not an OperationOutcome"
@@ -89,26 +85,27 @@ export function extractConceptsFromValueSet(
   if (!valueSet.expansion.contains) {
     throw new Error("No expansion.contains found in response");
   }
-  const concepts = valueSet.expansion.contains.map((concept) => {
-    const fullySpecifiedName =
-        concept.designation
+  const concepts = valueSet.expansion.contains
+    .map((concept): Partial<Concept> => {
+      const fullySpecifiedName = concept.designation
           ?.filter(matchFullySpecifiedNameDesignation)
           ?.map((d) => d.value)
-          .reduce<string | null>(
+          .reduce<string | undefined>(
             (prev, curr, currentIndex) => (currentIndex === 0 ? curr : prev),
-            null
-          ) || undefined,
-      semanticTagMatch = fullySpecifiedName?.match(SEMANTIC_TAG_PATTERN),
-      semanticTag =
-        semanticTagMatch && semanticTagMatch.length > 1
-          ? semanticTagMatch[1]
-          : undefined;
-    return {
-      id: concept.code as string,
-      display: concept.display,
-      semanticTag,
-    };
-  });
+            undefined
+          ),
+        semanticTagMatch = fullySpecifiedName?.match(SEMANTIC_TAG_PATTERN),
+        semanticTag =
+          semanticTagMatch && semanticTagMatch.length > 1
+            ? semanticTagMatch[1]
+            : undefined;
+      return {
+        id: concept.code,
+        display: concept.display,
+        semanticTag,
+      };
+    })
+    .filter(isValidConcept);
   return { concepts, total };
 }
 
@@ -124,4 +121,17 @@ function matchFullySpecifiedNameDesignation(
     designation.use?.system === SCT_URI &&
     designation.use?.code === FULLY_SPECIFIED_NAME_ID
   );
+}
+
+function isOperationOutcome(
+  response: Partial<OperationOutcome>
+): response is OperationOutcome {
+  return (
+    response.resourceType === "OperationOutcome" &&
+    Array.isArray(response.issue)
+  );
+}
+
+function isValidConcept(concept: Partial<Concept>): concept is Concept {
+  return concept.id !== undefined;
 }
