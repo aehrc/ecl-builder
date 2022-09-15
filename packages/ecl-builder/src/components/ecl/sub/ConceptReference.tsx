@@ -112,6 +112,10 @@ export default function ConceptReference({
     // terminology server.
     if (event && event.type === "change") {
       setSearchQuery(value);
+    } else if (event && event.type === "click" && value === "") {
+      // A click on the clear button resets the search query, and deselects the concept.
+      setSearchQuery("");
+      setSelectedConcept(undefined);
     }
   }
 
