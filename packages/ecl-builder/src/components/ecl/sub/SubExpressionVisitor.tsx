@@ -105,7 +105,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
               : this.transformer.spanFromTerminalNode(parent.LEFT_PAREN())
           );
         }}
-        onRemoveConstraint={() => this.handleRemoveConstraint()}
+        onRemoveConstraint={() => this.handleRemoveConstraint(parent)}
         onAddMemberOf={() => {
           const leftSurroundingParenthesis = parent.LEFT_PAREN();
           if (leftSurroundingParenthesis) {
@@ -162,7 +162,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
           onAddConstraint={() =>
             this.handleAddConstraint(this.transformer.spanFromContext(ctx))
           }
-          onRemoveConstraint={() => this.handleRemoveConstraint()}
+          onRemoveConstraint={() => this.handleRemoveConstraint(ctx)}
           onAddMemberOf={() => {
             const eclFocusConcept = ctx.eclfocusconcept();
             if (eclFocusConcept) {
@@ -297,8 +297,8 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
-  private handleRemoveConstraint() {
-    const constraintOperator = this.options.parent?.constraintoperator();
+  private handleRemoveConstraint(ctx: SubexpressionconstraintContext) {
+    const constraintOperator = ctx.constraintoperator();
     if (constraintOperator) {
       this.transformer.remove(constraintOperator, {
         collapseWhiteSpaceRight: true,
