@@ -15,7 +15,9 @@ export interface CopyExpressionProps {
 export default function CopyExpression({ expression }: CopyExpressionProps) {
   return (
     <CopyToClipboard text={expression}>
-      <Button startIcon={<ContentCopy />}>Copy ECL</Button>
+      <Button startIcon={<ContentCopy />} sx={{ whiteSpace: "nowrap" }}>
+        Copy ECL
+      </Button>
     </CopyToClipboard>
   );
 }

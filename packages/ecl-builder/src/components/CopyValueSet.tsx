@@ -20,7 +20,9 @@ export default function CopyValueSet({ expression }: CopyValueSetProps) {
   );
   return (
     <CopyToClipboard text={valueSetUri}>
-      <Button startIcon={<ContentCopy />}>Copy URI</Button>
+      <Button startIcon={<ContentCopy />} sx={{ whiteSpace: "nowrap" }}>
+        Copy URI
+      </Button>
     </CopyToClipboard>
   );
 }

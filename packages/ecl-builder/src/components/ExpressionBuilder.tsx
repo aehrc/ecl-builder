@@ -71,7 +71,12 @@ export default function ExpressionBuilder({
       <QueryClientProvider client={queryClient}>
         <OptionsContext.Provider value={applyDefaultOptions(options)}>
           <CssBaseline />
-          <Stack direction="row" spacing={1}>
+          <Stack
+            direction="row"
+            spacing={1}
+            flexWrap="wrap"
+            justifyContent="flex-end"
+          >
             <Tabs
               value={tab}
               onChange={(_, value) => setTab(value)}
