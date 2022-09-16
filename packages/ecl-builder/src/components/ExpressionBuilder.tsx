@@ -4,12 +4,20 @@
  */
 
 import { Code, Visibility } from "@mui/icons-material";
-import { CssBaseline, Tab, Tabs, Theme, ThemeProvider } from "@mui/material";
+import {
+  CssBaseline,
+  Stack,
+  Tab,
+  Tabs,
+  Theme,
+  ThemeProvider,
+} from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
 import React, { createContext, useState } from "react";
 import { queryClient } from "../queryClient";
 import { extendTheme } from "../themes/extendTheme";
 import CodeEditor from "./CodeEditor";
+import CopyExpression from "./CopyExpression";
 import FocusProvider from "./ecl/FocusProvider";
 import TabPanel from "./TabPanel";
 import VisualBuilder from "./VisualBuilder";
@@ -62,20 +70,27 @@ export default function ExpressionBuilder({
       <QueryClientProvider client={queryClient}>
         <OptionsContext.Provider value={applyDefaultOptions(options)}>
           <CssBaseline />
-          <Tabs value={tab} onChange={(_, value) => setTab(value)}>
-            <Tab
-              key="visual"
-              label="Visual"
-              value="visual"
-              icon={<Visibility fontSize="small" />}
-            />
-            <Tab
-              key="code"
-              label="Code"
-              value="code"
-              icon={<Code fontSize="small" />}
-            />
-          </Tabs>
+          <Stack direction="row">
+            <Tabs
+              value={tab}
+              onChange={(_, value) => setTab(value)}
+              sx={{ flexGrow: 1 }}
+            >
+              <Tab
+                key="visual"
+                label="Visual"
+                value="visual"
+                icon={<Visibility fontSize="small" />}
+              />
+              <Tab
+                key="code"
+                label="Code"
+                value="code"
+                icon={<Code fontSize="small" />}
+              />
+            </Tabs>
+            {expression ? <CopyExpression expression={expression} /> : null}
+          </Stack>
           <TabPanel id="visual" key="visual" selectedId={tab}>
             <FocusProvider>
               <VisualBuilder
