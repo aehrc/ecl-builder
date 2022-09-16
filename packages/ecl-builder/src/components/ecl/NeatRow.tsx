@@ -14,7 +14,7 @@ export interface NeatRowProps extends PropsWithChildren {
 export default function NeatRow({ className, children }: NeatRowProps) {
   return (
     <Stack
-      className={className}
+      className={`neat-row ${className}`}
       direction="row"
       alignItems="flex-start"
       alignSelf="stretch"
@@ -27,6 +27,9 @@ export default function NeatRow({ className, children }: NeatRowProps) {
         "& > *:first-of-type": {
           borderRadius: "3px 0 0 3px",
           overflow: "hidden",
+          "&:last-child": {
+            borderRadius: "3px",
+          },
         },
         "& > *:last-child": {
           borderRadius: "0 3px 3px 0",
