@@ -84,7 +84,7 @@ export function focusHandler(
   onFocus: PositionedFocusHandler | undefined
 ): () => unknown {
   return () => {
-    if (onFocus !== undefined) {
+    if (onFocus) {
       return onFocus(ctx.start.start);
     }
   };
