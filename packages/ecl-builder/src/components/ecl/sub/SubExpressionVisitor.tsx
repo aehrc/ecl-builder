@@ -114,7 +114,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
             );
           }
         }}
-        onRemoveMemberOf={() => this.handleRemoveMemberOf()}
+        onRemoveMemberOf={() => this.handleRemoveMemberOf(parent)}
         onRemoveRefinement={() => this.handleRemoveRefinement()}
         onAddLogicStatement={(type, expression) =>
           this.handleAddLogicStatement(ctx, type, expression)
@@ -171,7 +171,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
               );
             }
           }}
-          onRemoveMemberOf={() => this.handleRemoveMemberOf()}
+          onRemoveMemberOf={() => this.handleRemoveMemberOf(ctx)}
           onRemoveRefinement={() => this.handleRemoveRefinement()}
           onAddLogicStatement={(type, expression) =>
             this.handleAddLogicStatement(ctx, type, expression)
@@ -315,8 +315,8 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     });
   }
 
-  private handleRemoveMemberOf() {
-    const memberOf = this.options.parent?.memberof();
+  private handleRemoveMemberOf(ctx: SubexpressionconstraintContext) {
+    const memberOf = ctx.memberof();
     if (memberOf) {
       this.transformer.remove(memberOf, {
         collapseWhiteSpaceRight: true,
