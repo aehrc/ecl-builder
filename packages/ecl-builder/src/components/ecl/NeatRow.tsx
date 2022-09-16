@@ -24,7 +24,7 @@ export default function NeatRow({ className, children }: NeatRowProps) {
         backgroundColor: grey(theme, 4),
         p: "1px",
         borderRadius: "4px",
-        "& > *:first-of-type": {
+        "& > *:first-child": {
           borderRadius: "3px 0 0 3px",
           overflow: "hidden",
           "&:last-child": {
