@@ -23,7 +23,7 @@ import ExpressionConstraint from "./ExpressionConstraint";
 import ExpressionParserErrorListener from "./ExpressionParserErrorListener";
 import ExpressionTransformer from "./ExpressionTransformer";
 import Fallback from "./Fallback";
-import { focusHandler, isFocused } from "./FocusProvider";
+import { isFocused } from "./FocusProvider";
 import RefinementVisitor from "./refinement/RefinementVisitor";
 import SubExpressionVisitor from "./sub/SubExpressionVisitor";
 
@@ -39,8 +39,6 @@ export interface ChangeReporterProps<T = string> extends FocusManagementProps {
 export interface FocusManagementProps {
   // Set this to focus this component upon mounting it.
   focus?: boolean;
-  // This reports when the component receives focus.
-  onFocus?: () => unknown;
 }
 
 export type ExpressionVisitorOptions = BaseEclVisitorOptions;
@@ -87,7 +85,6 @@ export class ExpressionVisitor extends BaseEclVisitor {
         expression={ctx.getText()}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }

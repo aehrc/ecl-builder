@@ -45,7 +45,6 @@ export default function LogicStatement({
   focus,
   onChangeType,
   onAddCondition,
-  onFocus,
   children,
 }: LogicStatementProps) {
   const [addCondition, setAddCondition] = useState(false),
@@ -67,7 +66,6 @@ export default function LogicStatement({
           inputRef={focusRef}
           value={type}
           onChange={handleSelectType}
-          onFocus={onFocus}
           sx={{ backgroundColor: "background.default", border: 0 }}
         >
           <MenuItem value="conjunction">

@@ -33,7 +33,7 @@ import {
 } from "../compound/LogicStatement";
 import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
 import Fallback from "../Fallback";
-import { focusHandler, isFocused } from "../FocusProvider";
+import { isFocused } from "../FocusProvider";
 import ConceptSearchScope from "../sub/ConceptSearchScope";
 import SubExpressionVisitor from "../sub/SubExpressionVisitor";
 import Attribute from "./Attribute";
@@ -192,7 +192,6 @@ export default class RefinementVisitor extends BaseEclVisitor {
         expression={ctx.getText()}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -204,7 +203,6 @@ export default class RefinementVisitor extends BaseEclVisitor {
         expression={ctx.getText()}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -231,7 +229,6 @@ export default class RefinementVisitor extends BaseEclVisitor {
         typeLabelMap={EXPRESSION_COMPARISON_OPERATORS}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -245,7 +242,6 @@ export default class RefinementVisitor extends BaseEclVisitor {
         focus={isFocused(ctx, this.options.focusPosition)}
         typeLabelMap={NUMERIC_COMPARISON_OPERATORS}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -259,7 +255,6 @@ export default class RefinementVisitor extends BaseEclVisitor {
         focus={isFocused(ctx, this.options.focusPosition)}
         typeLabelMap={STRING_COMPARISON_OPERATORS}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -275,7 +270,6 @@ export default class RefinementVisitor extends BaseEclVisitor {
           .join(" ")}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, `"${e}"`)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }

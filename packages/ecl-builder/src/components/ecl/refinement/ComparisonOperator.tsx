@@ -25,7 +25,6 @@ export default function ComparisonOperator<T extends string>({
   typeLabelMap,
   focus,
   onChange,
-  onFocus,
 }: ComparisonOperatorProps<T>) {
   const theme = useTheme(),
     focusRef = useFocus(focus);
@@ -39,7 +38,6 @@ export default function ComparisonOperator<T extends string>({
       inputRef={focusRef}
       value={type}
       onChange={handleSelectOperator}
-      onFocus={onFocus}
       sx={{
         alignSelf: "flex-start",
         borderWidth: 1,

@@ -41,7 +41,6 @@ export default function ConstraintOperator({
   constraint,
   focus,
   onChange,
-  onFocus,
 }: ConstraintOperatorProps) {
   const focusRef = useFocus(focus);
 
@@ -63,7 +62,6 @@ export default function ConstraintOperator({
         inputRef={focusRef}
         value={constraint || "descendantorselfof"}
         onChange={handleSelectConstraint}
-        onFocus={onFocus}
       >
         <MenuItem value="descendantorselfof">self and descendants of</MenuItem>
         <MenuItem value="ancestororselfof">self and ancestors of</MenuItem>

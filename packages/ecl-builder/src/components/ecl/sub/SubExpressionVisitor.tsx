@@ -27,7 +27,7 @@ import { logicStatementTypeToOperator } from "../compound/LogicStatement";
 import { Span } from "../ExpressionTransformer";
 import { VisualExpressionType } from "../ExpressionVisitor";
 import Fallback from "../Fallback";
-import { focusHandler, isFocused } from "../FocusProvider";
+import { isFocused } from "../FocusProvider";
 import RefinementVisitor from "../refinement/RefinementVisitor";
 import ConceptReference from "./ConceptReference";
 import ConceptSearchScope from "./ConceptSearchScope";
@@ -215,7 +215,6 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         }}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -237,7 +236,6 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         constraint={operatorToConstraintName[ctx.getText()]}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -251,7 +249,6 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         expression={ctx.getText()}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -265,7 +262,6 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         expression={ctx.getText()}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -279,7 +275,6 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         expression={ctx.getText()}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }
@@ -291,7 +286,6 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         expression={ctx.getText()}
         focus={isFocused(ctx, this.options.focusPosition)}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-        onFocus={focusHandler(ctx, this.options.onFocus)}
       />
     );
   }

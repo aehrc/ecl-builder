@@ -25,7 +25,6 @@ export default function ConcreteValue({
   sx,
   focus,
   onChange,
-  onFocus,
 }: ConcreteValueProps) {
   const [currentValue, setCurrentValue] = useState(value),
     focusRef = useFocus(focus);
@@ -35,7 +34,6 @@ export default function ConcreteValue({
       inputRef={focusRef}
       value={currentValue}
       onChange={(e) => setCurrentValue(e.target.value)}
-      onFocus={onFocus}
       onBlur={(e) => onChange(e.target.value)}
       sx={{ flexGrow: 1, flexBasis: "8em", ...sx }}
       {...props}

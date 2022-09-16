@@ -21,7 +21,6 @@ export default function Fallback({
   expression,
   focus,
   onChange,
-  onFocus,
 }: FallbackProps) {
   const theme = useTheme(),
     [currentValue, setCurrentValue] = useState(expression),
@@ -45,7 +44,6 @@ export default function Fallback({
         inputRef={focusRef}
         value={currentValue}
         onChange={(e) => setCurrentValue(e.target.value)}
-        onFocus={onFocus}
         onBlur={(e) => onChange(e.target.value)}
         sx={{
           mt: 2,

@@ -75,17 +75,3 @@ export function isFocused(
     return focusPosition >= ctx.start.start && focusPosition <= ctx.stop.stop;
   }
 }
-
-/**
- * Provides a focus handler that reports the focus position based upon the specified parser context.
- */
-export function focusHandler(
-  ctx: ParserRuleContext,
-  onFocus: PositionedFocusHandler | undefined
-): () => unknown {
-  return () => {
-    if (onFocus) {
-      return onFocus(ctx.start.start);
-    }
-  };
-}

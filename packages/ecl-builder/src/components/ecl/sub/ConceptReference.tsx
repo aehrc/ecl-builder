@@ -57,7 +57,6 @@ export default function ConceptReference({
   concept,
   focus,
   onChange,
-  onFocus,
 }: ConceptReferenceProps) {
   const { terminologyServerUrl, maxSearchResults, minQueryLength } =
       useContext(OptionsContext),
@@ -166,7 +165,6 @@ export default function ConceptReference({
         label={
           selectedConcept ? getInputLabelForOption(selectedConcept) : label
         }
-        onFocus={onFocus}
       />
     );
   }
