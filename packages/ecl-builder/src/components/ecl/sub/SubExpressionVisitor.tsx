@@ -293,7 +293,8 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   private handleAddConstraint(prependSubject: Span) {
     this.transformer.prependToSpan(
       prependSubject,
-      constraintNameToOperator["descendantorselfof"]
+      constraintNameToOperator["descendantorselfof"],
+      false
     );
   }
 
@@ -310,8 +311,8 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   }
 
   private handleAddMemberOf(prependSubject: Span): void {
-    this.transformer.prependToSpan(prependSubject, MEMBER_OF_OPERATOR, {
-      focusUpdateStrategy: "AFTER_UPDATE",
+    this.transformer.prependToSpan(prependSubject, MEMBER_OF_OPERATOR, false, {
+      focusUpdateStrategy: "END_OF_UPDATE",
     });
   }
 
@@ -341,11 +342,11 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     this.transformer.append(
       ctx,
       logicStatementTypeToOperator[type] + expression,
-      { parenthesize: true }
+      true
     );
   }
 
   private handleAddRefinement(span: Span, e: string) {
-    this.transformer.appendToSpan(span, `: ${e}`);
+    this.transformer.appendToSpan(span, `: ${e}`, false);
   }
 }

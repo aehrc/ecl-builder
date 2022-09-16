@@ -312,7 +312,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
           )
         }
         onAddAttribute={(expression) =>
-          this.transformer.append(ctx, expression)
+          this.transformer.append(ctx, expression, false)
         }
       >
         {children}
@@ -346,7 +346,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
           )
         }
         onAddAttribute={(expression) =>
-          this.transformer.append(ctx, expression)
+          this.transformer.append(ctx, expression, false)
         }
       >
         {children}

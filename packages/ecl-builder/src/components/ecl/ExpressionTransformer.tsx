@@ -22,11 +22,6 @@ export interface UpdateOptions {
   focusUpdateStrategy?: FocusUpdateStrategy;
 }
 
-export interface SupplementOptions extends UpdateOptions {
-  // Set this to true to parenthesize the original expression.
-  parenthesize?: boolean;
-}
-
 // Represents a span of characters within an expression.
 export interface Span {
   start: number;
@@ -37,6 +32,7 @@ export interface Span {
 // Describes a strategy of updating the focus position following an update to the expression.
 export type FocusUpdateStrategy =
   | "START_OF_UPDATE"
+  | "END_OF_UPDATE"
   | "BEFORE_UPDATE"
   | "AFTER_UPDATE";
 
@@ -63,28 +59,18 @@ export default class ExpressionTransformer {
   /**
    * Prepends a new expression to the start of the existing expression, separated by a space.
    */
-  prepend(
-    ctx: ParserRuleContext,
-    expression: string,
-    options: SupplementOptions = {}
-  ): void {
-    this.prependToSpan(this.spanFromContext(ctx), expression, options);
-  }
-
-  /**
-   * Prepends a new expression to the start of the existing expression, separated by a space.
-   */
   prependToSpan(
     span: Span,
     expression: string,
-    { parenthesize = false }: SupplementOptions = {}
+    parenthesize: boolean,
+    options: UpdateOptions = {}
   ): void {
     const suffix = span.expression.trimStart(),
       newExpression = expression + " " + suffix,
       parenthesizedExpression = parenthesize
         ? `(${newExpression})`
         : newExpression;
-    this.applyUpdateToSpan(span, parenthesizedExpression);
+    this.applyUpdateToSpan(span, parenthesizedExpression, options);
   }
 
   /**
@@ -93,9 +79,15 @@ export default class ExpressionTransformer {
   append(
     ctx: ParserRuleContext,
     expression: string,
-    options: SupplementOptions = {}
+    parenthesize: boolean,
+    options: UpdateOptions = {}
   ): void {
-    this.appendToSpan(this.spanFromContext(ctx), expression, options);
+    this.appendToSpan(
+      this.spanFromContext(ctx),
+      expression,
+      parenthesize,
+      options
+    );
   }
 
   /**
@@ -104,14 +96,15 @@ export default class ExpressionTransformer {
   appendToSpan(
     span: Span,
     expression: string,
-    { parenthesize = false }: SupplementOptions = {}
+    parenthesize: boolean,
+    options: UpdateOptions = {}
   ): void {
     const prefix = span.expression.trimEnd(),
       newExpression = prefix + " " + expression,
       parenthesizedExpression = parenthesize
         ? `(${newExpression})`
         : newExpression;
-    this.applyUpdateToSpan(span, parenthesizedExpression);
+    this.applyUpdateToSpan(span, parenthesizedExpression, options);
   }
 
   /**
@@ -214,7 +207,8 @@ export default class ExpressionTransformer {
     }: UpdateOptions = {}
   ): void {
     let cursor = 0,
-      updateStart: number | undefined,
+      startOfUpdate: number | undefined,
+      endOfUpdate: number | undefined,
       beforeUpdate: number | undefined,
       afterUpdate: number | undefined;
 
@@ -242,10 +236,10 @@ export default class ExpressionTransformer {
         // final expression.
         beforeUpdate = Math.max(0, prefix.length - 1);
       }
-      if (updateStart === undefined) {
+      if (startOfUpdate === undefined) {
         // On the first update, record the position of the first updated character within the final
         // expression.
-        updateStart = prefix.length;
+        startOfUpdate = prefix.length;
       }
 
       // After each update, move the after update position to one character beyond the span of
@@ -254,6 +248,7 @@ export default class ExpressionTransformer {
         afterUpdate === undefined
           ? prefix.length + replacement.length
           : afterUpdate + prefix.length + replacement.length;
+      endOfUpdate = afterUpdate - 1;
       return acc.concat(prefix, replacement);
     }, []);
 
@@ -287,9 +282,14 @@ export default class ExpressionTransformer {
         position = Math.min(afterUpdate, newExpression.length - 1);
       } else if (
         focusUpdateStrategy === "START_OF_UPDATE" &&
-        updateStart !== undefined
+        startOfUpdate !== undefined
       ) {
-        position = updateStart;
+        position = startOfUpdate;
+      } else if (
+        focusUpdateStrategy === "END_OF_UPDATE" &&
+        endOfUpdate !== undefined
+      ) {
+        position = endOfUpdate;
       }
       if (position !== undefined && this.onFocus !== undefined) {
         this.onFocus(position);

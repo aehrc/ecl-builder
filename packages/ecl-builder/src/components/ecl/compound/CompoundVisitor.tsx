@@ -128,7 +128,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
             logicStatementTypeToOperator[type]
           )
         }
-        onAddCondition={(e) => this.transformer.append(ctx, e)}
+        onAddCondition={(e) => this.transformer.append(ctx, e, false)}
       >
         {result}
       </LogicStatement>
