@@ -23,14 +23,14 @@ function App() {
         })}
       >
         <Grid container spacing={4} columnSpacing={12}>
-          <Grid item xs={12} xl={6}>
+          <Grid item xs={12} xl={8} sx={{ overflow: "hidden" }}>
             <ExpressionBuilder
               expression={currentExpression}
               onChange={setCurrentExpression}
             />
           </Grid>
           {currentExpression ? (
-            <Grid item xs={12} xl={6}>
+            <Grid item xs={12} xl={4}>
               <ExpressionResult expression={currentExpression} />
             </Grid>
           ) : null}

@@ -18,6 +18,7 @@ import { queryClient } from "../queryClient";
 import { extendTheme } from "../themes/extendTheme";
 import CodeEditor from "./CodeEditor";
 import CopyExpression from "./CopyExpression";
+import CopyValueSet from "./CopyValueSet";
 import FocusProvider from "./ecl/FocusProvider";
 import TabPanel from "./TabPanel";
 import VisualBuilder from "./VisualBuilder";
@@ -70,7 +71,7 @@ export default function ExpressionBuilder({
       <QueryClientProvider client={queryClient}>
         <OptionsContext.Provider value={applyDefaultOptions(options)}>
           <CssBaseline />
-          <Stack direction="row">
+          <Stack direction="row" spacing={1}>
             <Tabs
               value={tab}
               onChange={(_, value) => setTab(value)}
@@ -90,6 +91,7 @@ export default function ExpressionBuilder({
               />
             </Tabs>
             {expression ? <CopyExpression expression={expression} /> : null}
+            {expression ? <CopyValueSet expression={expression} /> : null}
           </Stack>
           <TabPanel id="visual" key="visual" selectedId={tab}>
             <FocusProvider>

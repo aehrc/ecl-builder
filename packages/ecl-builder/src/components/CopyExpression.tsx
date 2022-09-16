@@ -15,7 +15,7 @@ export interface CopyExpressionProps {
 export default function CopyExpression({ expression }: CopyExpressionProps) {
   return (
     <CopyToClipboard text={expression}>
-      <Button startIcon={<ContentCopy />}>Copy expression</Button>
+      <Button startIcon={<ContentCopy />}>Copy ECL</Button>
     </CopyToClipboard>
   );
 }
