@@ -133,6 +133,7 @@ export function visitExpression(
       compound: false,
       removalContext: [],
       attributeGrouping: false,
+      attribute: false,
       onFocus,
     });
 

@@ -153,6 +153,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         new SubExpressionVisitor({
           ...this.options,
           parent: ctx as SubExpressionWithNestedExpression,
+          attribute: false,
         }).visit(expressionConstraint)
       ) : (
         <SubExpression
@@ -177,10 +178,17 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
             this.handleAddLogicStatement(ctx, type, expression)
           }
           onAddRefinement={(e) =>
-            this.handleAddRefinement(this.transformer.spanFromContext(ctx), e)
+            this.handleAddRefinement(
+              this.transformer.spanFromContext(ctx),
+              e,
+              this.options.attribute
+            )
           }
         >
-          {this.visitChildren(ctx)}
+          {new SubExpressionVisitor({
+            ...this.options,
+            attribute: false,
+          }).visitChildren(ctx)}
         </SubExpression>
       );
     // If there is a "member of" operator within this sub-expression, we modify the scope of concept
@@ -346,7 +354,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
-  private handleAddRefinement(span: Span, e: string) {
-    this.transformer.appendToSpan(span, `: ${e}`, false);
+  private handleAddRefinement(span: Span, e: string, parenthesize = false) {
+    this.transformer.appendToSpan(span, `: ${e}`, parenthesize);
   }
 }

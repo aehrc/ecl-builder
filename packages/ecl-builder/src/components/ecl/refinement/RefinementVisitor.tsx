@@ -131,6 +131,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
       const visitor = new RefinementVisitor({
           ...this.options,
           attributeGrouping: true,
+          refinement: false,
         }),
         conjunctionRefinementSet = ctx.conjunctionrefinementset(),
         disjunctionRefinementSet = ctx.disjunctionrefinementset();
@@ -148,7 +149,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
         );
       }
     } else {
-      return this.visitChildren(ctx);
+      return new RefinementVisitor({
+        ...this.options,
+        refinement: false,
+      }).visitChildren(ctx);
     }
   }
 
@@ -180,7 +184,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
           })
         }
       >
-        {this.visitChildren(ctx)}
+        {new RefinementVisitor({
+          ...this.options,
+          attribute: true,
+        }).visitChildren(ctx)}
       </Attribute>
     );
   }

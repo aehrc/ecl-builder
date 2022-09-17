@@ -20,12 +20,14 @@ export interface BaseEclVisitorOptions {
   focusPosition?: number;
   // A set of spans that is the current context for removal.
   removalContext: Span[];
-  // Set to the context of the current refinement.
+  // True if within a refinement expression.
   refinement: boolean;
-  // Set to the context of the current compound expression.
+  // True if within a compound expression.
   compound: boolean;
-  // Set to true if the current context is within an attribute grouping.
+  // True if within an attribute grouping.
   attributeGrouping: boolean;
+  // True if within an attribute.
+  attribute: boolean;
   // Called when the focus position changes.
   onFocus?: PositionedFocusHandler;
 }
