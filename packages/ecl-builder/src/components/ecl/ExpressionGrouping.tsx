@@ -69,6 +69,7 @@ export default function ExpressionGrouping({
           mb: 0,
           pt: heading ? "3.55em" : undefined,
           pb: 2,
+          minWidth: "338px",
           "& > *": {
             clear: "both",
           },
