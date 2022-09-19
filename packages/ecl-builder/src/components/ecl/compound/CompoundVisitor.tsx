@@ -69,7 +69,6 @@ export default class CompoundVisitor extends BaseEclVisitor {
         onRemove={() =>
           this.transformer.removeAllSpans(this.options.removalContext, {
             focusUpdateStrategy: "BEFORE_UPDATE",
-            collapseWhiteSpaceLeft: true,
           })
         }
       >
