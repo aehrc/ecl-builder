@@ -45,7 +45,7 @@ export function extendTheme(theme: Theme): Theme {
       MuiAutocomplete: {
         styleOverrides: {
           root: {
-            minWidth: "10em",
+            minWidth: "15em",
           },
           option: {
             alignItems: "flex-start",
