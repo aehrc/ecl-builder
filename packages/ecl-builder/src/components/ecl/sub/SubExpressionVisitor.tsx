@@ -23,7 +23,6 @@ import {
 import { nonNullish } from "../../../types";
 import BaseEclVisitor, { BaseEclVisitorOptions } from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
-import { logicStatementTypeToOperator } from "../compound/LogicStatement";
 import { Span } from "../ExpressionTransformer";
 import { VisualExpressionType } from "../ExpressionVisitor";
 import Fallback from "../Fallback";
@@ -116,8 +115,8 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
         }}
         onRemoveMemberOf={() => this.handleRemoveMemberOf(parent)}
         onRemoveRefinement={() => this.handleRemoveRefinement()}
-        onAddLogicStatement={(type, expression) =>
-          this.handleAddLogicStatement(ctx, type, expression)
+        onAddLogicStatement={(expression, focusPosition) =>
+          this.handleAddLogicStatement(ctx, expression, focusPosition)
         }
         onAddRefinement={(e) =>
           this.handleAddRefinement(
@@ -174,11 +173,11 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
           }}
           onRemoveMemberOf={() => this.handleRemoveMemberOf(ctx)}
           onRemoveRefinement={() => this.handleRemoveRefinement()}
-          onAddLogicStatement={(type, expression) =>
+          onAddLogicStatement={(expression, focusPosition) =>
             this.handleAddLogicStatement(
               this.options.parent ?? ctx,
-              type,
-              expression
+              expression,
+              focusPosition
             )
           }
           onAddRefinement={(e) =>
@@ -348,14 +347,13 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
 
   private handleAddLogicStatement(
     ctx: ParserRuleContext,
-    type: "conjunction" | "disjunction",
-    expression: string
+    expression: string,
+    focusPosition: number
   ) {
-    this.transformer.append(
-      ctx,
-      logicStatementTypeToOperator[type] + expression,
-      true
-    );
+    this.transformer.append(ctx, expression, true, {
+      focusUpdateStrategy: "SPECIFIED_POSITION",
+      focusPosition,
+    });
   }
 
   private handleAddRefinement(span: Span, e: string, parenthesize = false) {

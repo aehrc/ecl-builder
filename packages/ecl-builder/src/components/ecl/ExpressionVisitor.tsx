@@ -30,6 +30,10 @@ import SubExpressionVisitor from "./sub/SubExpressionVisitor";
 export type VisualExpressionType = ReactNode;
 
 export type ChangeHandler<T = string> = (expression: T) => unknown;
+export type ChangeHandlerWithPosition<T = string> = (
+  expression: T,
+  position: number
+) => unknown;
 
 export interface ChangeReporterProps<T = string> extends FocusManagementProps {
   // Invoked when expression is updated.

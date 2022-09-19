@@ -128,7 +128,12 @@ export default class CompoundVisitor extends BaseEclVisitor {
             logicStatementTypeToOperator[type]
           )
         }
-        onAddCondition={(e) => this.transformer.append(ctx, e, false)}
+        onAddCondition={(expression, focusPosition) => {
+          this.transformer.append(ctx, expression, false, {
+            focusUpdateStrategy: "SPECIFIED_POSITION",
+            focusPosition,
+          });
+        }}
       >
         {result}
       </LogicStatement>

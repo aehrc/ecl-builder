@@ -9,7 +9,10 @@ import React, { PropsWithChildren } from "react";
 import { DEFAULT_CONCEPT } from "../../../constants";
 import Actions from "../Actions";
 import ExpressionGrouping from "../ExpressionGrouping";
-import { ChangeHandler, FocusManagementProps } from "../ExpressionVisitor";
+import {
+  ChangeHandlerWithPosition,
+  FocusManagementProps,
+} from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
 import NeatRow from "../NeatRow";
 
@@ -24,7 +27,7 @@ export interface LogicStatementProps
   // Invoked when the user changes the type of logic statement.
   onChangeType: (type: LogicStatementType) => unknown;
   // Invoked when the user adds a new conjunction or disjunction to the statement.
-  onAddCondition: ChangeHandler;
+  onAddCondition: ChangeHandlerWithPosition;
 }
 
 export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
@@ -53,7 +56,8 @@ export default function LogicStatement({
   }
 
   function handleAddCondition() {
-    onAddCondition(logicStatementTypeToOperator[type] + DEFAULT_CONCEPT);
+    const operator = logicStatementTypeToOperator[type];
+    onAddCondition(operator + DEFAULT_CONCEPT, operator.length);
   }
 
   function renderHeading() {

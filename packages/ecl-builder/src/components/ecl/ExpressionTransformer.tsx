@@ -20,6 +20,8 @@ export interface UpdateOptions {
   reportFocusUpdate?: boolean;
   // Sets the strategy for handling focus updates.
   focusUpdateStrategy?: FocusUpdateStrategy;
+  // A position to update the focus to, if using the "SPECIFIED_POSITION" strategy.
+  focusPosition?: number;
 }
 
 // Represents a span of characters within an expression.
@@ -34,7 +36,8 @@ export type FocusUpdateStrategy =
   | "START_OF_UPDATE"
   | "END_OF_UPDATE"
   | "BEFORE_UPDATE"
-  | "AFTER_UPDATE";
+  | "AFTER_UPDATE"
+  | "SPECIFIED_POSITION";
 
 /**
  * This class knows how to transform an expression in a variety of different ways, including
@@ -99,12 +102,19 @@ export default class ExpressionTransformer {
     parenthesize: boolean,
     options: UpdateOptions = {}
   ): void {
-    const prefix = span.expression.trimEnd(),
-      newExpression = prefix + " " + expression,
+    const prefix = span.expression.trimEnd() + " ",
+      newExpression = prefix + expression,
       parenthesizedExpression = parenthesize
         ? `(${newExpression})`
         : newExpression;
-    this.applyUpdateToSpan(span, parenthesizedExpression, options);
+    this.applyUpdateToSpan(span, parenthesizedExpression, {
+      ...options,
+      focusPosition:
+        options.focusUpdateStrategy === "SPECIFIED_POSITION" &&
+        options.focusPosition
+          ? prefix.length + options.focusPosition + (parenthesize ? 1 : 0)
+          : options.focusPosition,
+    });
   }
 
   /**
@@ -204,6 +214,7 @@ export default class ExpressionTransformer {
       collapseWhiteSpaceLeft = false,
       reportFocusUpdate = true,
       focusUpdateStrategy = "START_OF_UPDATE",
+      focusPosition,
     }: UpdateOptions = {}
   ): void {
     let cursor = 0,
@@ -271,6 +282,12 @@ export default class ExpressionTransformer {
     if (reportFocusUpdate && spans.length > 0) {
       let position: number | undefined;
       if (
+        focusUpdateStrategy === "SPECIFIED_POSITION" &&
+        startOfUpdate !== undefined &&
+        focusPosition !== undefined
+      ) {
+        position = startOfUpdate + focusPosition;
+      } else if (
         focusUpdateStrategy === "BEFORE_UPDATE" &&
         beforeUpdate !== undefined
       ) {
@@ -291,7 +308,7 @@ export default class ExpressionTransformer {
       ) {
         position = endOfUpdate;
       }
-      if (position !== undefined && this.onFocus !== undefined) {
+      if (position !== undefined && this.onFocus) {
         this.onFocus(position);
       }
     }

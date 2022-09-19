@@ -8,7 +8,11 @@ import Stack from "@mui/material/Stack/Stack";
 import React, { PropsWithChildren } from "react";
 import { DEFAULT_CONCEPT, DEFAULT_REFINEMENT } from "../../../constants";
 import Actions, { Action } from "../Actions";
-import { LogicStatementType } from "../compound/LogicStatement";
+import {
+  LogicStatementType,
+  logicStatementTypeToOperator,
+} from "../compound/LogicStatement";
+import { ChangeHandlerWithPosition } from "../ExpressionVisitor";
 import NeatRow from "../NeatRow";
 
 export interface SubExpressionProps extends PropsWithChildren {
@@ -33,10 +37,7 @@ export interface SubExpressionProps extends PropsWithChildren {
   // Called when the refinement is removed.
   onRemoveRefinement?: () => unknown;
   // Called when a logical statement is added to the expression.
-  onAddLogicStatement?: (
-    type: LogicStatementType,
-    expression: string
-  ) => unknown;
+  onAddLogicStatement?: ChangeHandlerWithPosition;
   // Called when an attribute refinement is added to the expression.
   onAddRefinement?: (expression: string) => unknown;
 }
@@ -161,7 +162,8 @@ export function useSubExpression({
 
   function handleAddLogicStatement(type: LogicStatementType) {
     if (onAddLogicStatement) {
-      onAddLogicStatement(type, DEFAULT_CONCEPT);
+      const operator = logicStatementTypeToOperator[type];
+      onAddLogicStatement(operator + DEFAULT_CONCEPT, operator.length);
     }
   }
 
