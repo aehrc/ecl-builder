@@ -357,6 +357,9 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   }
 
   private handleAddRefinement(span: Span, e: string, parenthesize = false) {
-    this.transformer.appendToSpan(span, `: ${e}`, parenthesize);
+    this.transformer.appendToSpan(span, `: ${e}`, parenthesize, {
+      focusUpdateStrategy: "SPECIFIED_POSITION",
+      focusPosition: 2,
+    });
   }
 }
