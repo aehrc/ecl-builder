@@ -175,7 +175,11 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
           onRemoveMemberOf={() => this.handleRemoveMemberOf(ctx)}
           onRemoveRefinement={() => this.handleRemoveRefinement()}
           onAddLogicStatement={(type, expression) =>
-            this.handleAddLogicStatement(ctx, type, expression)
+            this.handleAddLogicStatement(
+              this.options.parent ?? ctx,
+              type,
+              expression
+            )
           }
           onAddRefinement={(e) =>
             this.handleAddRefinement(
