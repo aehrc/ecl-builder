@@ -181,7 +181,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
             this.handleAddRefinement(
               this.transformer.spanFromContext(ctx),
               e,
-              this.options.attribute
+              this.options.attribute || this.options.compound
             )
           }
         >
