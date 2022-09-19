@@ -35,6 +35,7 @@ export default function ComparisonOperator<T extends string>({
 
   return (
     <Select
+      className="comparison-operator"
       inputRef={focusRef}
       value={type}
       onChange={handleSelectOperator}
