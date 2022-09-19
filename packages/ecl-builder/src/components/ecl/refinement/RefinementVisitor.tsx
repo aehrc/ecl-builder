@@ -318,8 +318,11 @@ export default class RefinementVisitor extends BaseEclVisitor {
             logicStatementTypeToOperator[type]
           )
         }
-        onAddAttribute={(expression) =>
-          this.transformer.append(ctx, expression, false)
+        onAddAttribute={(expression, focusPosition) =>
+          this.transformer.append(ctx, expression, false, {
+            focusUpdateStrategy: "SPECIFIED_POSITION",
+            focusPosition,
+          })
         }
       >
         {children}
@@ -352,8 +355,11 @@ export default class RefinementVisitor extends BaseEclVisitor {
             logicStatementTypeToOperator[type]
           )
         }
-        onAddAttribute={(expression) =>
-          this.transformer.append(ctx, expression, false)
+        onAddAttribute={(expression, focusPosition) =>
+          this.transformer.append(ctx, expression, false, {
+            focusUpdateStrategy: "SPECIFIED_POSITION",
+            focusPosition,
+          })
         }
       >
         {children}

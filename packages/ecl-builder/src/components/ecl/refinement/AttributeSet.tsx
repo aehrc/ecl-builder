@@ -13,13 +13,14 @@ import {
   logicStatementTypeToOperator,
 } from "../compound/LogicStatement";
 import ExpressionGrouping from "../ExpressionGrouping";
+import { ChangeHandlerWithPosition } from "../ExpressionVisitor";
 import NeatRow from "../NeatRow";
 
 export interface AttributeSetProps extends PropsWithChildren {
   type: LogicStatementType;
   hideAddGroup?: boolean;
   onChangeType: (type: LogicStatementType) => unknown;
-  onAddAttribute: (expression: string) => unknown;
+  onAddAttribute: ChangeHandlerWithPosition;
 }
 
 export default function AttributeSet({
@@ -34,15 +35,13 @@ export default function AttributeSet({
   }
 
   function handleAddAttribute() {
-    onAddAttribute(
-      `${logicStatementTypeToOperator[type]}${DEFAULT_REFINEMENT}`
-    );
+    const operator = logicStatementTypeToOperator[type];
+    onAddAttribute(operator + DEFAULT_REFINEMENT, operator.length);
   }
 
   function handleAddAttributeGroup() {
-    onAddAttribute(
-      `${logicStatementTypeToOperator[type]}{ ${DEFAULT_REFINEMENT} }`
-    );
+    const operator = logicStatementTypeToOperator[type];
+    onAddAttribute(`${operator}{ ${DEFAULT_REFINEMENT} }`, operator.length + 2);
   }
 
   function renderHeading() {
