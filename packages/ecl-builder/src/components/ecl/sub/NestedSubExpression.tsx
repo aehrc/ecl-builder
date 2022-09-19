@@ -16,7 +16,7 @@ export interface NestedSubExpressionProps extends SubExpressionProps {
 
 export default function NestedSubExpression(props: NestedSubExpressionProps) {
   const { heading, children } = props,
-    { AddLogicStatement, SubExpressionActions } = useSubExpression(props);
+    { SubExpressionActions } = useSubExpression(props);
 
   function renderHeading() {
     return (
@@ -30,10 +30,8 @@ export default function NestedSubExpression(props: NestedSubExpressionProps) {
   }
 
   return (
-    <AddLogicStatement>
-      <ExpressionGrouping className="sub-expression" heading={renderHeading()}>
-        {children}
-      </ExpressionGrouping>
-    </AddLogicStatement>
+    <ExpressionGrouping className="sub-expression" heading={renderHeading()}>
+      {children}
+    </ExpressionGrouping>
   );
 }

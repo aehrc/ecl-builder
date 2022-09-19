@@ -5,10 +5,9 @@
 
 import { Done, Tune } from "@mui/icons-material";
 import Stack from "@mui/material/Stack/Stack";
-import React, { PropsWithChildren, useState } from "react";
-import { DEFAULT_REFINEMENT } from "../../../constants";
+import React, { PropsWithChildren } from "react";
+import { DEFAULT_CONCEPT, DEFAULT_REFINEMENT } from "../../../constants";
 import Actions, { Action } from "../Actions";
-import BlankLogicStatement from "../compound/BlankLogicStatement";
 import { LogicStatementType } from "../compound/LogicStatement";
 import NeatRow from "../NeatRow";
 
@@ -58,85 +57,83 @@ export function useSubExpression({
   onAddLogicStatement,
   onAddRefinement,
 }: SubExpressionProps) {
-  const [addLogicStatement, setAddLogicStatement] =
-      useState<LogicStatementType | null>(null),
-    actions: Action[] = [
-      {
-        type: "heading",
-        label: "Toggle:",
-      },
-      {
-        type: "item",
-        label: "Hierarchy",
-        onClick: handleClickHierarchy,
-        icon: constraint ? <Done /> : null,
-      },
-      {
-        type: "item",
-        label: "Reference set members",
-        onClick: handleClickReferenceSetMembers,
-        icon: memberOf ? <Done /> : null,
-      },
-      {
-        type: "item",
-        label: "Replaced concepts",
-        disabled: true,
-      },
-      {
-        type: "heading",
-        label: "Filter on:",
-      },
-      {
-        type: "item",
-        label: "Attributes",
-        onClick: handleAddRefinement,
-        icon: refinement ? <Done /> : null,
-      },
-      {
-        type: "item",
-        label: "Descriptions",
-        disabled: true,
-      },
-      {
-        type: "item",
-        label: "Definition status",
-        disabled: true,
-      },
-      {
-        type: "item",
-        label: "Module",
-        disabled: true,
-      },
-      {
-        type: "item",
-        label: "Effective time",
-        disabled: true,
-      },
-      {
-        type: "item",
-        label: "Active status",
-        disabled: true,
-      },
-      {
-        type: "item",
-        label: "Reference set attributes",
-        disabled: true,
-      },
-      {
-        type: "heading",
-        label: "Add:",
-      },
-      {
-        type: "item",
-        label: "AND condition",
-        onClick: () => setAddLogicStatement("conjunction"),
-      },
-      {
-        type: "item",
-        label: "OR condition",
-        onClick: () => setAddLogicStatement("disjunction"),
-      },
-    ];
+  const actions: Action[] = [
+    {
+      type: "heading",
+      label: "Toggle:",
+    },
+    {
+      type: "item",
+      label: "Hierarchy",
+      onClick: handleClickHierarchy,
+      icon: constraint ? <Done /> : null,
+    },
+    {
+      type: "item",
+      label: "Reference set members",
+      onClick: handleClickReferenceSetMembers,
+      icon: memberOf ? <Done /> : null,
+    },
+    {
+      type: "item",
+      label: "Replaced concepts",
+      disabled: true,
+    },
+    {
+      type: "heading",
+      label: "Filter on:",
+    },
+    {
+      type: "item",
+      label: "Attributes",
+      onClick: handleAddRefinement,
+      icon: refinement ? <Done /> : null,
+    },
+    {
+      type: "item",
+      label: "Descriptions",
+      disabled: true,
+    },
+    {
+      type: "item",
+      label: "Definition status",
+      disabled: true,
+    },
+    {
+      type: "item",
+      label: "Module",
+      disabled: true,
+    },
+    {
+      type: "item",
+      label: "Effective time",
+      disabled: true,
+    },
+    {
+      type: "item",
+      label: "Active status",
+      disabled: true,
+    },
+    {
+      type: "item",
+      label: "Reference set attributes",
+      disabled: true,
+    },
+    {
+      type: "heading",
+      label: "Add:",
+    },
+    {
+      type: "item",
+      label: "AND condition",
+      onClick: () => handleAddLogicStatement("conjunction"),
+    },
+    {
+      type: "item",
+      label: "OR condition",
+      onClick: () => handleAddLogicStatement("disjunction"),
+    },
+  ];
 
   function handleClickHierarchy() {
     if (constraint && onRemoveConstraint) {
@@ -154,16 +151,6 @@ export function useSubExpression({
     }
   }
 
-  function handleLogicStatementUpdate(expression: string) {
-    if (addLogicStatement && onAddLogicStatement) {
-      onAddLogicStatement(addLogicStatement, expression);
-    } else {
-      console.warn(
-        "Attempt to update logic statement when no statement is selected"
-      );
-    }
-  }
-
   function handleAddRefinement() {
     if (refinement && onRemoveRefinement) {
       onRemoveRefinement();
@@ -172,18 +159,10 @@ export function useSubExpression({
     }
   }
 
-  function AddLogicStatement({ children }: PropsWithChildren) {
-    return addLogicStatement ? (
-      <BlankLogicStatement
-        type={addLogicStatement}
-        onChangeType={setAddLogicStatement}
-        onSave={(_, e) => handleLogicStatementUpdate(e)}
-      >
-        {children}
-      </BlankLogicStatement>
-    ) : (
-      <>{children}</>
-    );
+  function handleAddLogicStatement(type: LogicStatementType) {
+    if (onAddLogicStatement) {
+      onAddLogicStatement(type, DEFAULT_CONCEPT);
+    }
   }
 
   function SubExpressionActions() {
@@ -191,7 +170,6 @@ export function useSubExpression({
   }
 
   return {
-    AddLogicStatement,
     SubExpressionActions,
   };
 }
@@ -203,16 +181,14 @@ export function useSubExpression({
  * @author John Grimes
  */
 export default function SubExpression(props: SubExpressionProps) {
-  const { AddLogicStatement, SubExpressionActions } = useSubExpression(props);
+  const { SubExpressionActions } = useSubExpression(props);
 
   return (
-    <AddLogicStatement>
-      <Stack className="sub-expression" sx={{ flexGrow: 1 }}>
-        <NeatRow className="sub-expression-content">
-          {props.children}
-          <SubExpressionActions />
-        </NeatRow>
-      </Stack>
-    </AddLogicStatement>
+    <Stack className="sub-expression" sx={{ flexGrow: 1 }}>
+      <NeatRow className="sub-expression-content">
+        {props.children}
+        <SubExpressionActions />
+      </NeatRow>
+    </Stack>
   );
 }

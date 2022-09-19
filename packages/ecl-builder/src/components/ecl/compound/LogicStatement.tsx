@@ -5,14 +5,13 @@
 
 import { Add } from "@mui/icons-material";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import React, { PropsWithChildren, useState } from "react";
+import React, { PropsWithChildren } from "react";
+import { DEFAULT_CONCEPT } from "../../../constants";
 import Actions from "../Actions";
 import ExpressionGrouping from "../ExpressionGrouping";
 import { ChangeHandler, FocusManagementProps } from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
 import NeatRow from "../NeatRow";
-import ConceptReference from "../sub/ConceptReference";
-import LogicOperator from "./LogicOperator";
 
 // The type of logic statement, either "conjunction" or "disjunction".
 export type LogicStatementType = "conjunction" | "disjunction";
@@ -47,16 +46,14 @@ export default function LogicStatement({
   onAddCondition,
   children,
 }: LogicStatementProps) {
-  const [addCondition, setAddCondition] = useState(false),
-    focusRef = useFocus(focus);
+  const focusRef = useFocus(focus);
 
   function handleSelectType(event: SelectChangeEvent<LogicStatementType>) {
     onChangeType(event.target.value as LogicStatementType);
   }
 
-  function handleAddCondition(expression: string) {
-    onAddCondition(logicStatementTypeToOperator[type] + expression);
-    setAddCondition(false);
+  function handleAddCondition() {
+    onAddCondition(logicStatementTypeToOperator[type] + DEFAULT_CONCEPT);
   }
 
   function renderHeading() {
@@ -80,7 +77,7 @@ export default function LogicStatement({
             {
               type: "item",
               label: "Add condition",
-              onClick: () => setAddCondition(true),
+              onClick: handleAddCondition,
             },
           ]}
           icon={Add}
@@ -91,15 +88,7 @@ export default function LogicStatement({
 
   return (
     <ExpressionGrouping className="logic-statement" heading={renderHeading()}>
-      {addCondition ? (
-        <>
-          {children}
-          <LogicOperator type={type} />
-          <ConceptReference onChange={handleAddCondition} />
-        </>
-      ) : (
-        children
-      )}
+      {children}
     </ExpressionGrouping>
   );
 }
