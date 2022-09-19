@@ -184,7 +184,6 @@ export default function ConceptReference({
       onChange={handleSelectConcept}
       onClose={remove}
       loading={isLoading}
-      open
     />
   );
 }
