@@ -45,7 +45,7 @@ export function extendTheme(theme: Theme): Theme {
       MuiAutocomplete: {
         styleOverrides: {
           root: {
-            minWidth: "15em",
+            minWidth: "240px",
           },
           option: {
             alignItems: "flex-start",
@@ -60,7 +60,7 @@ export function extendTheme(theme: Theme): Theme {
             justifyContent: "space-between",
             "& .MuiListItemIcon-root": {
               minWidth: "unset",
-              width: 16,
+              width: "16px",
             },
           },
         },
@@ -111,8 +111,8 @@ export function extendTheme(theme: Theme): Theme {
             },
           },
           select: {
-            height: "2.56em",
-            lineHeight: "2.56em",
+            height: "39px",
+            lineHeight: "39px",
             paddingTop: theme.spacing(1),
             "&:focus": {
               backgroundColor: theme.palette.background.paper,

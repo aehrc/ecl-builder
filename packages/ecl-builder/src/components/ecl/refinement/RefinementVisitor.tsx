@@ -287,7 +287,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
         value={ctx.getText()}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
         props={{ type: "number" }}
-        sx={{ flexBasis: "6em" }}
+        sx={{ flexBasis: "96px" }}
       />
     );
   }

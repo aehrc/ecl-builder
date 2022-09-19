@@ -21,7 +21,7 @@ export default function ComponentLabel({ sx, children }: ComponentLabelProps) {
       className="component-label"
       sx={{
         backgroundColor: "background.default",
-        p: "1.06em",
+        p: "16px",
         userSelect: "none",
         fontSize: "0.95em",
         whiteSpace: "nowrap",

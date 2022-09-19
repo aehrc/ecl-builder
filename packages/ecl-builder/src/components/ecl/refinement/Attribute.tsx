@@ -19,7 +19,7 @@ export default function Attribute({ children, onRemove }: AttributeProps) {
       childrenArray,
       new Array(childrenArray.length - 1).fill(
         <HorizontalLink
-          style={{ marginTop: "1.85em", alignSelf: "flex-start" }}
+          style={{ marginTop: "28px", alignSelf: "flex-start" }}
         />
       )
     );

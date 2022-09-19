@@ -23,7 +23,7 @@ export default function AnyConcept({ props, separator }: AnyConcept) {
           fontSize: "1.2em",
           color: grey(theme, 5),
           position: "relative",
-          top: "0.2em",
+          top: "6px",
         }}
       />
     ),

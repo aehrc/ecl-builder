@@ -35,7 +35,14 @@ export default function ConcreteValue({
       value={currentValue}
       onChange={(e) => setCurrentValue(e.target.value)}
       onBlur={(e) => onChange(e.target.value)}
-      sx={{ flexGrow: 1, flexBasis: "8em", ...sx }}
+      sx={{
+        flexGrow: 1,
+        flexBasis: "128px",
+        "& .MuiInputBase-root": {
+          height: "57px",
+        },
+        ...sx,
+      }}
       {...props}
     />
   );
