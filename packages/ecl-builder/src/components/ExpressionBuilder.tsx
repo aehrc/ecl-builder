@@ -83,12 +83,14 @@ export default function ExpressionBuilder({
               sx={{ flexGrow: 1 }}
             >
               <Tab
+                id="tab-visual"
                 key="visual"
                 label="Visual"
                 value="visual"
                 icon={<Visibility fontSize="small" />}
               />
               <Tab
+                id="tab-code"
                 key="code"
                 label="Code"
                 value="code"
