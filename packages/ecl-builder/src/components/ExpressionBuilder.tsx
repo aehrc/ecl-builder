@@ -87,6 +87,7 @@ export default function ExpressionBuilder({
                 key="visual"
                 label="Visual"
                 value="visual"
+                title="Switch to the visual expression builder"
                 icon={<Visibility fontSize="small" />}
               />
               <Tab
@@ -94,6 +95,7 @@ export default function ExpressionBuilder({
                 key="code"
                 label="Code"
                 value="code"
+                title="Switch to the code editor"
                 icon={<Code fontSize="small" />}
               />
             </Tabs>
