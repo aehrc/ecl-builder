@@ -4,12 +4,13 @@
  */
 
 import { Clear } from "@mui/icons-material";
-import { IconButton, SxProps, Theme } from "@mui/material";
+import { IconButton, Theme } from "@mui/material";
+import { SystemStyleObject } from "@mui/system/styleFunctionSx";
 import React from "react";
 
 export interface RemoveButtonProps {
   tooltip?: string;
-  sx?: SxProps<Theme>;
+  sx?: SystemStyleObject<Theme>;
   onClick?: () => unknown;
 }
 

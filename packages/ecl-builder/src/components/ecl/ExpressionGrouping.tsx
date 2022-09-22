@@ -3,7 +3,8 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Box, SxProps, Theme, useTheme } from "@mui/material";
+import { Box, Theme, useTheme } from "@mui/material";
+import { SystemStyleObject } from "@mui/system/styleFunctionSx";
 import React, { PropsWithChildren, ReactNode } from "react";
 import { grey } from "../../themes/color";
 import GroupingHeading from "./GroupingHeading";
@@ -11,7 +12,7 @@ import GroupingHeading from "./GroupingHeading";
 export interface ExpressionGroupingProps extends PropsWithChildren {
   heading?: ReactNode;
   className?: string;
-  sx?: SxProps<Theme>;
+  sx?: SystemStyleObject<Theme>;
 }
 
 /**

@@ -3,12 +3,13 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Box, ListItem, SxProps, Theme, Typography } from "@mui/material";
+import { Box, ListItem, Theme, Typography } from "@mui/material";
+import { SystemStyleObject } from "@mui/system/styleFunctionSx";
 import React, { ReactNode } from "react";
 
 interface ConceptOptionProps {
   props: Record<string, unknown>;
-  listItemStyles?: SxProps<Theme>;
+  listItemStyles?: SystemStyleObject<Theme>;
   display: ReactNode;
   semanticTag: ReactNode;
 }
@@ -20,18 +21,33 @@ export default function ConceptOption({
   semanticTag,
 }: ConceptOptionProps) {
   return (
-    <ListItem {...props} sx={listItemStyles}>
+    <ListItem
+      {...props}
+      sx={(theme) => ({
+        "&.MuiListItem-root": {
+          alignItems: "flex-start",
+          [theme.breakpoints.down("sm")]: {
+            paddingTop: "12px",
+          },
+        },
+        ...listItemStyles,
+      })}
+    >
       <Typography sx={{ fontSize: "0.95em" }} flexGrow={1}>
         {display}
       </Typography>
       <Box
         sx={{
           marginLeft: 1,
-          lineHeight: 1.83,
-          alignSelf: "flex-start",
           textAlign: "right",
-          position: "relative",
-          top: "2px",
+          height: "1em",
+          "& .MuiTypography-root": {
+            lineHeight: "1.65em",
+          },
+          "& .MuiChip-root": {
+            position: "relative",
+            top: "-2px",
+          },
         }}
       >
         {semanticTag ?? null}

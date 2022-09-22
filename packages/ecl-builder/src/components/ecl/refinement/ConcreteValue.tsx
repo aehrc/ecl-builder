@@ -3,7 +3,8 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { SxProps, TextField, TextFieldProps, Theme } from "@mui/material";
+import { TextField, TextFieldProps, Theme } from "@mui/material";
+import { SystemStyleObject } from "@mui/system/styleFunctionSx";
 import React, { useState } from "react";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
@@ -11,7 +12,7 @@ import { useFocus } from "../FocusProvider";
 export interface ConcreteValueProps extends ChangeReporterProps {
   value: string;
   props?: TextFieldProps;
-  sx?: SxProps<Theme>;
+  sx?: SystemStyleObject<Theme>;
 }
 
 /**
