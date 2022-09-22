@@ -61,6 +61,7 @@ export default function AttributeGroup({
             },
           ]}
           icon={Add}
+          title="Add attribute group"
         />
       </NeatRow>
     );

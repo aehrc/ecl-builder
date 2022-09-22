@@ -70,6 +70,7 @@ export default function AttributeSet({
             ...(hideAddGroup ? [] : [addAttributeGroup]),
           ]}
           icon={Add}
+          title="Add attribute"
         />
       </NeatRow>
     );

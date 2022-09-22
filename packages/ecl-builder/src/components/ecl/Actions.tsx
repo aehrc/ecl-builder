@@ -17,6 +17,7 @@ import { grey } from "../../themes/color";
 export interface ActionsProps extends PropsWithChildren {
   actions: Action[];
   icon: SvgIconComponent;
+  title: string;
 }
 
 export type Action = ActionItem | ActionHeading;
@@ -38,7 +39,7 @@ function isActionItem(action: Action): action is ActionItem {
   return action.type === "item";
 }
 
-export default function Actions({ actions, icon }: ActionsProps) {
+export default function Actions({ actions, icon, title }: ActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false),
     addButton = useRef(null),
     actionItems = actions.filter(isActionItem),
@@ -91,6 +92,7 @@ export default function Actions({ actions, icon }: ActionsProps) {
       <IconButton
         className="actions"
         ref={addButton}
+        title={title}
         sx={(theme) => ({
           alignSelf: "stretch",
           backgroundColor: menuOpen

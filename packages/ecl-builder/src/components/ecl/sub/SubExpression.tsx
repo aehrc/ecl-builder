@@ -168,7 +168,13 @@ export function useSubExpression({
   }
 
   function SubExpressionActions() {
-    return hideActions ? null : <Actions actions={actions} icon={Tune} />;
+    return hideActions ? null : (
+      <Actions
+        actions={actions}
+        icon={Tune}
+        title="Open menu with options to change this expression"
+      />
+    );
   }
 
   return {

@@ -85,6 +85,7 @@ export default function LogicStatement({
             },
           ]}
           icon={Add}
+          title="Add condition"
         />
       </NeatRow>
     );
