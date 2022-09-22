@@ -20,7 +20,11 @@ export default function CopyValueSet({ expression }: CopyValueSetProps) {
   );
   return (
     <CopyToClipboard text={valueSetUri}>
-      <Button startIcon={<ContentCopy />} sx={{ whiteSpace: "nowrap" }}>
+      <Button
+        startIcon={<ContentCopy />}
+        sx={{ whiteSpace: "nowrap" }}
+        title="Copy the FHIR ValueSet URI to the clipboard"
+      >
         Copy URI
       </Button>
     </CopyToClipboard>
