@@ -3,10 +3,8 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Box, useTheme } from "@mui/material";
+import { TextField } from "@mui/material";
 import React from "react";
-import Editor from "react-simple-code-editor";
-import { grey } from "../themes/color";
 
 interface Props {
   expression: string;
@@ -19,31 +17,19 @@ interface Props {
  * @author John Grimes
  */
 export default function CodeEditor({ expression, onChange }: Props) {
-  const theme = useTheme();
-
   return (
-    <Box
+    <TextField
       className="code-editor"
+      onChange={(ev) => onChange(ev.target.value)}
+      value={expression}
+      fullWidth
+      multiline
       sx={{
-        backgroundColor: "background.default",
-        borderWidth: 1,
-        borderColor: grey(theme, 4),
-        borderStyle: "solid",
-        borderRadius: 1,
-        p: 2,
-        userSelect: "none",
-        fontSize: "0.85em",
-        fontFamily: "monospace",
-        "& .npm__react-simple-code-editor__textarea": {
-          outline: "none",
+        "& .MuiInputBase-input.MuiOutlinedInput-input": {
+          fontSize: "0.85em",
+          fontFamily: "monospace",
         },
       }}
-    >
-      <Editor
-        onValueChange={onChange}
-        highlight={(code) => code}
-        value={expression}
-      />
-    </Box>
+    />
   );
 }
