@@ -13,8 +13,9 @@ import {
 } from "@mui/material";
 import React, { PropsWithChildren, ReactNode, useRef, useState } from "react";
 import { grey } from "../../themes/color";
+import { StyleForwardingProps } from "./ExpressionVisitor";
 
-export interface ActionsProps extends PropsWithChildren {
+export interface ActionsProps extends PropsWithChildren, StyleForwardingProps {
   actions: Action[];
   icon?: SvgIconComponent;
   title: string;
@@ -43,6 +44,7 @@ export default function Actions({
   actions,
   icon,
   title,
+  sx,
   children,
 }: ActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false),
@@ -63,7 +65,12 @@ export default function Actions({
     if (options.type === "item") {
       const { label, icon, disabled, onClick } = options;
       return (
-        <MenuItem key={key} onClick={onClick} disabled={disabled}>
+        <MenuItem
+          key={key}
+          onClick={onClick}
+          disabled={disabled}
+          sx={{ textAlign: "left" }}
+        >
           <ListItemText>{label}</ListItemText>
           <ListItemIcon>{icon}</ListItemIcon>
         </MenuItem>
@@ -76,6 +83,7 @@ export default function Actions({
           disabled
           divider
           sx={{
+            textAlign: "left",
             "&.Mui-disabled": {
               opacity: 1,
               "& .MuiTypography-root": {
@@ -114,6 +122,7 @@ export default function Actions({
           "& > .MuiTypography-root:hover": {
             color: theme.palette.getContrastText(theme.palette.primary.main),
           },
+          ...sx,
         })}
         onClick={
           numberOfItems === 1 ? actionItems[0].onClick : () => setMenuOpen(true)
@@ -126,6 +135,7 @@ export default function Actions({
           open={menuOpen}
           anchorEl={addButton.current}
           anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
+          container={addButton.current}
           onClose={handleCloseMenu}
           onClick={handleCloseMenu}
         >

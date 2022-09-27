@@ -32,24 +32,7 @@ export default function Cardinality({
   children,
 }: CardinalityProps) {
   return (
-    <NeatRow
-      className="cardinality"
-      sx={{
-        flexGrow: 0,
-        "& .actions": { display: "none" },
-        "&:focus-within > .actions": { display: "block" },
-        "& > .inline-expression-grouping": {
-          borderRadius: "3px",
-        },
-        "&:focus-within > .inline-expression-grouping": {
-          borderRadius: "3px 0 0 3px",
-          overflow: "hidden",
-          "&:last-child": {
-            borderRadius: "3px",
-          },
-        },
-      }}
-    >
+    <NeatRow className="cardinality" sx={{ flexGrow: 0 }}>
       <InlineExpressionGrouping>
         {Children.map(children, (child) =>
           isValidElement(child)

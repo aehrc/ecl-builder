@@ -193,7 +193,23 @@ export default function SubExpression(props: SubExpressionProps) {
 
   return (
     <Stack className="sub-expression" sx={{ flexGrow: 1 }}>
-      <NeatRow className="sub-expression-content">
+      <NeatRow
+        className="sub-expression-content"
+        sx={{
+          "& .actions": { display: "none" },
+          "&:focus-within > .actions": { display: "block" },
+          "& > .inline-expression-grouping": {
+            borderRadius: "3px",
+          },
+          "&:focus-within > .inline-expression-grouping": {
+            borderRadius: "3px 0 0 3px",
+            overflow: "hidden",
+            "&:last-child": {
+              borderRadius: "3px",
+            },
+          },
+        }}
+      >
         {props.children}
         <SubExpressionActions />
       </NeatRow>

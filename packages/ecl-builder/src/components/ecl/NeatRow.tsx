@@ -29,14 +29,31 @@ export default function NeatRow({ className, sx, children }: NeatRowProps) {
         "& > *:first-child": {
           borderRadius: "3px 0 0 3px",
           overflow: "hidden",
+          "&:nth-last-child(2)": {
+            borderRadius: "3px",
+          },
+        },
+        "&:focus-within > *:first-child": {
+          "&:nth-last-child(2)": {
+            borderRadius: "3px 0 0 3px",
+          },
           "&:last-child": {
             borderRadius: "3px",
           },
         },
-        "& > *:last-child": {
+        "&:focus-within > *:nth-last-child(2)": {
+          borderRadius: 0,
+        },
+        "&:focus-within > *:last-child": {
           borderRadius: "0 3px 3px 0",
           overflow: "hidden",
         },
+        "& > *:nth-last-child(2)": {
+          borderRadius: "0 3px 3px 0",
+          overflow: "hidden",
+        },
+        "& > *:last-child.actions": { display: "none" },
+        "&:focus-within > *:last-child.actions": { display: "block" },
         ...sx,
       })}
     >

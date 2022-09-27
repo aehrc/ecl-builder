@@ -3,6 +3,8 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
+import { Theme } from "@mui/material";
+import { SystemStyleObject } from "@mui/system/styleFunctionSx";
 import antlr4 from "antlr4";
 import React, { ReactNode } from "react";
 import ECLLexer from "../../parser/src/grammar/syntax/ECLLexer";
@@ -43,6 +45,10 @@ export interface ChangeReporterProps<T = string> extends FocusManagementProps {
 export interface FocusManagementProps {
   // Set this to focus this component upon mounting it.
   focus?: boolean;
+}
+
+export interface StyleForwardingProps {
+  sx?: SystemStyleObject<Theme>;
 }
 
 export type ExpressionVisitorOptions = BaseEclVisitorOptions;
