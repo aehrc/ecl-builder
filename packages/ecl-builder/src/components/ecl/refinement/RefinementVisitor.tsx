@@ -39,6 +39,8 @@ import SubExpressionVisitor from "../sub/SubExpressionVisitor";
 import Attribute from "./Attribute";
 import AttributeGroup from "./AttributeGroup";
 import AttributeSet from "./AttributeSet";
+import Cardinality from "./Cardinality";
+import CardinalityVisitor from "./CardinalityVisitor";
 import ComparisonOperator from "./ComparisonOperator";
 import ConcreteValue from "./ConcreteValue";
 import RefinedExpression from "./RefinedExpression";
@@ -71,8 +73,11 @@ export const STRING_COMPARISON_OPERATORS: Record<string, string> = {
 };
 
 export default class RefinementVisitor extends BaseEclVisitor {
+  readonly options: RefinementVisitorOptions;
+
   constructor(options: RefinementVisitorOptions) {
     super(options);
+    this.options = options;
   }
 
   visitExpressionconstraint(
@@ -141,12 +146,14 @@ export default class RefinementVisitor extends BaseEclVisitor {
           disjunctionRefinementSet.disjunction(),
           "disjunction"
         );
-      } else {
+      } else if (conjunctionRefinementSet) {
         return visitor.renderRefinementSet(
           ctx,
           conjunctionRefinementSet?.conjunction() ?? [],
           "conjunction"
         );
+      } else {
+        return this.visitChildren(ctx);
       }
     } else {
       return new RefinementVisitor({
@@ -193,13 +200,20 @@ export default class RefinementVisitor extends BaseEclVisitor {
   }
 
   visitCardinality(ctx: CardinalityContext): VisualExpressionType {
+    const focused =
+      isFocused(ctx.minvalue(), this.options.focusPosition) ||
+      isFocused(ctx.maxvalue(), this.options.focusPosition);
     return (
-      <Fallback
-        name="Cardinality"
-        expression={ctx.getText()}
-        focus={isFocused(ctx, this.options.focusPosition)}
-        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-      />
+      <Cardinality
+        focus={focused}
+        many={!!ctx.maxvalue().many()}
+        onChange={(e) => this.transformer.applyUpdate(ctx.maxvalue(), e)}
+      >
+        {new CardinalityVisitor({
+          ...this.options,
+          align: "left",
+        }).visitChildren(ctx)}
+      </Cardinality>
     );
   }
 
@@ -287,6 +301,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
         value={ctx.getText()}
         onChange={(e) => this.transformer.applyUpdate(ctx, e)}
         props={{ type: "number" }}
+        focus={isFocused(ctx, this.options.focusPosition)}
         sx={{ flexBasis: "96px" }}
       />
     );

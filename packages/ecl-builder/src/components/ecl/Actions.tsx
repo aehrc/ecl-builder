@@ -16,7 +16,7 @@ import { grey } from "../../themes/color";
 
 export interface ActionsProps extends PropsWithChildren {
   actions: Action[];
-  icon: SvgIconComponent;
+  icon?: SvgIconComponent;
   title: string;
 }
 
@@ -39,7 +39,12 @@ function isActionItem(action: Action): action is ActionItem {
   return action.type === "item";
 }
 
-export default function Actions({ actions, icon, title }: ActionsProps) {
+export default function Actions({
+  actions,
+  icon,
+  title,
+  children,
+}: ActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false),
     addButton = useRef(null),
     actionItems = actions.filter(isActionItem),
@@ -106,12 +111,15 @@ export default function Actions({ actions, icon, title }: ActionsProps) {
           "&:focus": {
             color: theme.palette.primary.main,
           },
+          "& > .MuiTypography-root:hover": {
+            color: theme.palette.getContrastText(theme.palette.primary.main),
+          },
         })}
         onClick={
           numberOfItems === 1 ? actionItems[0].onClick : () => setMenuOpen(true)
         }
       >
-        <Icon fontSize="small" />
+        {children ?? (Icon ? <Icon fontSize="small" /> : null)}
       </IconButton>
       {numberOfItems > 1 ? (
         <Menu

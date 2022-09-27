@@ -4,7 +4,9 @@
  */
 
 import { Stack } from "@mui/material";
-import React, { PropsWithChildren, ReactNode } from "react";
+import React, { Children, PropsWithChildren, ReactNode } from "react";
+import { interleave } from "../../../array";
+import HorizontalLink from "../HorizontalLink";
 import RefinementConnector from "./RefinementConnector";
 
 export interface RefinedExpressionProps extends PropsWithChildren {
@@ -15,6 +17,15 @@ export default function RefinedExpression({
   subExpression,
   children,
 }: RefinedExpressionProps) {
+  const childrenArray = Children.toArray(children),
+    interleavedChildren = interleave(
+      childrenArray,
+      new Array(childrenArray.length - 1).fill(
+        <HorizontalLink
+          style={{ marginTop: "28px", alignSelf: "flex-start" }}
+        />
+      )
+    );
   return (
     <Stack className="refined-expression" alignItems="stretch" flexGrow={1}>
       {subExpression}
@@ -24,9 +35,10 @@ export default function RefinedExpression({
           className="refinement-content"
           direction="row"
           flexGrow={1}
+          alignItems="flex-start"
           sx={{ pt: 2 }}
         >
-          {children}
+          {interleavedChildren}
         </Stack>
       </Stack>
     </Stack>

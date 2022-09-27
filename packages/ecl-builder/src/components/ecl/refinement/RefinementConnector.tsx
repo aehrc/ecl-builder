@@ -15,7 +15,7 @@ export default function RefinementConnector() {
       className="refinement-connector"
       style={{
         minWidth: theme.spacing(2),
-        height: theme.spacing(8),
+        height: "46px",
         margin: 0,
         border: 0,
         borderLeftColor: grey(theme, 4),

@@ -252,7 +252,33 @@ export class EclattributeContext extends ParserRuleContext {}
 /**
  * cardinality : minvalue to maxvalue;
  */
-export class CardinalityContext extends ParserRuleContext {}
+export class CardinalityContext extends ParserRuleContext {
+  minvalue(): MinvalueContext;
+  to(): ToContext;
+  maxvalue(): MaxvalueContext;
+}
+
+/**
+ * minvalue : nonnegativeintegervalue;
+ */
+export class MinvalueContext extends ParserRuleContext {}
+
+/**
+ * to : (PERIOD PERIOD);
+ */
+export class ToContext extends ParserRuleContext {}
+
+/**
+ * maxvalue : nonnegativeintegervalue | many;
+ */
+export class MaxValueContext extends ParserRuleContext {
+  many(): ManyContext | null | undefined;
+}
+
+/**
+ * many : ASTERISK;
+ */
+export class ManyContext extends ParserRuleContext {}
 
 /**
  * reverseflag : (CAP_R | R);
@@ -323,3 +349,8 @@ export class HistorysupplementContext extends ParserRuleContext {}
  * numericvalue : (DASH|PLUS)? (decimalvalue | integervalue);
  */
 export class NumericvalueContext extends ParserRuleContext {}
+
+/**
+ * nonnegativeintegervalue : (digitnonzero digit* ) | zero;
+ */
+export class NonnegativeintegervalueContext extends ParserRuleContext {}

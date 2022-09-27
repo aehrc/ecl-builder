@@ -4,8 +4,8 @@
  */
 
 import React, { Children } from "react";
-import ComponentLabel from "../ComponentLabel";
 import ExpressionGrouping from "../ExpressionGrouping";
+import InlineExpressionGrouping from "../InlineExpressionGrouping";
 import NeatRow from "../NeatRow";
 import { SubExpressionProps, useSubExpression } from "./SubExpression";
 
@@ -22,7 +22,9 @@ export default function NestedSubExpression(props: NestedSubExpressionProps) {
     return (
       <NeatRow className="sub-expression-heading">
         {Children.toArray(heading).concat(
-          <ComponentLabel>matching the following expression</ComponentLabel>,
+          <InlineExpressionGrouping>
+            matching the following expression
+          </InlineExpressionGrouping>,
           <SubExpressionActions key="actions" />
         )}
       </NeatRow>
