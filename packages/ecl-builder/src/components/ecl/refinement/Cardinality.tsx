@@ -74,6 +74,7 @@ export default function Cardinality({
             fontSize: "26px",
             position: "relative",
             top: "3px",
+            width: "20px",
             color: many
               ? theme.palette.primary.main
               : theme.palette.text.primary,
