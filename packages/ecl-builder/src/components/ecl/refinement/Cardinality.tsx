@@ -32,7 +32,10 @@ export default function Cardinality({
   children,
 }: CardinalityProps) {
   return (
-    <NeatRow className="cardinality" sx={{ flexGrow: 0 }}>
+    <NeatRow
+      className="cardinality"
+      sx={{ flexGrow: 0, alignSelf: "flex-start" }}
+    >
       <InlineExpressionGrouping>
         {Children.map(children, (child) =>
           isValidElement(child)

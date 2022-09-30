@@ -190,11 +190,11 @@ export function useSubExpression({
  */
 export default function SubExpression(props: SubExpressionProps) {
   const { SubExpressionActions } = useSubExpression(props);
-
   return (
     <Stack className="sub-expression" sx={{ flexGrow: 1 }}>
       <NeatRow
         className="sub-expression-content"
+        disableActionsHide={props.hideActions}
         sx={{
           "& .actions": { display: "none" },
           "&:focus-within > .actions": { display: "block" },

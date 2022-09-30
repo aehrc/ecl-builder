@@ -51,6 +51,10 @@ export interface StyleForwardingProps {
   sx?: SystemStyleObject<Theme>;
 }
 
+export interface ClassNameForwardingProps {
+  className?: string;
+}
+
 export type ExpressionVisitorOptions = BaseEclVisitorOptions;
 
 /**
@@ -142,8 +146,6 @@ export function visitExpression(
       refinement: false,
       compound: false,
       removalContext: [],
-      attributeGrouping: false,
-      attribute: false,
       onFocus,
     });
 
