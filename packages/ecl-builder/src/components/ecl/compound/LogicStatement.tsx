@@ -16,8 +16,8 @@ import {
 import { useFocus } from "../FocusProvider";
 import NeatRow from "../NeatRow";
 
-// The type of logic statement, either "conjunction" or "disjunction".
-export type LogicStatementType = "conjunction" | "disjunction";
+// The type of logic statement, either "conjunction" or "disjunction" or "exclusion"
+export type LogicStatementType = "conjunction" | "disjunction" | "exclusion";
 
 export interface LogicStatementProps
   extends FocusManagementProps,
@@ -28,6 +28,8 @@ export interface LogicStatementProps
   onChangeType: (type: LogicStatementType) => unknown;
   // Invoked when the user adds a new conjunction or disjunction to the statement.
   onAddCondition: ChangeHandlerWithPosition;
+  // Number of subexpressions in statement
+  nSubexpressions: number;
 }
 
 export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
@@ -35,6 +37,7 @@ export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
     // These have a space after them due to the "mws" in the parser rule.
     conjunction: "AND ",
     disjunction: "OR ",
+    exclusion: "MINUS ",
   };
 
 /**
@@ -48,6 +51,7 @@ export default function LogicStatement({
   onChangeType,
   onAddCondition,
   children,
+  nSubexpressions,
 }: LogicStatementProps) {
   const focusRef = useFocus(focus);
 
@@ -75,18 +79,25 @@ export default function LogicStatement({
           <MenuItem value="disjunction">
             matching any of these conditions
           </MenuItem>
+          {nSubexpressions < 3 ? (
+            <MenuItem value="exclusion">
+              matching the first but not the second condition
+            </MenuItem>
+          ) : null}
         </Select>
-        <Actions
-          actions={[
-            {
-              type: "item",
-              label: "Add condition",
-              onClick: handleAddCondition,
-            },
-          ]}
-          icon={Add}
-          title="Add condition"
-        />
+        {type !== "exclusion" ? (
+          <Actions
+            actions={[
+              {
+                type: "item",
+                label: "Add condition",
+                onClick: handleAddCondition,
+              },
+            ]}
+            icon={Add}
+            title="Add condition"
+          />
+        ) : null}
       </NeatRow>
     );
   }

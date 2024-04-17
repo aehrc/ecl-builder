@@ -15,7 +15,6 @@ import {
 } from "../../../parser/src/grammar/syntax/ECLParser";
 import BaseEclVisitor from "../BaseEclVisitor";
 import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
-import Fallback from "../Fallback";
 import { isFocused } from "../FocusProvider";
 import SubExpressionVisitor from "../sub/SubExpressionVisitor";
 import LogicOperator from "./LogicOperator";
@@ -51,14 +50,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
   visitExclusionexpressionconstraint(
     ctx: ExclusionexpressionconstraintContext
   ): VisualExpressionType {
-    return (
-      <Fallback
-        name="Exclusion"
-        expression={ctx.getText()}
-        focus={isFocused(ctx, this.options.focusPosition)}
-        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
-      />
-    );
+    return this.renderLogicStatement(ctx, ctx.exclusion(), "exclusion");
   }
 
   visitSubexpressionconstraint(
@@ -87,18 +79,26 @@ export default class CompoundVisitor extends BaseEclVisitor {
     return <LogicOperator type="disjunction" />;
   }
 
+  visitExclusion(): VisualExpressionType {
+    return <LogicOperator type="exclusion" />;
+  }
+
   private renderLogicStatement(
     ctx:
       | ConjunctionexpressionconstraintContext
-      | DisjunctionexpressionconstraintContext,
+      | DisjunctionexpressionconstraintContext
+      | ExclusionexpressionconstraintContext,
     operatorCtx: ParserRuleContext[],
     type: LogicStatementType
   ): VisualExpressionType {
     let result: VisualExpressionType;
 
-    if (ctx.subexpressionconstraint().length > 1) {
+    const subexpressions = ctx.subexpressionconstraint();
+
+    if (subexpressions.length > 1) {
       // If there is more than one sub-expression in the statement, harvest the removal context
       // and then re-assemble the children.
+      if (!Array.isArray(operatorCtx)) operatorCtx = [operatorCtx]
       const children = interleave(ctx.subexpressionconstraint(), operatorCtx);
       result = [];
       for (let i = 0; i < children.length; i++) {
@@ -121,6 +121,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
       <LogicStatement
         type={type}
         focus={isFocused(ctx, this.options.focusPosition)}
+        nSubexpressions={subexpressions.length}
         onChangeType={(type) =>
           this.transformer.applyUpdates(
             operatorCtx,

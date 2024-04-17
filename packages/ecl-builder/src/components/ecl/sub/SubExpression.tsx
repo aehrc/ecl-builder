@@ -134,6 +134,11 @@ export function useSubExpression({
       label: "OR condition",
       onClick: () => handleAddLogicStatement("disjunction"),
     },
+    {
+      type: "item",
+      label: "MINUS condition",
+      onClick: () => handleAddLogicStatement("exclusion"),
+    },
   ];
 
   function handleClickHierarchy() {
