@@ -16,7 +16,7 @@ import {
 import BaseEclVisitor from "../BaseEclVisitor";
 import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
 import { isFocused } from "../FocusProvider";
-import SubExpressionVisitor from "../sub/SubExpressionVisitor";
+import SubExpressionVisitor, { SubExpressionVisitorOptions } from "../sub/SubExpressionVisitor";
 import LogicOperator from "./LogicOperator";
 import LogicStatement, {
   LogicStatementType,
@@ -29,6 +29,13 @@ import LogicStatementSubExpression from "./LogicStatementSubExpression";
  * expressions.
  */
 export default class CompoundVisitor extends BaseEclVisitor {
+  readonly options: SubExpressionVisitorOptions;
+
+  constructor(options: SubExpressionVisitorOptions) {
+    super(options);
+    this.options = options;
+  }
+
   visitExpressionconstraint(
     ctx: ExpressionconstraintContext
   ): VisualExpressionType {
@@ -93,6 +100,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
   ): VisualExpressionType {
     let result: VisualExpressionType;
 
+    const parent = this.options.parent;
     const subexpressions = ctx.subexpressionconstraint();
 
     if (subexpressions.length > 1) {
@@ -106,6 +114,14 @@ export default class CompoundVisitor extends BaseEclVisitor {
           children,
           i
         );
+
+        // Include parentheses in removal context if there are only 2 subexpressions
+        if (subexpressions.length < 3 && parent) {
+          const parentheses = [parent.LEFT_PAREN(), parent.RIGHT_PAREN()];
+          removalContext.push(...parentheses.map(node => this.transformer.spanFromTerminalNode(node)));
+          removalContext.sort((a, b) => a.start - b.start);
+        }
+
         result = Children.toArray(result).concat(
           new CompoundVisitor({
             ...this.options,
