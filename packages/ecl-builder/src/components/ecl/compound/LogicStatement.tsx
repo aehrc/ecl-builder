@@ -5,7 +5,7 @@
 
 import { Add } from "@mui/icons-material";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import React, { PropsWithChildren } from "react";
+import React, { Children, PropsWithChildren } from "react";
 import { DEFAULT_CONCEPT } from "../../../constants";
 import Actions from "../Actions";
 import ExpressionGrouping from "../ExpressionGrouping";
@@ -15,13 +15,15 @@ import {
 } from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
 import NeatRow from "../NeatRow";
+import { SubExpressionProps, useSubExpression } from "../sub/SubExpression";
 
 // The type of logic statement, either "conjunction" or "disjunction" or "exclusion"
 export type LogicStatementType = "conjunction" | "disjunction" | "exclusion";
 
 export interface LogicStatementProps
   extends FocusManagementProps,
-    PropsWithChildren {
+    PropsWithChildren,
+    SubExpressionProps {
   // The type of logic statement, either "conjunction" or "disjunction".
   type: LogicStatementType;
   // Invoked when the user changes the type of logic statement.
@@ -30,6 +32,8 @@ export interface LogicStatementProps
   onAddCondition: ChangeHandlerWithPosition;
   // Number of subexpressions in statement
   nSubexpressions: number;
+  // Components to render within the heading of the expression grouping.
+  heading?: React.ReactNode;
 }
 
 export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
@@ -52,6 +56,8 @@ export default function LogicStatement({
   onAddCondition,
   children,
   nSubexpressions,
+  heading,
+  ...subexpressionProps
 }: LogicStatementProps) {
   const focusRef = useFocus(focus);
 
@@ -64,9 +70,12 @@ export default function LogicStatement({
     onAddCondition(operator + DEFAULT_CONCEPT, operator.length);
   }
 
+  const { SubExpressionActions } = useSubExpression(subexpressionProps);
+
   function renderHeading() {
     return (
       <NeatRow className="logic-statement-heading">
+        {Children.toArray(heading)}
         <Select
           inputRef={focusRef}
           value={type}
@@ -98,6 +107,7 @@ export default function LogicStatement({
             title="Add condition"
           />
         ) : null}
+        <SubExpressionActions key="actions" />
       </NeatRow>
     );
   }

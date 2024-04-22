@@ -103,6 +103,7 @@ export default function Actions({
           backgroundColor: menuOpen
             ? theme.palette.primary.main
             : grey(theme, 1),
+          borderRadius: 0,
           color: menuOpen ? theme.palette.primary.contrastText : "inherit",
           "&:hover": {
             backgroundColor: theme.palette.primary.main,

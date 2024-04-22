@@ -8,6 +8,7 @@ import React, { Children } from "react";
 import { interleave } from "../../../array";
 import {
   ConjunctionexpressionconstraintContext,
+  ConstraintoperatorContext,
   DisjunctionexpressionconstraintContext,
   ExclusionexpressionconstraintContext,
   ExpressionconstraintContext,
@@ -23,6 +24,10 @@ import LogicStatement, {
   logicStatementTypeToOperator,
 } from "./LogicStatement";
 import LogicStatementSubExpression from "./LogicStatementSubExpression";
+import { Span } from "../ExpressionTransformer";
+import ConstraintOperator, { constraintNameToOperator, operatorToConstraintName } from "../sub/ConstraintOperator";
+import MemberOfOperator, { MEMBER_OF_OPERATOR } from "../sub/MemberOfOperator";
+import { nonNullish } from "../../../types";
 
 /**
  * This component implements an ANTLR visitor specialised to the task of rendering compound
@@ -71,7 +76,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
           })
         }
       >
-        {new SubExpressionVisitor({ ...this.options, compound: true }).visit(
+        {new SubExpressionVisitor({ ...this.options, compound: true, refinement: false }).visit(
           ctx
         )}
       </LogicStatementSubExpression>
@@ -88,6 +93,22 @@ export default class CompoundVisitor extends BaseEclVisitor {
 
   visitExclusion(): VisualExpressionType {
     return <LogicOperator type="exclusion" />;
+  }
+
+  visitMemberof(): VisualExpressionType {
+    return <MemberOfOperator />;
+  }
+
+  visitConstraintoperator(
+    ctx: ConstraintoperatorContext
+  ): VisualExpressionType {
+    return (
+      <ConstraintOperator
+        constraint={operatorToConstraintName[ctx.getText()]}
+        focus={isFocused(ctx, this.options.focusPosition)}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+      />
+    );
   }
 
   private renderLogicStatement(
@@ -116,7 +137,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
         );
 
         // Include parentheses in removal context if there are only 2 subexpressions
-        if (subexpressions.length < 3 && parent) {
+        if (subexpressions.length < 3 && parent && !parent.memberof() && !parent.constraintoperator()) {
           const parentheses = [parent.LEFT_PAREN(), parent.RIGHT_PAREN()];
           removalContext.push(...parentheses.map(node => this.transformer.spanFromTerminalNode(node)));
           removalContext.sort((a, b) => a.start - b.start);
@@ -133,6 +154,13 @@ export default class CompoundVisitor extends BaseEclVisitor {
       result = this.visitChildren(ctx);
     }
 
+    const heading: VisualExpressionType = [
+      parent?.constraintoperator(),
+      parent?.memberof(),
+    ]
+      .filter(nonNullish)
+      .map((ctx: ParserRuleContext) => this.visit(ctx));
+
     return (
       <LogicStatement
         type={type}
@@ -145,14 +173,117 @@ export default class CompoundVisitor extends BaseEclVisitor {
           )
         }
         onAddCondition={(expression, focusPosition) => {
-          this.transformer.append(ctx, expression, false, {
+          this.transformer.append(ctx, expression, false, false, {
             focusUpdateStrategy: "SPECIFIED_POSITION",
             focusPosition,
           });
         }}
+
+        heading={heading}
+        constraint={!!parent?.constraintoperator()}
+        memberOf={!!parent?.memberof()}
+        refinement={this.options.refinement}
+        onAddConstraint={() => {
+          const memberOf = parent?.memberof();
+          this.handleAddConstraint(
+            memberOf
+              ? this.transformer.spanFromContext(memberOf)
+              : parent 
+                ? this.transformer.spanFromTerminalNode(parent.LEFT_PAREN())
+                : this.transformer.spanFromContext(ctx),
+            !parent
+          );
+        }}
+        onRemoveConstraint={() => parent && this.handleRemoveConstraint(parent)}
+        onAddMemberOf={() => {
+          const leftSurroundingParenthesis = parent?.LEFT_PAREN();
+          this.handleAddMemberOf(
+            leftSurroundingParenthesis 
+              ? this.transformer.spanFromTerminalNode(leftSurroundingParenthesis)
+              : this.transformer.spanFromContext(ctx),
+            !parent
+          );
+        }}
+        onRemoveMemberOf={() => parent && this.handleRemoveMemberOf(parent)}
+        onRemoveRefinement={() => this.handleRemoveRefinement()}
+        onAddLogicStatement={(expression, focusPosition) =>
+          this.handleAddLogicStatement(parent ?? ctx, expression, focusPosition, !parent)
+        }
+        onAddRefinement={(e) =>
+          this.handleAddRefinement(
+            this.transformer.spanFromContext(parent ?? ctx),
+            e,
+            this.options.attribute || this.options.compound,
+            !parent
+          )
+        }
       >
         {result}
       </LogicStatement>
     );
+  }
+
+  private handleAddConstraint(prependSubject: Span, preParenthesize: boolean) {
+    this.transformer.prependToSpan(
+      prependSubject,
+      constraintNameToOperator["descendantorselfof"],
+      false,
+      preParenthesize
+    );
+  }
+
+  private handleRemoveConstraint(ctx: SubexpressionconstraintContext) {
+    const constraintOperator = ctx.constraintoperator();
+    if (constraintOperator) {
+      this.transformer.remove(constraintOperator, {
+        collapseWhiteSpaceRight: true,
+        focusUpdateStrategy: "AFTER_UPDATE",
+      });
+    } else {
+      console.warn("Attempted to remove constraint, no constraint available");
+    }
+  }
+
+  private handleAddMemberOf(prependSubject: Span, preParenthesize: boolean): void {
+    this.transformer.prependToSpan(prependSubject, MEMBER_OF_OPERATOR, false, preParenthesize, {
+      focusUpdateStrategy: "END_OF_UPDATE",
+    });
+  }
+
+  private handleRemoveMemberOf(ctx: SubexpressionconstraintContext) {
+    const memberOf = ctx.memberof();
+    if (memberOf) {
+      this.transformer.remove(memberOf, {
+        collapseWhiteSpaceRight: true,
+        focusUpdateStrategy: "AFTER_UPDATE",
+      });
+    } else {
+      console.warn(
+        "Attempted to remove member of operator, no member of operator found"
+      );
+    }
+  }
+
+  private handleRemoveRefinement() {
+    this.transformer.removeAllSpans(this.options.removalContext);
+  }
+
+  private handleAddLogicStatement(
+    ctx: ParserRuleContext,
+    expression: string,
+    focusPosition: number,
+    preParenthesize: boolean
+  ) {
+    this.transformer.append(ctx, expression, true, preParenthesize, {
+      focusUpdateStrategy: "SPECIFIED_POSITION",
+      focusPosition,
+    });
+  }
+
+  private handleAddRefinement(span: Span, e: string, parenthesize: boolean, preParenthesize: boolean) {
+    this.transformer.appendToSpan(span, `: ${e}`, parenthesize, preParenthesize, {
+      focusUpdateStrategy: "SPECIFIED_POSITION",
+      focusPosition: 2,
+    });
   }
 }
