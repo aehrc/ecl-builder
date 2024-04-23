@@ -4,7 +4,7 @@
  */
 
 import { Done, Tune } from "@mui/icons-material";
-import Stack from "@mui/material/Stack/Stack";
+import { Stack } from "@mui/material";
 import React, { PropsWithChildren } from "react";
 import { DEFAULT_CONCEPT, DEFAULT_REFINEMENT } from "../../../constants";
 import Actions, { Action } from "../Actions";

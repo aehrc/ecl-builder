@@ -4,7 +4,7 @@
   "description": "UI components that help you build SNOMED CT ECL expressions",
   "main": "lib/index.js",
   "scripts": {
-    "compile": "tsc",
+    "compile": "tsc && fix-tsc-es-imports -y -V",
     "watch": "tsc --watch",
     "prepare": "npm run compile",
     "test": "jest",
@@ -47,6 +47,7 @@
     "eslint": "^8.22.0",
     "eslint-plugin-react": "^7.30.1",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "fix-tsc-es-imports": "^0.1.6",
     "jest": "^28.1.3",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -69,5 +70,6 @@
     "antlr4": "^4.10.1",
     "react-copy-to-clipboard": "^5.1.0",
     "uuid": "^8.3.2"
-  }
+  },
+  "type": "module"
 }
