@@ -5,7 +5,7 @@
 
 import { Stack } from "@mui/material";
 import React, { PropsWithChildren } from "react";
-import RemoveButton from "../RemoveButton";
+import RemoveExpression from "../RemoveExpression";
 
 export interface LogicStatementSubExpressionProps extends PropsWithChildren {
   onRemove?: () => unknown;
@@ -21,17 +21,14 @@ export default function LogicStatementSubExpression({
       direction="row"
       spacing={1}
     >
-      <Stack
-        className="logic-statement-sub-expression-removal-context"
-        direction="row"
-        flexGrow={1}
-      >
-        {children}
-      </Stack>
-      <RemoveButton
+      <RemoveExpression
+        enabled={!!onRemove}
         tooltip="Remove this expression from the logic statement"
         onClick={onRemove}
-      />
+        sx={{ display: "flex", flexGrow: 1, flexDirection: "row" }}
+      >
+        {children}
+      </RemoveExpression>
     </Stack>
   );
 }

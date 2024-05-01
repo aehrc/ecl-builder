@@ -15,7 +15,10 @@ import React, {
 import useConceptSearch from "../../../hooks/useConceptSearch";
 import { Concept } from "../../../hooks/useValueSetExpansion";
 import { OptionsContext } from "../../ExpressionBuilder";
-import { ChangeReporterProps } from "../ExpressionVisitor";
+import {
+  ChangeReporterProps,
+  StyleForwardingProps,
+} from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
 import AnyConcept from "./AnyConcept";
 import ConceptSearchInput from "./ConceptSearchInput";
@@ -23,7 +26,9 @@ import ConceptSearchScope from "./ConceptSearchScope";
 import SelectedConcept from "./SelectedConcept";
 import SuggestedConcept from "./SuggestedConcept";
 
-export interface ConceptReferenceProps extends ChangeReporterProps {
+export interface ConceptReferenceProps
+  extends ChangeReporterProps,
+    StyleForwardingProps {
   // The currently selected concept.
   concept?: ConceptReferenceOptionType;
 }
@@ -56,6 +61,7 @@ const ANY_CONCEPT: AnyConceptOption = { type: "ANY_CONCEPT" };
 export default function ConceptReference({
   concept,
   focus,
+  sx,
   onChange,
 }: ConceptReferenceProps) {
   const { terminologyServerUrl, maxSearchResults, minQueryLength } =
@@ -172,7 +178,7 @@ export default function ConceptReference({
   return (
     <Autocomplete
       className="concept-reference"
-      sx={{ flexGrow: 1 }}
+      sx={{ flexGrow: 1, ...sx }}
       renderInput={renderInput}
       options={options}
       value={selectedConcept ?? null}

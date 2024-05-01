@@ -34,21 +34,7 @@ export default function Cardinality({
   return (
     <NeatRow
       className="cardinality"
-      sx={{
-        flexGrow: 0,
-        "& .actions": { display: "none" },
-        "&:focus-within > .actions": { display: "block" },
-        "& > .inline-expression-grouping": {
-          borderRadius: "3px",
-        },
-        "&:focus-within > .inline-expression-grouping": {
-          borderRadius: "3px 0 0 3px",
-          overflow: "hidden",
-          "&:last-child": {
-            borderRadius: "3px",
-          },
-        },
-      }}
+      sx={{ flexGrow: 0, alignSelf: "flex-start" }}
     >
       <InlineExpressionGrouping>
         {Children.map(children, (child) =>

@@ -24,10 +24,8 @@ export interface BaseEclVisitorOptions {
   refinement: boolean;
   // True if within a compound expression.
   compound: boolean;
-  // True if within an attribute grouping.
-  attributeGrouping: boolean;
   // True if within an attribute.
-  attribute: boolean;
+  attribute?: boolean;
   // Called when the focus position changes.
   onFocus?: PositionedFocusHandler;
 }

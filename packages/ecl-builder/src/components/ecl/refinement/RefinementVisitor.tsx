@@ -13,6 +13,7 @@ import {
   ConjunctionContext,
   DisjunctionContext,
   EclattributeContext,
+  EclattributegroupContext,
   EclattributenameContext,
   EclattributesetContext,
   EclrefinementContext,
@@ -47,7 +48,10 @@ import ConcreteValue from "./ConcreteValue";
 import RefinedExpression from "./RefinedExpression";
 
 export interface RefinementVisitorOptions extends SubExpressionVisitorOptions {
-  attributeGrouping: boolean;
+  // True if within an attribute grouping.
+  attributeGrouping?: boolean;
+  // True if within a conjunction of disjunction attribute or refinement set.
+  set?: boolean;
 }
 
 export const EXPRESSION_COMPARISON_OPERATORS: Record<string, string> = {
@@ -119,11 +123,17 @@ export default class RefinementVisitor extends BaseEclVisitor {
     const visitor = new RefinementVisitor({
       ...this.options,
       refinement: true,
-      removalContext: removalContext,
+      removalContext,
     });
     return (
       <RefinedExpression
         subExpression={visitor.visit(ctx.subexpressionconstraint())}
+        onRemove={() =>
+          this.transformer.removeAllSpans(removalContext, {
+            focusUpdateStrategy: "BEFORE_UPDATE",
+            collapseWhiteSpaceLeft: true,
+          })
+        }
       >
         {visitor.visit(ctx.eclrefinement())}
       </RefinedExpression>
@@ -205,13 +215,25 @@ export default class RefinementVisitor extends BaseEclVisitor {
     }
   }
 
+  visitEclAttributeGroup(ctx: EclattributegroupContext): VisualExpressionType {
+    return new RefinementVisitor({
+      ...this.options,
+      removalContext: [this.transformer.spanFromContext(ctx)],
+    }).visitChildren(ctx);
+  }
+
   visitEclattribute(ctx: EclattributeContext): VisualExpressionType {
     return (
       <Attribute
-        onRemove={() =>
-          this.transformer.removeAllSpans(this.options.removalContext, {
-            focusUpdateStrategy: "BEFORE_UPDATE",
-          })
+        onRemove={
+          // We don't render a remove button if there is only one attribute.
+          this.options.set
+            ? () =>
+                this.transformer.removeAllSpans(this.options.removalContext, {
+                  focusUpdateStrategy: "BEFORE_UPDATE",
+                  // collapseWhiteSpaceLeft: true,
+                })
+            : undefined
         }
       >
         {new RefinementVisitor({
@@ -362,6 +384,11 @@ export default class RefinementVisitor extends BaseEclVisitor {
             focusPosition,
           })
         }
+        onRemove={() =>
+          this.transformer.removeAllSpans(this.options.removalContext, {
+            focusUpdateStrategy: "BEFORE_UPDATE",
+          })
+        }
       >
         {children}
       </AttributeSet>
@@ -422,6 +449,8 @@ export default class RefinementVisitor extends BaseEclVisitor {
           new RefinementVisitor({
             ...this.options,
             removalContext,
+            // Render the remove button only if the child is not the first one.
+            set: i !== 0,
           }).visit(children[i])
         );
         result = this.addKeys(result);

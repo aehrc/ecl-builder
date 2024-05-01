@@ -39,7 +39,7 @@ export default function AttributeGroup({
 
   function renderHeading() {
     return (
-      <NeatRow className="attribute-group-heading">
+      <NeatRow className="attribute-group-heading" disableActionsHide>
         <Select
           value={type}
           onChange={handleSelectType}
