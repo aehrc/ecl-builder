@@ -131,7 +131,6 @@ export default class RefinementVisitor extends BaseEclVisitor {
         onRemove={() =>
           this.transformer.removeAllSpans(removalContext, {
             focusUpdateStrategy: "BEFORE_UPDATE",
-            collapseWhiteSpaceLeft: true,
           })
         }
       >
@@ -231,7 +230,6 @@ export default class RefinementVisitor extends BaseEclVisitor {
             ? () =>
                 this.transformer.removeAllSpans(this.options.removalContext, {
                   focusUpdateStrategy: "BEFORE_UPDATE",
-                  // collapseWhiteSpaceLeft: true,
                 })
             : undefined
         }
