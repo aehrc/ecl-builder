@@ -4,8 +4,9 @@
  */
 
 import { Add } from "@mui/icons-material";
-import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { ButtonGroup, MenuItem, Select, SelectChangeEvent, useTheme } from "@mui/material";
 import React, { Children, PropsWithChildren } from "react";
+import { grey } from "../../../themes/color";
 import { DEFAULT_CONCEPT } from "../../../constants";
 import Actions from "../Actions";
 import ExpressionGrouping from "../ExpressionGrouping";
@@ -59,6 +60,7 @@ export default function LogicStatement({
   heading,
   ...subexpressionProps
 }: LogicStatementProps) {
+  const theme = useTheme();
   const focusRef = useFocus(focus);
 
   function handleSelectType(event: SelectChangeEvent<LogicStatementType>) {
@@ -94,20 +96,34 @@ export default function LogicStatement({
             </MenuItem>
           ) : null}
         </Select>
-        {type !== "exclusion" ? (
-          <Actions
-            actions={[
-              {
-                type: "item",
-                label: "Add condition",
-                onClick: handleAddCondition,
-              },
-            ]}
-            icon={Add}
-            title="Add condition"
-          />
-        ) : null}
-        <SubExpressionActions key="actions" />
+        <ButtonGroup 
+          className="actions" 
+          sx={{
+            "& > *": {
+              height: '100%', 
+              "&:not(:last-child)": {
+                borderRightColor: grey(theme, 4), 
+                borderRightWidth: 1, 
+                borderRightStyle: "solid"
+              }
+            },
+          }}
+        >
+          {type !== "exclusion" ? (
+            <Actions
+              actions={[
+                {
+                  type: "item",
+                  label: "Add condition",
+                  onClick: handleAddCondition,
+                },
+              ]}
+              icon={Add}
+              title="Add condition"
+            />
+          ) : null}
+          <SubExpressionActions key="actions" />
+        </ButtonGroup>
       </NeatRow>
     );
   }
