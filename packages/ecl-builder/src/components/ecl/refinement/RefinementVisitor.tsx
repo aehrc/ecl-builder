@@ -4,6 +4,7 @@
  */
 
 import { ParserRuleContext } from "antlr4";
+import { TerminalNode } from "antlr4/tree/Tree";
 import React, { ReactNode } from "react";
 import { interleave } from "../../../array";
 import { ATTRIBUTE_VALUE_SET_URI } from "../../../constants";
@@ -26,7 +27,7 @@ import {
   StringcomparisonoperatorContext,
   SubexpressionconstraintContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
-import BaseEclVisitor, { BaseEclVisitorOptions } from "../BaseEclVisitor";
+import BaseEclVisitor from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
 import {
   LogicStatementType,
@@ -36,7 +37,7 @@ import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
 import Fallback from "../Fallback";
 import { isFocused } from "../FocusProvider";
 import ConceptSearchScope from "../sub/ConceptSearchScope";
-import SubExpressionVisitor from "../sub/SubExpressionVisitor";
+import SubExpressionVisitor, { SubExpressionVisitorOptions } from "../sub/SubExpressionVisitor";
 import Attribute from "./Attribute";
 import AttributeGroup from "./AttributeGroup";
 import AttributeSet from "./AttributeSet";
@@ -46,7 +47,7 @@ import ComparisonOperator from "./ComparisonOperator";
 import ConcreteValue from "./ConcreteValue";
 import RefinedExpression from "./RefinedExpression";
 
-export interface RefinementVisitorOptions extends BaseEclVisitorOptions {
+export interface RefinementVisitorOptions extends SubExpressionVisitorOptions {
   // True if within an attribute grouping.
   attributeGrouping?: boolean;
   // True if within a conjunction of disjunction attribute or refinement set.
@@ -97,6 +98,28 @@ export default class RefinementVisitor extends BaseEclVisitor {
       this.transformer.spanFromTerminalNode(ctx.COLON()),
       this.transformer.spanFromContext(ctx.eclrefinement()),
     ];
+  
+    // Subexpression containing the refinement expression
+    const parent = this.options.parent;
+    if (parent && !parent.memberof() && !parent.constraintoperator()) {
+      // Remove parentheses surrounding refinement expression if subexpression does not contain a member of/constraint operator
+      const parentheses = [parent.LEFT_PAREN(), parent.RIGHT_PAREN()];
+      removalContext.push(...parentheses.map(node => this.transformer.spanFromTerminalNode(node)));
+    }
+
+    // Subexpression within the refinement expression
+    const subCtx = ctx.subexpressionconstraint(),
+      expCtx = subCtx.expressionconstraint();
+    if (
+      subCtx.LEFT_PAREN() && subCtx.RIGHT_PAREN() && 
+      !subCtx.memberof() && !subCtx.constraintoperator() && !expCtx?.compoundexpressionconstraint()
+    ) {
+      // Remove parentheses surrounding subexpression if it does not contain a compound expression or a member of/constraint operator
+      const parentheses = [subCtx.LEFT_PAREN(), subCtx.RIGHT_PAREN()] as TerminalNode[];
+      removalContext.push(...parentheses.map(node => this.transformer.spanFromTerminalNode(node)));
+    }
+    removalContext.sort((a, b) => a.start - b.start);
+
     const visitor = new RefinementVisitor({
       ...this.options,
       refinement: true,
@@ -108,7 +131,6 @@ export default class RefinementVisitor extends BaseEclVisitor {
         onRemove={() =>
           this.transformer.removeAllSpans(removalContext, {
             focusUpdateStrategy: "BEFORE_UPDATE",
-            collapseWhiteSpaceLeft: true,
           })
         }
       >
@@ -208,7 +230,6 @@ export default class RefinementVisitor extends BaseEclVisitor {
             ? () =>
                 this.transformer.removeAllSpans(this.options.removalContext, {
                   focusUpdateStrategy: "BEFORE_UPDATE",
-                  collapseWhiteSpaceLeft: true,
                 })
             : undefined
         }
@@ -356,7 +377,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
           )
         }
         onAddAttribute={(expression, focusPosition) =>
-          this.transformer.append(ctx, expression, false, {
+          this.transformer.append(ctx, expression, false, false, {
             focusUpdateStrategy: "SPECIFIED_POSITION",
             focusPosition,
           })
@@ -398,7 +419,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
           )
         }
         onAddAttribute={(expression, focusPosition) =>
-          this.transformer.append(ctx, expression, false, {
+          this.transformer.append(ctx, expression, false, false, {
             focusUpdateStrategy: "SPECIFIED_POSITION",
             focusPosition,
           })

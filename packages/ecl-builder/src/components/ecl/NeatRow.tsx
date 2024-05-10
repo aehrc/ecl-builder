@@ -79,7 +79,7 @@ export default function NeatRow({
     <Stack
       className={`neat-row ${className}`}
       direction="row"
-      alignItems="flex-start"
+      alignItems="stretch"
       alignSelf="stretch"
       spacing="1px"
       sx={{

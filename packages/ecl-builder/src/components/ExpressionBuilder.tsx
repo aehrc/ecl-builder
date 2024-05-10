@@ -13,7 +13,7 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
-import React, { createContext, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { queryClient } from "../queryClient";
 import { extendTheme } from "../themes/extendTheme";
 import CodeEditor from "./CodeEditor";
@@ -58,6 +58,10 @@ export default function ExpressionBuilder({
 }: ExpressionBuilderProps) {
   const [tab, setTab] = useState("visual"),
     [expression, setExpression] = useState(initialExpression);
+
+  useEffect(() => {
+    setExpression(initialExpression)
+  }, [initialExpression]);
 
   function handleChange(newExpression: string) {
     setExpression(newExpression);

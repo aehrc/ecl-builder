@@ -53,6 +53,11 @@ export class CompoundexpressionconstraintContext extends ParserRuleContext {
     | DisjunctionexpressionconstraintContext
     | null
     | undefined;
+
+  exclusionexpressionconstraint():
+    | ExclusionexpressionconstraintContext
+    | null
+    | undefined;
 }
 
 /**
@@ -78,7 +83,11 @@ export class DisjunctionexpressionconstraintContext extends ParserRuleContext {
 /**
  * exclusionexpressionconstraint : subexpressionconstraint ws exclusion ws subexpressionconstraint;
  */
-export class ExclusionexpressionconstraintContext extends ParserRuleContext {}
+export class ExclusionexpressionconstraintContext extends ParserRuleContext {
+  subexpressionconstraint(): SubexpressionconstraintContext[];
+
+  exclusion(): ExclusionContext[];
+}
 
 /**
  * dottedexpressionconstraint : subexpressionconstraint (ws dottedexpressionattribute)+;
@@ -155,6 +164,11 @@ export class ConjunctionContext extends ParserRuleContext {}
  * disjunction : ((CAP_O | O)|(CAP_O | O)) ((CAP_R | R)|(CAP_R | R)) mws;
  */
 export class DisjunctionContext extends ParserRuleContext {}
+
+/**
+ * exclusion : ((CAP_M | M)|(CAP_M | M)) ((CAP_I | I)|(CAP_I | I)) ((CAP_N | N)|(CAP_N | N)) ((CAP_U | U)|(CAP_U | U)) ((CAP_S | S)|(CAP_S | S)) mws
+ */
+export class ExclusionContext extends ParserRuleContext {}
 
 /**
  * eclrefinement : subrefinement ws (conjunctionrefinementset | disjunctionrefinementset)?;

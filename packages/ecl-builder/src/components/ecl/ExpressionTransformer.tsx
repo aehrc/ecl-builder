@@ -66,9 +66,11 @@ export default class ExpressionTransformer {
     span: Span,
     expression: string,
     parenthesize: boolean,
+    preParenthesize: boolean,
     options: UpdateOptions = {}
   ): void {
-    const suffix = span.expression.trimStart(),
+    const prevExpression = span.expression.trimStart(),
+      suffix = preParenthesize ? `(${prevExpression})` : prevExpression,
       newExpression = expression + " " + suffix,
       parenthesizedExpression = parenthesize
         ? `(${newExpression})`
@@ -83,12 +85,14 @@ export default class ExpressionTransformer {
     ctx: ParserRuleContext,
     expression: string,
     parenthesize: boolean,
+    preParenthesize: boolean,
     options: UpdateOptions = {}
   ): void {
     this.appendToSpan(
       this.spanFromContext(ctx),
       expression,
       parenthesize,
+      preParenthesize,
       options
     );
   }
@@ -100,9 +104,11 @@ export default class ExpressionTransformer {
     span: Span,
     expression: string,
     parenthesize: boolean,
+    preParenthesize: boolean,
     options: UpdateOptions = {}
   ): void {
-    const prefix = span.expression.trimEnd() + " ",
+    const prevExpression = span.expression.trimEnd(),
+      prefix = (preParenthesize ? `(${prevExpression})` : prevExpression) + " ",
       newExpression = prefix + expression,
       parenthesizedExpression = parenthesize
         ? `(${newExpression})`
@@ -112,7 +118,7 @@ export default class ExpressionTransformer {
       focusPosition:
         options.focusUpdateStrategy === "SPECIFIED_POSITION" &&
         options.focusPosition
-          ? prefix.length + options.focusPosition + (parenthesize ? 1 : 0)
+          ? prefix.length + options.focusPosition + (preParenthesize ? 1 : 0) + (parenthesize ? 1 : 0)
           : options.focusPosition,
     });
   }

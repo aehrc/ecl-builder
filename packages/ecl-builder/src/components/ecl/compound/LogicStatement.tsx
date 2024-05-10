@@ -4,8 +4,9 @@
  */
 
 import { Add } from "@mui/icons-material";
-import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import React, { PropsWithChildren } from "react";
+import { ButtonGroup, MenuItem, Select, SelectChangeEvent, useTheme } from "@mui/material";
+import React, { Children, PropsWithChildren } from "react";
+import { grey } from "../../../themes/color";
 import { DEFAULT_CONCEPT } from "../../../constants";
 import Actions from "../Actions";
 import ExpressionGrouping from "../ExpressionGrouping";
@@ -15,19 +16,25 @@ import {
 } from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
 import NeatRow from "../NeatRow";
+import { SubExpressionProps, useSubExpression } from "../sub/SubExpression";
 
-// The type of logic statement, either "conjunction" or "disjunction".
-export type LogicStatementType = "conjunction" | "disjunction";
+// The type of logic statement, either "conjunction" or "disjunction" or "exclusion"
+export type LogicStatementType = "conjunction" | "disjunction" | "exclusion";
 
 export interface LogicStatementProps
   extends FocusManagementProps,
-    PropsWithChildren {
+    PropsWithChildren,
+    SubExpressionProps {
   // The type of logic statement, either "conjunction" or "disjunction".
   type: LogicStatementType;
   // Invoked when the user changes the type of logic statement.
   onChangeType: (type: LogicStatementType) => unknown;
   // Invoked when the user adds a new conjunction or disjunction to the statement.
   onAddCondition: ChangeHandlerWithPosition;
+  // Number of subexpressions in statement
+  nSubexpressions: number;
+  // Components to render within the heading of the expression grouping.
+  heading?: React.ReactNode;
 }
 
 export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
@@ -35,6 +42,7 @@ export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
     // These have a space after them due to the "mws" in the parser rule.
     conjunction: "AND ",
     disjunction: "OR ",
+    exclusion: "MINUS ",
   };
 
 /**
@@ -48,7 +56,11 @@ export default function LogicStatement({
   onChangeType,
   onAddCondition,
   children,
+  nSubexpressions,
+  heading,
+  ...subexpressionProps
 }: LogicStatementProps) {
+  const theme = useTheme();
   const focusRef = useFocus(focus);
 
   function handleSelectType(event: SelectChangeEvent<LogicStatementType>) {
@@ -60,9 +72,12 @@ export default function LogicStatement({
     onAddCondition(operator + DEFAULT_CONCEPT, operator.length);
   }
 
+  const { SubExpressionActions } = useSubExpression(subexpressionProps);
+
   function renderHeading() {
     return (
       <NeatRow className="logic-statement-heading">
+        {Children.toArray(heading)}
         <Select
           inputRef={focusRef}
           value={type}
@@ -75,18 +90,40 @@ export default function LogicStatement({
           <MenuItem value="disjunction">
             matching any of these conditions
           </MenuItem>
+          {nSubexpressions < 3 ? (
+            <MenuItem value="exclusion">
+              matching the first but not the second condition
+            </MenuItem>
+          ) : null}
         </Select>
-        <Actions
-          actions={[
-            {
-              type: "item",
-              label: "Add condition",
-              onClick: handleAddCondition,
+        <ButtonGroup 
+          className="actions" 
+          sx={{
+            "& > *": {
+              height: '100%', 
+              "&:not(:last-child)": {
+                borderRightColor: grey(theme, 4), 
+                borderRightWidth: 1, 
+                borderRightStyle: "solid"
+              }
             },
-          ]}
-          icon={Add}
-          title="Add condition"
-        />
+          }}
+        >
+          {type !== "exclusion" ? (
+            <Actions
+              actions={[
+                {
+                  type: "item",
+                  label: "Add condition",
+                  onClick: handleAddCondition,
+                },
+              ]}
+              icon={Add}
+              title="Add condition"
+            />
+          ) : null}
+          <SubExpressionActions key="actions" />
+        </ButtonGroup>
       </NeatRow>
     );
   }

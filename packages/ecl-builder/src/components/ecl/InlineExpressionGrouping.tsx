@@ -25,13 +25,15 @@ export default function InlineExpressionGrouping({
       className="inline-expression-grouping"
       direction="row"
       sx={{
-        backgroundColor: "background.default",
+        backgroundColor: "background.paper",
+        color: 'text.primary',
         p: "16px",
         userSelect: "none",
         fontSize: "0.95em",
         whiteSpace: "nowrap",
-        alignSelf: "flex-start",
+        alignSelf: "stretch",
         flexGrow: 1,
+        alignItems: 'center',
         gap: "4px",
         ...sx,
       }}
