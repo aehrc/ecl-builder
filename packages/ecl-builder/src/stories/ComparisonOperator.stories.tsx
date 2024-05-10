@@ -3,7 +3,7 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { ComponentStory } from "@storybook/react";
+import { StoryFn } from "@storybook/react";
 import React from "react";
 import ComparisonOperator, {
   ComparisonOperatorProps,
@@ -12,6 +12,7 @@ import { EXPRESSION_COMPARISON_OPERATORS } from "../components/ecl/refinement/Re
 
 export default {
   component: ComparisonOperator,
+  tags: ['autodocs'],
   argTypes: { onChange: { action: "changed" } },
 };
 
@@ -27,9 +28,9 @@ const Template = ({
   />
 );
 
-export const DescendantOrSelfOf: ComponentStory<typeof ComparisonOperator> =
+export const IsEqualTo: StoryFn<typeof ComparisonOperator> =
   Template.bind({});
-DescendantOrSelfOf.args = {
+  IsEqualTo.args = {
   type: "=",
   typeLabelMap: EXPRESSION_COMPARISON_OPERATORS,
 };

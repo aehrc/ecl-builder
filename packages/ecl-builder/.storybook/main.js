@@ -2,26 +2,24 @@
  * Copyright © 2022, Commonwealth Scientific and Industrial Research
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
-
-module.exports = {
-  stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
+export default {
+  stories: [
+    "../src/**/*.stories.mdx", 
+    "../src/**/*.stories.@(js|jsx|ts|tsx)",
+    "../src/**/*.dynamic.@(js|jsx|ts|tsx)"
+  ],
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
+    "@storybook/addon-webpack5-compiler-swc",
+    "./preset"
   ],
-  framework: "@storybook/react",
-  webpackFinal: async (config) => {
-    // Load ECL examples into the Storybook bundle, so that we can automatically
-    // generate stories for them.
-    config.module.rules.push({
-      test: /\.txt$/,
-      use: "raw-loader",
-    });
-    config.devtool = "source-map";
-    return config;
+  framework: {
+    name: "@storybook/react-webpack5",
+    options: {}
   },
-  core: {
-    builder: "webpack5",
-  }
+  docs: {
+    autodocs: 'tag',
+  },
 };
