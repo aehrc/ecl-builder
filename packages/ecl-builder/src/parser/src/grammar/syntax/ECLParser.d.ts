@@ -55,7 +55,7 @@ export class CompoundexpressionconstraintContext extends ParserRuleContext {
     | undefined;
 
   exclusionexpressionconstraint():
-    | ExclsuionexpressionconstraintContext
+    | ExclusionexpressionconstraintContext
     | null
     | undefined;
 }
