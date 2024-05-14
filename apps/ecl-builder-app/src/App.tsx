@@ -1,6 +1,6 @@
 import { Box, createTheme, CssBaseline, ThemeProvider } from "@mui/material";
-import ExpressionBuilder from "ecl-builder";
-import ExpressionResult from "ecl-builder/lib/components/ExpressionResult";
+import ExpressionBuilder from "@csiro/ecl-builder";
+import ExpressionResult from "@csiro/ecl-builder/lib/components/ExpressionResult";
 import React, { useState } from "react";
 
 let theme = createTheme();

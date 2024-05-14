@@ -1,6 +1,6 @@
 {
-  "name": "ecl-builder",
-  "version": "0.1.0",
+  "name": "@csiro/ecl-builder",
+  "version": "0.1.2",
   "description": "UI components that help you build SNOMED CT ECL expressions",
   "main": "lib/index.js",
   "scripts": {
@@ -65,8 +65,8 @@
     "@emotion/styled": "^11.9.3",
     "@mui/icons-material": "^5.8.3",
     "@mui/material": "^5.8.3",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react": "^17.0.2 || ^18.0.0",
+    "react-dom": "^17.0.2 || ^18.0.0"
   },
   "dependencies": {
     "@tanstack/react-query": "^4.2.1",
@@ -74,7 +74,7 @@
     "@types/fhir": "^0.0.35",
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/uuid": "^8.3.4",
-    "antlr4": "^4.10.1",
+    "antlr4": "~4.10.1",
     "react-copy-to-clipboard": "^5.1.0",
     "uuid": "^8.3.2"
   },
