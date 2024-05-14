@@ -1,5 +1,5 @@
 import { parseModule } from 'magicast';
-import type { DynamicConfig } from './types';
+import type { DynamicConfig } from '../src/stories/types';
 
 // adapted from https://stackblitz.com/edit/github-h2rgfk?file=README.md
 

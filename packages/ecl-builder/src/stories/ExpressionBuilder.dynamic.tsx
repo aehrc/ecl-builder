@@ -2,7 +2,7 @@ import fs from 'fs/promises';
 import { glob } from 'glob';
 import { basename, join } from 'path';
 import { dedent } from 'ts-dedent';
-import type { StoryConfigs } from '../../.storybook/types';
+import type { StoryConfigs } from './types';
 
 export default (
   // adapted from https://stackblitz.com/edit/github-h2rgfk?file=README.md
