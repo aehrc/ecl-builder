@@ -12,16 +12,17 @@ describe("applyUpdates", () => {
       "< 19829001 |disorder of lung| AND < 301867009 |edema of trunk|\n",
       (expression) => {
         expect(expression).toEqual(
-          "< 19829001 |disorder of lung| OR < 301867009 |edema of trunk|\n"
+          "< 19829001 |disorder of lung| OR < 301867009 |edema of trunk|\n",
         );
         done();
       },
-      () => undefined
+      () => undefined,
     );
     const contexts: ParserRuleContext[] = [
       {
         start: { start: 30 },
         stop: { stop: 33 },
+        getText: () => "AND",
       } as ParserRuleContext,
     ];
     transformer.applyUpdates(contexts, "OR ");
@@ -34,12 +35,13 @@ describe("applyUpdates", () => {
         expect(expression).toEqual("404684003");
         done();
       },
-      () => undefined
+      () => undefined,
     );
     const contexts: ParserRuleContext[] = [
       {
         start: { start: 0 },
         stop: { stop: 0 },
+        getText: () => "<",
       } as ParserRuleContext,
     ];
     transformer.applyUpdates(contexts, "", { collapseWhiteSpaceRight: true });
@@ -52,12 +54,13 @@ describe("applyUpdates", () => {
         expect(expression).toEqual("404684003");
         done();
       },
-      () => undefined
+      () => undefined,
     );
     const contexts: ParserRuleContext[] = [
       {
         start: { start: 0 },
         stop: { stop: 0 },
+        getText: () => "<",
       } as ParserRuleContext,
     ];
     transformer.applyUpdates(contexts, "", { collapseWhiteSpaceRight: true });
@@ -70,12 +73,13 @@ describe("applyUpdates", () => {
         expect(expression).toEqual("<<  195967001 |Asthma|");
         done();
       },
-      () => undefined
+      () => undefined,
     );
     const contexts: ParserRuleContext[] = [
       {
         start: { start: 22 },
         stop: { stop: 40 },
+        getText: () => "{{ + HISTORY-MOD }}",
       } as ParserRuleContext,
     ];
     transformer.applyUpdates(contexts, "", { collapseWhiteSpaceLeft: true });
@@ -88,12 +92,13 @@ describe("applyUpdates", () => {
         expect(expression).toEqual("<<  195967001 |Asthma|");
         done();
       },
-      () => undefined
+      () => undefined,
     );
     const contexts: ParserRuleContext[] = [
       {
         start: { start: 24 },
         stop: { stop: 42 },
+        getText: () => "{{ + HISTORY-MOD }}",
       } as ParserRuleContext,
     ];
     transformer.applyUpdates(contexts, "", { collapseWhiteSpaceLeft: true });
@@ -104,20 +109,22 @@ describe("applyUpdates", () => {
       "< 19829001 |disorder of lung| AND  < 301867009 |edema of trunk| AND < 40733004 |Infection| ",
       (expression) => {
         expect(expression).toEqual(
-          "< 19829001 |disorder of lung| OR  < 301867009 |edema of trunk| OR < 40733004 |Infection| "
+          "< 19829001 |disorder of lung| OR  < 301867009 |edema of trunk| OR < 40733004 |Infection| ",
         );
         done();
       },
-      () => undefined
+      () => undefined,
     );
     const contexts: ParserRuleContext[] = [
       {
         start: { start: 30 },
         stop: { stop: 33 },
+        getText: () => "AND",
       } as ParserRuleContext,
       {
         start: { start: 64 },
         stop: { stop: 67 },
+        getText: () => "AND",
       } as ParserRuleContext,
     ];
     transformer.applyUpdates(contexts, "OR ");
