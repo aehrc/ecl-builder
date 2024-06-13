@@ -10,6 +10,7 @@ import React, {
   ReactNode,
   SyntheticEvent,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import useConceptSearch from "../../../hooks/useConceptSearch";
@@ -69,6 +70,8 @@ export default function ConceptReference({
     { valueSet, label } = useContext(ConceptSearchScope),
     [selectedConcept, setSelectedConcept] =
       useState<ConceptReferenceOptionType | undefined>(concept),
+    [selectedConceptOption, setSelectedConceptOption] =
+      useState<ConceptReferenceOptionType | undefined>(concept),
     [searchQuery, setSearchQuery] = useState(""),
     { data, isLoading, remove } = useConceptSearch(
       terminologyServerUrl,
@@ -98,12 +101,39 @@ export default function ConceptReference({
     }
   }
 
+  useEffect(() => {
+    setSelectedConceptOption(selectedConcept);
+  }, [selectedConcept])
+
+  // Update the selected concept option with semantic tag if available from search results
+  useEffect(() => {
+    setSelectedConceptOption(sc => {
+      if (
+        sc && 
+        sc.type === "SPECIFIC_CONCEPT" && 
+        data?.concepts
+      ) {
+        const map: ConceptSearchOption[] = data.concepts.map((c) => ({
+          ...c,
+          type: "SPECIFIC_CONCEPT",
+        }));
+  
+        const result = map.find(c => isOptionEqualToValue(c, sc));
+        if (result && result.semanticTag) return ({
+          ...sc, 
+          semanticTag: result.semanticTag
+        });
+      }
+      return sc;
+    })
+  }, [data?.concepts])
+
   /**
    * Get the full set of options, including "any concept" and the currently selected concept.
    */
   function getOptions(): ConceptReferenceOptionType[] {
     return [
-      ...(selectedConcept ? [selectedConcept] : []),
+      ...(selectedConceptOption ? [selectedConceptOption] : []),
       ...(searchQuery.length >= minQueryLength ? searchResults : []),
       ...(selectedConcept?.type === "ANY_CONCEPT" ? [] : [ANY_CONCEPT]),
     ];
