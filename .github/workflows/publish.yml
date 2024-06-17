@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: 18
           registry-url: https://pkgs.dev.azure.com/aehrc/ontoserver/_packaging/aehrc-npm/npm/registry/
-          scope: @csiro
+          scope: '@csiro'
       - run: npm ci -w packages/ecl-builder
       - run: npm publish -w packages/ecl-builder
         env:
