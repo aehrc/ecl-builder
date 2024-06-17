@@ -1,6 +1,6 @@
 {
   "name": "@csiro/ecl-builder",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "UI components that help you build SNOMED CT ECL expressions",
   "main": "lib/index.js",
   "scripts": {
