@@ -26,9 +26,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          registry-url: https://pkgs.dev.azure.com/aehrc/ontoserver/_packaging/aehrc-npm/npm/registry/
-          scope: '@csiro'
+      - run: echo "${{secrets.AZURE_AUTH}}" > ~/.npmrc
+      - run: npm config set @csiro:registry https://pkgs.dev.azure.com/aehrc/ontoserver/_packaging/aehrc-npm/npm/registry/
       - run: npm ci -w packages/ecl-builder
       - run: npm publish -w packages/ecl-builder
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
