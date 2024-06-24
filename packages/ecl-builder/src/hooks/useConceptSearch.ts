@@ -4,10 +4,10 @@
  */
 
 import { QueryObserverOptions, UseQueryResult } from "@tanstack/react-query";
+import useDebounce from "./useDebounce";
 import useValueSetExpansion, {
   ConceptSearchResult,
 } from "./useValueSetExpansion";
-import { useEffect, useState } from "react";
 
 /**
  * A hook for incorporating concept search into components.
@@ -23,19 +23,7 @@ export default function useConceptSearch(
   options: QueryObserverOptions<ConceptSearchResult, Error> = {}
 ): UseQueryResult<ConceptSearchResult, Error> {
   // The query is debounced to avoid too many requests to the server.
-  const [debouncedQuery, setDebouncedQuery] = useState(query);
-
-  useEffect(() => {
-    // Update debouncedQuery when the query changes
-    const timer = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 250);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [query]);
-
+  const debouncedQuery = useDebounce(query);
   return useValueSetExpansion(endpoint, buildExpandParams(valueSet, debouncedQuery, limit), {
     ...options,
     enabled: debouncedQuery.length >= minQueryLength,
