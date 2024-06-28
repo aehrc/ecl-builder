@@ -150,6 +150,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
           }).visit(children[i])
         );
       }
+      result = Children.toArray(result);
     } else {
       result = this.visitChildren(ctx);
     }
