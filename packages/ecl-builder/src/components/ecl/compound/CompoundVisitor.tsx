@@ -73,10 +73,12 @@ export default class CompoundVisitor extends BaseEclVisitor {
         onRemove={() =>
           this.transformer.removeAllSpans(this.options.removalContext, {
             focusUpdateStrategy: "BEFORE_UPDATE",
+            collapseWhiteSpaceLeft: true,
+            preserveFirstWhiteSpace: this.options.removalOptions?.preserveFirstWhiteSpace,
           })
         }
       >
-        {new SubExpressionVisitor({ ...this.options, compound: true, refinement: false }).visit(
+        {new SubExpressionVisitor({ ...this.options, removalOptions: undefined, compound: true, refinement: false }).visit(
           ctx
         )}
       </LogicStatementSubExpression>
@@ -136,17 +138,23 @@ export default class CompoundVisitor extends BaseEclVisitor {
           i
         );
 
+        // Preserve the first white space if subexpression is not the first or last subexpression
+        const removalOptions = { preserveFirstWhiteSpace: i !== 0 && i !== children.length - 1 }
+
         // Include parentheses in removal context if there are only 2 subexpressions
         if (subexpressions.length < 3 && parent && !parent.memberof() && !parent.constraintoperator()) {
           const parentheses = [parent.LEFT_PAREN(), parent.RIGHT_PAREN()];
           removalContext.push(...parentheses.map(node => this.transformer.spanFromTerminalNode(node)));
           removalContext.sort((a, b) => a.start - b.start);
+          // Preserve the first white space when removing parentheses
+          removalOptions.preserveFirstWhiteSpace = true;
         }
 
         result = Children.toArray(result).concat(
           new CompoundVisitor({
             ...this.options,
             removalContext,
+            removalOptions,
           }).visit(children[i])
         );
       }

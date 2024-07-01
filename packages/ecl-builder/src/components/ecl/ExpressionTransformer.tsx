@@ -15,6 +15,9 @@ export interface UpdateOptions {
   // Set this to true if the subject expression has optional whitespace on the left side that needs
   // to be collapsed, e.g. when removing the sub-expression.
   collapseWhiteSpaceLeft?: boolean;
+  // Set this to true to ensure a whitespace remains to the left side of the first span of the
+  // subject expression
+  preserveFirstWhiteSpace?: boolean;
   // Set this to true to notify of change in focus, along with the position of the focus within the
   // expression.
   reportFocusUpdate?: boolean;
@@ -218,6 +221,7 @@ export default class ExpressionTransformer {
     {
       collapseWhiteSpaceRight = false,
       collapseWhiteSpaceLeft = false,
+      preserveFirstWhiteSpace = !collapseWhiteSpaceLeft,
       reportFocusUpdate = true,
       focusUpdateStrategy = "START_OF_UPDATE",
       focusPosition,
@@ -232,7 +236,7 @@ export default class ExpressionTransformer {
     // Go through each of the contexts and add two things to an array:
     // - The slice since the start of the expression, or since the last context, and;
     // - The replacement expression.
-    const newExpressionParts = spans.reduce((acc: string[], span) => {
+    const newExpressionParts = spans.reduce((acc: string[], span, idx) => {
       const start = span.start,
         stop = span.stop;
 
@@ -244,7 +248,9 @@ export default class ExpressionTransformer {
 
       // Conditionally modify the whitespace at the trailing edge of the prefix expression.
       if (/\s/.test(prefix[prefix.length - 1])) {
-        prefix = prefix.trimEnd() + (collapseWhiteSpaceLeft ? "" : " ");
+        // For the first subject span, check if first white space needs to be preserved.
+        let spanCollapseWhiteSpaceLeft = idx ? collapseWhiteSpaceLeft : !preserveFirstWhiteSpace;
+        prefix = prefix.trimEnd() + (spanCollapseWhiteSpaceLeft ? "" : " ");
       }
 
       cursor = stop + 1;

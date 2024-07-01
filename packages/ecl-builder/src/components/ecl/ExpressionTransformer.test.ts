@@ -129,4 +129,38 @@ describe("applyUpdates", () => {
     ];
     transformer.applyUpdates(contexts, "OR ");
   });
+
+  it("should collapse on the left but maintain the first whitespace", (done) => {
+    const transformer = new ExpressionTransformer(
+      "(<< 195967001 |Asthma| OR (< 19829001 |Pulmonary disease| AND < 40733004 |Infection|))",
+      (expression) => {
+        expect(expression).toEqual("(<< 195967001 |Asthma| OR < 40733004 |Infection|)");
+        done();
+      },
+      () => undefined,
+    );
+    const contexts: ParserRuleContext[] = [
+      {
+        start: { start: 26 },
+        stop: { stop: 26 },
+        getText: () => "(",
+      } as ParserRuleContext,
+      {
+        start: { start: 27 },
+        stop: { stop: 56 },
+        getText: () => "< 19829001 |Pulmonary disease|",
+      } as ParserRuleContext,
+      {
+        start: { start: 58 },
+        stop: { stop: 61 },
+        getText: () => "AND ",
+      } as ParserRuleContext,
+      {
+        start: { start: 84 },
+        stop: { stop: 84 },
+        getText: () => ")",
+      } as ParserRuleContext,
+    ];
+    transformer.applyUpdates(contexts, "", { collapseWhiteSpaceLeft: true, preserveFirstWhiteSpace: true });
+  });
 });

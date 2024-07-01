@@ -98,6 +98,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
       this.transformer.spanFromTerminalNode(ctx.COLON()),
       this.transformer.spanFromContext(ctx.eclrefinement()),
     ];
+    let preserveFirstWhiteSpace = false;
   
     // Subexpression containing the refinement expression
     const parent = this.options.parent;
@@ -105,6 +106,8 @@ export default class RefinementVisitor extends BaseEclVisitor {
       // Remove parentheses surrounding refinement expression if subexpression does not contain a member of/constraint operator
       const parentheses = [parent.LEFT_PAREN(), parent.RIGHT_PAREN()];
       removalContext.push(...parentheses.map(node => this.transformer.spanFromTerminalNode(node)));
+      // Preserve first whitespace when removing parentheses.
+      preserveFirstWhiteSpace = true;
     }
 
     // Subexpression within the refinement expression
@@ -131,6 +134,8 @@ export default class RefinementVisitor extends BaseEclVisitor {
         onRemove={() =>
           this.transformer.removeAllSpans(removalContext, {
             focusUpdateStrategy: "BEFORE_UPDATE",
+            collapseWhiteSpaceLeft: true,
+            preserveFirstWhiteSpace,
           })
         }
       >
@@ -230,12 +235,15 @@ export default class RefinementVisitor extends BaseEclVisitor {
             ? () =>
                 this.transformer.removeAllSpans(this.options.removalContext, {
                   focusUpdateStrategy: "BEFORE_UPDATE",
+                  collapseWhiteSpaceLeft: true,
+                  preserveFirstWhiteSpace: this.options.removalOptions?.preserveFirstWhiteSpace,
                 })
             : undefined
         }
       >
         {new RefinementVisitor({
           ...this.options,
+          removalOptions: undefined,
           attribute: true,
         }).visitChildren(ctx)}
       </Attribute>
@@ -385,6 +393,8 @@ export default class RefinementVisitor extends BaseEclVisitor {
         onRemove={() =>
           this.transformer.removeAllSpans(this.options.removalContext, {
             focusUpdateStrategy: "BEFORE_UPDATE",
+            collapseWhiteSpaceLeft: true,
+            preserveFirstWhiteSpace: this.options.removalOptions?.preserveFirstWhiteSpace,
           })
         }
       >
@@ -443,10 +453,13 @@ export default class RefinementVisitor extends BaseEclVisitor {
           children,
           i
         );
+        // Preserve the first white space if child is not first or last in the set
+        const removalOptions = { preserveFirstWhiteSpace: i !== 0 && i !== children.length - 1 };
         result = result.concat(
           new RefinementVisitor({
             ...this.options,
             removalContext,
+            removalOptions,
             // Render the remove button only if the child is not the first one.
             set: i !== 0,
           }).visit(children[i])
