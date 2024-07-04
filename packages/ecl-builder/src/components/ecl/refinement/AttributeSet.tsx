@@ -5,7 +5,7 @@
 
 import { Add } from "@mui/icons-material";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import React, { PropsWithChildren, useRef } from "react";
+import React, { Children, PropsWithChildren, useRef } from "react";
 import { DEFAULT_REFINEMENT } from "../../../constants";
 import Actions, { ActionItem } from "../Actions";
 import {
@@ -23,6 +23,7 @@ export interface AttributeSetProps extends PropsWithChildren {
   onChangeType: (type: LogicStatementType) => unknown;
   onAddAttribute: ChangeHandlerWithPosition;
   onRemove?: () => unknown;
+  heading?: React.ReactNode;
 }
 
 export default function AttributeSet(props: AttributeSetProps) {
@@ -50,6 +51,7 @@ function Heading({
   hideAddGroup,
   onChangeType,
   onAddAttribute,
+  heading
 }: AttributeSetProps) {
   useRef(null);
   const addAttributeGroup: ActionItem = {
@@ -73,7 +75,19 @@ function Heading({
   }
 
   return (
-    <NeatRow className="attribute-set-heading" disableActionsHide>
+    <NeatRow 
+      className="attribute-set-heading" 
+      disableActionsHide
+      sx={{ 
+        "& > .neat-row": {
+          p: 0, 
+          "& > *": {
+            borderRadius: "0 !important",
+          },
+        }
+      }}
+    >
+      {Children.toArray(heading)}
       <Select
         value={type}
         onChange={handleSelectType}

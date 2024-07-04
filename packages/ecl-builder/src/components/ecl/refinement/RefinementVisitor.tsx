@@ -46,6 +46,7 @@ import CardinalityVisitor from "./CardinalityVisitor";
 import ComparisonOperator from "./ComparisonOperator";
 import ConcreteValue from "./ConcreteValue";
 import RefinedExpression from "./RefinedExpression";
+import { nonNullish } from "../../../types";
 
 export interface RefinementVisitorOptions extends SubExpressionVisitorOptions {
   // True if within an attribute grouping.
@@ -184,14 +185,12 @@ export default class RefinementVisitor extends BaseEclVisitor {
           disjunctionRefinementSet.disjunction(),
           "disjunction"
         );
-      } else if (conjunctionRefinementSet) {
+      } else {
         return visitor.renderRefinementSet(
           ctx,
           conjunctionRefinementSet?.conjunction() ?? [],
           "conjunction"
         );
-      } else {
-        return this.visitChildren(ctx);
       }
     } else {
       return new RefinementVisitor({
@@ -202,28 +201,14 @@ export default class RefinementVisitor extends BaseEclVisitor {
   }
 
   visitEclattributeset(ctx: EclattributesetContext): VisualExpressionType {
-    const conjunctionAttributeSet = ctx.conjunctionattributeset(),
-      disjunctionAttributeSet = ctx.disjunctionattributeset();
-    if (disjunctionAttributeSet) {
-      return this.renderAttributeSet(
-        ctx,
-        disjunctionAttributeSet.disjunction(),
-        "disjunction"
-      );
-    } else {
-      return this.renderAttributeSet(
-        ctx,
-        conjunctionAttributeSet?.conjunction() ?? [],
-        "conjunction"
-      );
-    }
+    return this.renderAttributeSet(ctx);
   }
 
-  visitEclAttributeGroup(ctx: EclattributegroupContext): VisualExpressionType {
-    return new RefinementVisitor({
-      ...this.options,
-      removalContext: [this.transformer.spanFromContext(ctx)],
-    }).visitChildren(ctx);
+  visitEclattributegroup(ctx: EclattributegroupContext): VisualExpressionType {
+    const heading: VisualExpressionType = [ ctx.cardinality() ]
+      .filter(nonNullish)
+      .map((ctx: ParserRuleContext) => this.visit(ctx));
+    return this.renderAttributeSet(ctx.eclattributeset(), heading);
   }
 
   visitEclattribute(ctx: EclattributeContext): VisualExpressionType {
@@ -245,6 +230,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
           ...this.options,
           removalOptions: undefined,
           attribute: true,
+          refinement: false,
         }).visitChildren(ctx)}
       </Attribute>
     );
@@ -360,11 +346,13 @@ export default class RefinementVisitor extends BaseEclVisitor {
 
   renderAttributeSet(
     ctx: EclattributesetContext,
-    operatorCtx: ParserRuleContext[],
-    type: LogicStatementType
+    heading?: React.ReactNode,
   ): VisualExpressionType {
-    const logicalAttributeSet =
-      ctx.conjunctionattributeset() ?? ctx.disjunctionattributeset();
+    const conjunctionAttributeSet = ctx.conjunctionattributeset(),
+      disjunctionAttributeSet = ctx.disjunctionattributeset();
+    const operatorCtx = disjunctionAttributeSet ? disjunctionAttributeSet.disjunction() 
+      : (conjunctionAttributeSet?.conjunction() ?? []);
+    const logicalAttributeSet = conjunctionAttributeSet ?? disjunctionAttributeSet;
     const subAttributeSets = [
       ctx.subattributeset(),
       ...(logicalAttributeSet?.subattributeset() ?? []),
@@ -376,7 +364,8 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
     return (
       <AttributeSet
-        type={type}
+        heading={heading}
+        type={disjunctionAttributeSet ? "disjunction" : "conjunction"}
         hideAddGroup={this.options.attributeGrouping}
         onChangeType={(type) =>
           this.transformer.applyUpdates(
@@ -453,8 +442,8 @@ export default class RefinementVisitor extends BaseEclVisitor {
           children,
           i
         );
-        // Preserve the first white space if child is not first or last in the set
-        const removalOptions = { preserveFirstWhiteSpace: i !== 0 && i !== children.length - 1 };
+        // Preserve the first white space if child is not the last in the set
+        const removalOptions = { preserveFirstWhiteSpace: i !== children.length - 1 };
         result = result.concat(
           new RefinementVisitor({
             ...this.options,

@@ -253,7 +253,10 @@ export class SubattributesetContext extends ParserRuleContext {}
  * eclattributegroup : (LEFT_BRACE cardinality RIGHT_BRACE ws)? LEFT_CURLY_BRACE ws eclattributeset
  * ws RIGHT_CURLY_BRACE;
  */
-export class EclattributegroupContext extends ParserRuleContext {}
+export class EclattributegroupContext extends ParserRuleContext {
+  cardinality(): CardinalityContext | null | undefined;
+  eclattributeset(): EclattributesetContext;
+}
 
 /**
  * eclattribute : (LEFT_BRACE cardinality RIGHT_BRACE ws)? (reverseflag ws)? eclattributename ws
