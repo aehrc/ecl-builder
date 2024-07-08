@@ -7,7 +7,7 @@ import { ParserRuleContext } from "antlr4";
 import { TerminalNode } from "antlr4/tree/Tree";
 import React, { ReactNode } from "react";
 import { interleave } from "../../../array";
-import { ATTRIBUTE_VALUE_SET_URI } from "../../../constants";
+import { ATTRIBUTE_VALUE_SET_URI, DEFAULT_CARDINALITY } from "../../../constants";
 import {
   CardinalityContext,
   ConjunctionContext,
@@ -208,7 +208,13 @@ export default class RefinementVisitor extends BaseEclVisitor {
     const heading: VisualExpressionType = [ ctx.cardinality() ]
       .filter(nonNullish)
       .map((ctx: ParserRuleContext) => this.visit(ctx));
-    return this.renderAttributeSet(ctx.eclattributeset(), heading);
+    return this.renderAttributeSet(
+      ctx.eclattributeset(), 
+      heading,
+      !!ctx.cardinality(),
+      () => this.handleAddCardinality(ctx),
+      () => this.handleRemoveCardinality(ctx)
+    );
   }
 
   visitEclattribute(ctx: EclattributeContext): VisualExpressionType {
@@ -225,6 +231,9 @@ export default class RefinementVisitor extends BaseEclVisitor {
                 })
             : undefined
         }
+        cardinality={!!ctx.cardinality()}
+        onAddCardinality={() => this.handleAddCardinality(ctx)}
+        onRemoveCardinality={() => this.handleRemoveCardinality(ctx)}
       >
         {new RefinementVisitor({
           ...this.options,
@@ -347,6 +356,9 @@ export default class RefinementVisitor extends BaseEclVisitor {
   renderAttributeSet(
     ctx: EclattributesetContext,
     heading?: React.ReactNode,
+    cardinality?: boolean,
+    onAddCardinality?: () => unknown,
+    onRemoveCardinality?: () => unknown,
   ): VisualExpressionType {
     const conjunctionAttributeSet = ctx.conjunctionattributeset(),
       disjunctionAttributeSet = ctx.disjunctionattributeset();
@@ -373,7 +385,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
             logicStatementTypeToOperator[type]
           )
         }
-        onAddAttribute={(expression, focusPosition) =>
+        onAddAttribute={(expression, focusPosition) => 
           this.transformer.append(ctx, expression, false, false, {
             focusUpdateStrategy: "SPECIFIED_POSITION",
             focusPosition,
@@ -386,6 +398,9 @@ export default class RefinementVisitor extends BaseEclVisitor {
             preserveFirstWhiteSpace: this.options.removalOptions?.preserveFirstWhiteSpace,
           })
         }
+        cardinality={cardinality}
+        onAddCardinality={onAddCardinality}
+        onRemoveCardinality={onRemoveCardinality}
       >
         {children}
       </AttributeSet>
@@ -443,7 +458,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
           i
         );
         // Preserve the first white space if child is not the last in the set
-        const removalOptions = { preserveFirstWhiteSpace: i !== children.length - 1 };
+        const removalOptions = { preserveFirstWhiteSpace: i !== children.length - 1 || !this.options.set };
         result = result.concat(
           new RefinementVisitor({
             ...this.options,
@@ -458,6 +473,34 @@ export default class RefinementVisitor extends BaseEclVisitor {
       return result;
     } else {
       return this.visitChildren(ctx);
+    }
+  }
+
+  private handleAddCardinality(ctx: ParserRuleContext) {
+    this.transformer.prependToSpan(
+      this.transformer.spanFromContext(ctx),
+      `[${DEFAULT_CARDINALITY}]`,
+      false,
+      false
+    );
+  }
+
+  private handleRemoveCardinality(ctx: EclattributeContext | EclattributegroupContext) {
+    const cardinality = ctx.cardinality(),
+      LEFT_BRACE = ctx.LEFT_BRACE(),
+      RIGHT_BRACE = ctx.RIGHT_BRACE();
+    if (cardinality && LEFT_BRACE && RIGHT_BRACE) {
+      const removalContext = [
+        this.transformer.spanFromTerminalNode(LEFT_BRACE),
+        this.transformer.spanFromContext(cardinality),
+        this.transformer.spanFromTerminalNode(RIGHT_BRACE),
+      ];
+      this.transformer.removeAllSpans(removalContext, {
+        collapseWhiteSpaceRight: true,
+        focusUpdateStrategy: "AFTER_UPDATE",
+      });
+    } else {
+      console.warn("Attempted to remove cardinality, no cardinality available");
     }
   }
 }

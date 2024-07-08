@@ -256,6 +256,8 @@ export class SubattributesetContext extends ParserRuleContext {}
 export class EclattributegroupContext extends ParserRuleContext {
   cardinality(): CardinalityContext | null | undefined;
   eclattributeset(): EclattributesetContext;
+  LEFT_BRACE(): TerminalNode | null | undefined;
+  RIGHT_BRACE(): TerminalNode | null | undefined;
 }
 
 /**
@@ -264,7 +266,11 @@ export class EclattributegroupContext extends ParserRuleContext {
  * numericvalue) | (stringcomparisonoperator ws (typedsearchterm | typedsearchtermset)) |
  * (booleancomparisonoperator ws booleanvalue));
  */
-export class EclattributeContext extends ParserRuleContext {}
+export class EclattributeContext extends ParserRuleContext {
+  cardinality(): CardinalityContext | null | undefined;
+  LEFT_BRACE(): TerminalNode | null | undefined;
+  RIGHT_BRACE(): TerminalNode | null | undefined;
+}
 
 /**
  * cardinality : minvalue to maxvalue;

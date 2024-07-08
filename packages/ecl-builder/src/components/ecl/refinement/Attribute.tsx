@@ -3,17 +3,30 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Stack } from "@mui/material";
+import { Stack, useTheme } from "@mui/material";
 import React, { Children, cloneElement, PropsWithChildren } from "react";
 import { interleave } from "../../../array";
 import HorizontalLink from "../HorizontalLink";
 import RemoveExpression from "../RemoveExpression";
+import Actions from "../Actions";
+import { Done, Tune } from "@mui/icons-material";
+import { grey } from "../../../themes/color";
 
 export interface AttributeProps extends PropsWithChildren {
   onRemove?: () => unknown;
+  cardinality?: boolean;
+  onAddCardinality?: () => unknown;
+  onRemoveCardinality?: () => unknown;
 }
 
-export default function Attribute({ children, onRemove }: AttributeProps) {
+export default function Attribute({ 
+  children, 
+  onRemove, 
+  cardinality, 
+  onAddCardinality, 
+  onRemoveCardinality 
+}: AttributeProps) {
+  const theme = useTheme();
   const childrenArray = Children.toArray(children),
     interleavedChildren = interleave(
       childrenArray,
@@ -26,6 +39,14 @@ export default function Attribute({ children, onRemove }: AttributeProps) {
         .map((child, i) => cloneElement(child, { key: `horizontal-link-${i}` }))
     );
 
+  function handleClickCardinality() {
+    if (cardinality && onRemoveCardinality) {
+      onRemoveCardinality();
+    } else if (onAddCardinality) {
+      onAddCardinality();
+    }
+  }
+
   return (
     <Stack className="attribute" direction="row" spacing={1}>
       <RemoveExpression
@@ -37,9 +58,50 @@ export default function Attribute({ children, onRemove }: AttributeProps) {
           flexGrow: 1,
           flexDirection: "row",
           alignItems: "flex-start",
+          "& > .actions": {
+            display: "none",
+          },
+          "&:focus-within, &:hover": {
+            "& > .actions": {
+              display: "inline-flex",
+            }
+          }
         }}
       >
         {interleavedChildren}
+
+        <Stack direction="row" className="actions" height="57px">
+          <HorizontalLink
+            style={{ marginTop: "28px", alignSelf: "flex-start" }}
+          />
+          <Actions
+            actions={[
+              {
+                type: "heading",
+                label: "Toggle:",
+              },
+              {
+                type: "item",
+                label: "Cardinality",
+                onClick: handleClickCardinality,
+                icon: cardinality ? <Done /> : null,
+              },
+              {
+                type: "item",
+                label: "Reverse flag",
+                disabled: true,
+              },
+            ]}
+            icon={Tune}
+            title="Open menu with options to change this attribute"
+            sx={{
+              borderWidth: 1,
+              borderColor: grey(theme, 4),
+              borderStyle: "solid",
+              borderRadius: 1,
+            }}
+          />
+        </Stack>
       </RemoveExpression>
     </Stack>
   );
