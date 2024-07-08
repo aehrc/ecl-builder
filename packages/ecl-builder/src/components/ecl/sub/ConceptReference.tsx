@@ -3,7 +3,7 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Autocomplete, TextFieldProps } from "@mui/material";
+import { Autocomplete, LinearProgress, TextFieldProps } from "@mui/material";
 import React, {
   HTMLAttributes,
   Key,
@@ -73,7 +73,7 @@ export default function ConceptReference({
     [selectedConceptOption, setSelectedConceptOption] =
       useState<ConceptReferenceOptionType | undefined>(concept),
     [searchQuery, setSearchQuery] = useState(""),
-    { data, isLoading, remove } = useConceptSearch(
+    { data, isLoading, isFetching, remove } = useConceptSearch(
       terminologyServerUrl,
       valueSet,
       searchQuery,
@@ -205,6 +205,32 @@ export default function ConceptReference({
     );
   }
 
+  const ListboxComponent = React.forwardRef<
+    HTMLUListElement,
+    React.HTMLAttributes<HTMLElement>
+  >((props, ref) => {
+    const { children, ...other } = props;
+    return (
+      <ul
+        {...other}
+        role="listbox"
+        ref={ref}
+        style={{ paddingTop: "4px" }}
+      >
+        <li>
+          <LinearProgress 
+            sx={{ 
+              height: '4px', 
+              marginTop: 0, 
+              visibility: isFetching ? "visible" : "hidden" 
+            }}
+          />
+        </li>
+        {children}
+      </ul>
+    );
+  });
+
   return (
     <Autocomplete
       className="concept-reference"
@@ -220,6 +246,7 @@ export default function ConceptReference({
       onChange={handleSelectConcept}
       onClose={remove}
       loading={isLoading}
+      ListboxComponent={ListboxComponent}
     />
   );
 }
