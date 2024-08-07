@@ -342,6 +342,14 @@ export default class ExpressionTransformer {
     };
   }
 
+  spanFromIndices(start: number, stop: number): Span {
+    return {
+      start: start,
+      stop: stop,
+      expression: this.expression.substring(start, stop + 1),
+    }
+  }
+
   /**
    * For an expression containing any number of binary expressions (e.g. [SUBJECT] [OPERATOR]
    * [SUBJECT] [OPERATOR] [SUBJECT]), this method can tell the set expressions should be removed

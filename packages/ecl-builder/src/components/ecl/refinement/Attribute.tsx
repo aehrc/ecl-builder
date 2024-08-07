@@ -12,11 +12,15 @@ import Actions from "../Actions";
 import { Done, Tune } from "@mui/icons-material";
 import { grey } from "../../../themes/color";
 
+export type AttributeComparisonType = "expression" | "numeric" | "string" | "boolean";
+
 export interface AttributeProps extends PropsWithChildren {
   onRemove?: () => unknown;
   cardinality?: boolean;
   onAddCardinality?: () => unknown;
   onRemoveCardinality?: () => unknown;
+  comparisonType: AttributeComparisonType;
+  onSelectComparisonType: (newComparisonType: AttributeComparisonType) => unknown;
 }
 
 export default function Attribute({ 
@@ -24,7 +28,9 @@ export default function Attribute({
   onRemove, 
   cardinality, 
   onAddCardinality, 
-  onRemoveCardinality 
+  onRemoveCardinality,
+  comparisonType,
+  onSelectComparisonType,
 }: AttributeProps) {
   const theme = useTheme();
   const childrenArray = Children.toArray(children),
@@ -89,6 +95,35 @@ export default function Attribute({
               {
                 type: "item",
                 label: "Reverse flag",
+                disabled: true,
+              },
+              {
+                type: "heading",
+                label: "Comparison:",
+              },
+              {
+                type: "item",
+                label: "Expression",
+                onClick: () => onSelectComparisonType("expression"),
+                icon: comparisonType === "expression" ? <Done /> : null,
+              },
+              {
+                type: "item",
+                label: "Numeric",
+                onClick: () => onSelectComparisonType("numeric"),
+                icon: comparisonType === "numeric" ? <Done /> : null,
+              },
+              {
+                type: "item",
+                label: "Typed search term",
+                onClick: () => onSelectComparisonType("string"),
+                icon: comparisonType === "string" ? <Done /> : null,
+              },
+              {
+                type: "item",
+                label: "Boolean",
+                onClick: () => onSelectComparisonType("boolean"),
+                icon: comparisonType === "boolean" ? <Done /> : null,
                 disabled: true,
               },
             ]}

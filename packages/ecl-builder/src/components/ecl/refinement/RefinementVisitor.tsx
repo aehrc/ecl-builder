@@ -7,7 +7,7 @@ import { ParserRuleContext } from "antlr4";
 import { TerminalNode } from "antlr4/tree/Tree";
 import React, { ReactNode } from "react";
 import { interleave } from "../../../array";
-import { ATTRIBUTE_VALUE_SET_URI, DEFAULT_CARDINALITY } from "../../../constants";
+import { ATTRIBUTE_VALUE_SET_URI, DEFAULT_CARDINALITY, DEFAULT_CONCEPT, DEFAULT_NUMERIC_VALUE, DEFAULT_TYPED_SEARCH_TERM } from "../../../constants";
 import {
   CardinalityContext,
   ConjunctionContext,
@@ -38,7 +38,7 @@ import Fallback from "../Fallback";
 import { isFocused } from "../FocusProvider";
 import ConceptSearchScope from "../sub/ConceptSearchScope";
 import SubExpressionVisitor, { SubExpressionVisitorOptions } from "../sub/SubExpressionVisitor";
-import Attribute from "./Attribute";
+import Attribute, { AttributeComparisonType } from "./Attribute";
 import AttributeGroup from "./AttributeGroup";
 import AttributeSet from "./AttributeSet";
 import Cardinality from "./Cardinality";
@@ -72,10 +72,6 @@ export const NUMERIC_COMPARISON_OPERATORS: Record<string, string> = {
 export const STRING_COMPARISON_OPERATORS: Record<string, string> = {
   "=": "=",
   "!=": "!=",
-  "<": "<",
-  "<=": "<=",
-  ">": ">",
-  ">=": ">=",
 };
 
 export default class RefinementVisitor extends BaseEclVisitor {
@@ -218,6 +214,25 @@ export default class RefinementVisitor extends BaseEclVisitor {
   }
 
   visitEclattribute(ctx: EclattributeContext): VisualExpressionType {
+    let comparisonType: AttributeComparisonType, start: number | undefined, stop: number | undefined;
+    if (ctx.expressioncomparisonoperator()) {
+      comparisonType = "expression";
+      start = ctx.expressioncomparisonoperator()?.start.start;
+      stop = ctx.subexpressionconstraint()?.stop.stop;
+    } else if (ctx.numericcomparisonoperator()) {
+      comparisonType = "numeric"
+      start = ctx.numericcomparisonoperator()?.start.start;
+      stop = ctx.numericvalue()?.stop.stop;
+    } else if (ctx.stringcomparisonoperator()) {
+      comparisonType = "string"
+      start = ctx.stringcomparisonoperator()?.start.start;
+      stop = ctx.typedsearchterm()?.stop.stop ?? ctx.typedsearchtermset()?.stop.stop;
+    } else {
+      comparisonType = "boolean"
+      start = ctx.booleancomparisonoperator()?.start.start;
+      stop = ctx.booleanvalue()?.stop.stop;
+    }
+
     return (
       <Attribute
         onRemove={
@@ -234,6 +249,22 @@ export default class RefinementVisitor extends BaseEclVisitor {
         cardinality={!!ctx.cardinality()}
         onAddCardinality={() => this.handleAddCardinality(ctx)}
         onRemoveCardinality={() => this.handleRemoveCardinality(ctx)}
+        comparisonType={comparisonType}
+        onSelectComparisonType={(newComparisonType: AttributeComparisonType) => {
+          if (newComparisonType === comparisonType) return;
+
+          if (start === undefined || stop === undefined) return;
+          const spanToReplace = this.transformer.spanFromIndices(start, stop);
+
+          const replacement = newComparisonType === "expression" ? `= << ${DEFAULT_CONCEPT}` :
+            newComparisonType === "numeric" ? `= #${DEFAULT_NUMERIC_VALUE}` : 
+            newComparisonType === "string" ? `= "${DEFAULT_TYPED_SEARCH_TERM}"` :
+            `= TRUE`;
+
+          this.transformer.applyUpdateToSpan(spanToReplace, replacement, {
+            focusUpdateStrategy: "END_OF_UPDATE"
+          });
+        }}
       >
         {new RefinementVisitor({
           ...this.options,
