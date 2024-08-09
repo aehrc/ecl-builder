@@ -124,7 +124,6 @@ export default function Attribute({
                 label: "Boolean",
                 onClick: () => onSelectComparisonType("boolean"),
                 icon: comparisonType === "boolean" ? <Done /> : null,
-                disabled: true,
               },
             ]}
             icon={Tune}

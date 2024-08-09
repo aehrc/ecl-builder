@@ -9,6 +9,8 @@ import React, { ReactNode } from "react";
 import { interleave } from "../../../array";
 import { ATTRIBUTE_VALUE_SET_URI, DEFAULT_CARDINALITY, DEFAULT_CONCEPT, DEFAULT_NUMERIC_VALUE, DEFAULT_TYPED_SEARCH_TERM } from "../../../constants";
 import {
+  BooleancomparisonoperatorContext,
+  BooleanvalueContext,
   CardinalityContext,
   ConjunctionContext,
   DisjunctionContext,
@@ -47,6 +49,7 @@ import ComparisonOperator from "./ComparisonOperator";
 import ConcreteValue from "./ConcreteValue";
 import RefinedExpression from "./RefinedExpression";
 import { nonNullish } from "../../../types";
+import { MenuItem } from "@mui/material";
 
 export interface RefinementVisitorOptions extends SubExpressionVisitorOptions {
   // True if within an attribute grouping.
@@ -72,6 +75,11 @@ export const NUMERIC_COMPARISON_OPERATORS: Record<string, string> = {
 export const STRING_COMPARISON_OPERATORS: Record<string, string> = {
   "=": "=",
   "!=": "!=",
+};
+
+export const BOOLEAN_COMPARISON_OPERATORS: Record<string, string> = {
+  "=": "is",
+  "!=": "is not",
 };
 
 export default class RefinementVisitor extends BaseEclVisitor {
@@ -357,6 +365,19 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  visitBooleancomparisonoperator(
+    ctx: BooleancomparisonoperatorContext
+  ): VisualExpressionType {
+    return (
+      <ComparisonOperator
+        type={ctx.getText()}
+        focus={isFocused(ctx, this.options.focusPosition)}
+        typeLabelMap={BOOLEAN_COMPARISON_OPERATORS}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+      />
+    );
+  }
+
   visitMatchsearchtermset(
     ctx: MatchsearchtermsetContext
   ): VisualExpressionType {
@@ -381,6 +402,35 @@ export default class RefinementVisitor extends BaseEclVisitor {
         focus={isFocused(ctx, this.options.focusPosition)}
         sx={{ flexBasis: "96px" }}
       />
+    );
+  }
+
+  visitBooleanvalue(ctx: BooleanvalueContext): VisualExpressionType {
+    return (
+      <ConcreteValue
+        value={ctx.getText()}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        props={{ 
+          select: true, 
+          SelectProps: { 
+            MenuProps: { disablePortal: true },
+            SelectDisplayProps: {
+              style: {
+                height: "auto",
+                lineHeight: "initial",
+                padding: "16.5px 14px",
+              }
+            },
+          },
+        }}
+        focus={isFocused(ctx, this.options.focusPosition)}
+      >
+        {["TRUE", "FALSE"].map((option) => (
+            <MenuItem key={option} value={option}>
+              {option}
+            </MenuItem>
+        ))}
+      </ConcreteValue>
     );
   }
 

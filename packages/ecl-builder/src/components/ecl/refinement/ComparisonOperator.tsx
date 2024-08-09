@@ -39,6 +39,7 @@ export default function ComparisonOperator<T extends string>({
       inputRef={focusRef}
       value={type}
       onChange={handleSelectOperator}
+      MenuProps={{ disablePortal: true }}
       sx={{
         alignSelf: "flex-start",
         borderWidth: 1,

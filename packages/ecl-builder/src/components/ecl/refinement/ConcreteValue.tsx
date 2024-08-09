@@ -5,11 +5,11 @@
 
 import { TextField, TextFieldProps, Theme } from "@mui/material";
 import { SystemStyleObject } from "@mui/system/styleFunctionSx";
-import React, { useState } from "react";
+import React, { PropsWithChildren, useState } from "react";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
 
-export interface ConcreteValueProps extends ChangeReporterProps {
+export interface ConcreteValueProps extends ChangeReporterProps, PropsWithChildren {
   value: string;
   props?: TextFieldProps;
   sx?: SystemStyleObject<Theme>;
@@ -26,6 +26,7 @@ export default function ConcreteValue({
   sx,
   focus,
   onChange,
+  children,
 }: ConcreteValueProps) {
   const [currentValue, setCurrentValue] = useState(value),
     focusRef = useFocus(focus);
@@ -45,6 +46,8 @@ export default function ConcreteValue({
         ...sx,
       }}
       {...props}
-    />
+    >
+      {children}
+    </TextField>
   );
 }
