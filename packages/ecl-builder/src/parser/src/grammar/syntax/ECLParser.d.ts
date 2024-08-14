@@ -353,25 +353,44 @@ export class BooleancomparisonoperatorContext extends ParserRuleContext {}
 export class DescriptionfilterconstraintContext extends ParserRuleContext {}
 
 /**
- * matchsearchterm : (nonwsnonescapedchar | escapedchar)+;
- */
-export class MatchsearchtermContext extends ParserRuleContext {}
-
-/**
  * typedsearchterm : ( ( matchkeyword ws COLON ws )? matchsearchtermset ) | ( wild ws COLON ws wildsearchtermset );
  */
-export class TypedsearchtermContext extends ParserRuleContext {}
+export class TypedsearchtermContext extends ParserRuleContext {
+  matchsearchtermset(): MatchsearchtermsetContext | null | undefined;
+  wildsearchtermset(): WildsearchtermsetContext | null | undefined;
+}
 
 /**
  * typedsearchtermset : LEFT_PAREN ws typedsearchterm (mws typedsearchterm)* ws RIGHT_PAREN;
  */
-export class TypedsearchtermsetContext extends ParserRuleContext {}
+export class TypedsearchtermsetContext extends ParserRuleContext {
+  typedsearchterm(): TypedsearchtermContext[];
+  LEFT_PAREN(): TerminalNode;
+  RIGHT_PAREN(): TerminalNode;
+}
+
+/**
+ * matchsearchterm : (nonwsnonescapedchar | escapedchar)+;
+ */
+export class MatchsearchtermContext extends ParserRuleContext {}
 
 /**
  * matchsearchtermset : qm ws matchsearchterm (mws matchsearchterm)* ws qm;
  */
 export class MatchsearchtermsetContext extends ParserRuleContext {
   matchsearchterm(): MatchsearchtermContext[];
+}
+
+/**
+ * wildsearchterm : (anynonescapedchar | escapedwildchar)+;
+ */
+export class WildsearchtermContext extends ParserRuleContext {}
+
+/**
+ * wildsearchtermset : qm wildsearchterm qm;
+ */
+export class WildsearchtermsetContext extends ParserRuleContext {
+  wildsearchterm(): WildsearchtermContext;
 }
 
 /**

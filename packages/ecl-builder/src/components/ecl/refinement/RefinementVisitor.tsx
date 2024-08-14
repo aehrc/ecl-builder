@@ -28,6 +28,8 @@ import {
   ReverseflagContext,
   StringcomparisonoperatorContext,
   SubexpressionconstraintContext,
+  TypedsearchtermContext,
+  TypedsearchtermsetContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
 import BaseEclVisitor from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
@@ -50,6 +52,7 @@ import ConcreteValue from "./ConcreteValue";
 import RefinedExpression from "./RefinedExpression";
 import { nonNullish } from "../../../types";
 import { MenuItem } from "@mui/material";
+import TypedSearchTerm from "./TypedSearchTerm";
 
 export interface RefinementVisitorOptions extends SubExpressionVisitorOptions {
   // True if within an attribute grouping.
@@ -273,12 +276,29 @@ export default class RefinementVisitor extends BaseEclVisitor {
             focusUpdateStrategy: "END_OF_UPDATE"
           });
         }}
+        onAddTypedSearchTerm={() => {
+          const termSetCtx = ctx.typedsearchtermset(),
+            termCtx = ctx.typedsearchterm();
+          if (termSetCtx) {
+            // Append after last search term in set
+            const terms = termSetCtx.typedsearchterm();
+            this.transformer.append(terms[terms.length - 1], `"${DEFAULT_TYPED_SEARCH_TERM}"`, false, false, {
+              focusUpdateStrategy: "END_OF_UPDATE"
+            });
+          } else if (termCtx) {
+            // Append and add parentheses
+            this.transformer.append(termCtx, `"${DEFAULT_TYPED_SEARCH_TERM}"`, true, false, {
+              focusUpdateStrategy: "END_OF_UPDATE"
+            });
+          }
+        }}
       >
         {new RefinementVisitor({
           ...this.options,
           removalOptions: undefined,
           attribute: true,
           refinement: false,
+          set: false,
         }).visitChildren(ctx)}
       </Attribute>
     );
@@ -378,17 +398,73 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
-  visitMatchsearchtermset(
-    ctx: MatchsearchtermsetContext
+  visitTypedsearchtermset(
+    ctx: TypedsearchtermsetContext
   ): VisualExpressionType {
+    const terms = ctx.typedsearchterm();
+    if (terms.length > 1) {
+      let result: ReactNode[] = [];
+      for (let i = 0; i < terms.length; i++) {
+        const removalContext = [this.transformer.spanFromContext(terms[i])];
+        let removalOptions;
+        // Include parentheses in removal context if there are only 2 terms
+        if (terms.length < 3) {
+          const parentheses = [ctx.LEFT_PAREN(), ctx.RIGHT_PAREN()];
+          removalContext.push(...parentheses.map(node => this.transformer.spanFromTerminalNode(node)));
+          removalContext.sort((a, b) => a.start - b.start);
+          removalOptions = { preserveFirstWhiteSpace: true };
+        }
+
+        result = result.concat(
+          new RefinementVisitor({
+            ...this.options,
+            removalContext,
+            removalOptions,
+            // Render the remove button only if the term is not the first one.
+            set: i !== 0,
+          }).visit(terms[i])
+        );
+      }
+      result = this.addKeys(result);
+      return result;
+    } else {
+      return this.visitChildren(ctx);
+    }
+  }
+
+  visitTypedsearchterm(
+    ctx: TypedsearchtermContext
+  ): VisualExpressionType {
+    const matchSearchTermSetCtx = ctx.matchsearchtermset(),
+      wildSearchTermSetCtx = ctx.wildsearchtermset(),
+      termSetCtx = matchSearchTermSetCtx ?? wildSearchTermSetCtx,
+      value = matchSearchTermSetCtx 
+        ? matchSearchTermSetCtx
+            .matchsearchterm()
+            .map((m) => m.getText())
+            .join(" ")
+        : wildSearchTermSetCtx!.wildsearchterm().getText();
     return (
-      <ConcreteValue
-        value={ctx
-          .matchsearchterm()
-          .map((m) => m.getText())
-          .join(" ")}
-        focus={isFocused(ctx, this.options.focusPosition)}
-        onChange={(e) => this.transformer.applyUpdate(ctx, `"${e}"`)}
+      <TypedSearchTerm
+        type={matchSearchTermSetCtx ? "match" : "wild"}
+        onChangeType={(newType) => 
+          this.transformer.applyUpdate(ctx, (newType === "wild" ? "wild:" : "") + `"${value}"`)
+        }
+        onRemove={
+          this.options.set
+            ? () =>
+              this.transformer.removeAllSpans(this.options.removalContext, {
+                focusUpdateStrategy: "BEFORE_UPDATE",
+                collapseWhiteSpaceLeft: true,
+                preserveFirstWhiteSpace: this.options.removalOptions?.preserveFirstWhiteSpace
+              })
+            : undefined
+        }
+        ConcreteValueProps={{
+          value,
+          focus: !!termSetCtx && isFocused(termSetCtx, this.options.focusPosition),
+          onChange: (e) => termSetCtx && this.transformer.applyUpdate(termSetCtx, `"${e}"`)
+        }}
       />
     );
   }

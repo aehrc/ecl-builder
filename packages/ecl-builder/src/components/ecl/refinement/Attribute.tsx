@@ -8,7 +8,7 @@ import React, { Children, cloneElement, PropsWithChildren } from "react";
 import { interleave } from "../../../array";
 import HorizontalLink from "../HorizontalLink";
 import RemoveExpression from "../RemoveExpression";
-import Actions from "../Actions";
+import Actions, { Action } from "../Actions";
 import { Done, Tune } from "@mui/icons-material";
 import { grey } from "../../../themes/color";
 
@@ -21,6 +21,7 @@ export interface AttributeProps extends PropsWithChildren {
   onRemoveCardinality?: () => unknown;
   comparisonType: AttributeComparisonType;
   onSelectComparisonType: (newComparisonType: AttributeComparisonType) => unknown;
+  onAddTypedSearchTerm: () => unknown;
 }
 
 export default function Attribute({ 
@@ -31,6 +32,7 @@ export default function Attribute({
   onRemoveCardinality,
   comparisonType,
   onSelectComparisonType,
+  onAddTypedSearchTerm,
 }: AttributeProps) {
   const theme = useTheme();
   const childrenArray = Children.toArray(children),
@@ -115,7 +117,7 @@ export default function Attribute({
               },
               {
                 type: "item",
-                label: "Typed search term",
+                label: "Search term",
                 onClick: () => onSelectComparisonType("string"),
                 icon: comparisonType === "string" ? <Done /> : null,
               },
@@ -125,6 +127,14 @@ export default function Attribute({
                 onClick: () => onSelectComparisonType("boolean"),
                 icon: comparisonType === "boolean" ? <Done /> : null,
               },
+              ...(comparisonType !== "string" ? [] : [{
+                type: "heading",
+                label: "Add:",
+              }, {
+                type: "item",
+                label: "Search term",
+                onClick: () => onAddTypedSearchTerm()
+              }] as Action[])
             ]}
             icon={Tune}
             title="Open menu with options to change this attribute"
