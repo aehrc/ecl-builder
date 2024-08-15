@@ -35,6 +35,8 @@ export interface ExpressionBuilderProps {
 export interface ExpressionBuilderOptions {
   // The URL of the FHIR terminology server to use for concept search.
   terminologyServerUrl: string;
+  // The system version to use for concept search.
+  systemVersion?: string;
   // The maximum number of results to return within concept search.
   maxSearchResults: number;
   // The minimum number of characters required to submit a query to the terminology server.

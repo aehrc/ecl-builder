@@ -65,7 +65,7 @@ export default function ConceptReference({
   sx,
   onChange,
 }: ConceptReferenceProps) {
-  const { terminologyServerUrl, maxSearchResults, minQueryLength } =
+  const { terminologyServerUrl, systemVersion, maxSearchResults, minQueryLength } =
       useContext(OptionsContext),
     { valueSet, label } = useContext(ConceptSearchScope),
     [selectedConcept, setSelectedConcept] =
@@ -76,6 +76,7 @@ export default function ConceptReference({
     { data, isLoading, isFetching, remove } = useConceptSearch(
       terminologyServerUrl,
       valueSet,
+      systemVersion?.trim() ?? "",
       searchQuery,
       maxSearchResults,
       minQueryLength

@@ -17,6 +17,7 @@ import useValueSetExpansion, {
 export default function useConceptSearch(
   endpoint: string,
   valueSet: string,
+  systemVersion: string,
   query: string,
   limit: number,
   minQueryLength: number,
@@ -24,7 +25,7 @@ export default function useConceptSearch(
 ): UseQueryResult<ConceptSearchResult, Error> {
   // The query is debounced to avoid too many requests to the server.
   const debouncedQuery = useDebounce(query);
-  return useValueSetExpansion(endpoint, buildExpandParams(valueSet, debouncedQuery, limit), {
+  return useValueSetExpansion(endpoint, buildExpandParams(valueSet, systemVersion, debouncedQuery, limit), {
     ...options,
     enabled: debouncedQuery.length >= minQueryLength,
   });
@@ -32,11 +33,13 @@ export default function useConceptSearch(
 
 function buildExpandParams(
   valueSet: string,
+  systemVersion: string,
   query: string,
   limit: number
 ): URLSearchParams {
   const searchParams = new URLSearchParams();
   searchParams.set("url", valueSet);
+  if (systemVersion) searchParams.set("system-version", systemVersion);
   searchParams.set("filter", query);
   // Designations are included, so that we can get the semantic tag from the FSN.
   searchParams.set("includeDesignations", "true");
