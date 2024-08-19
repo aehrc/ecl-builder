@@ -11,7 +11,7 @@ import ConstraintOperator, {
 
 export default {
   component: ConstraintOperator,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: { onChange: { action: "changed" } },
 };
 

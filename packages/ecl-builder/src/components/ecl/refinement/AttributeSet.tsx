@@ -75,7 +75,7 @@ function Heading({
       label: "Cardinality",
       onClick: handleClickCardinality,
       icon: cardinality ? <Done /> : null,
-    }
+    },
   ];
 
   function handleSelectType(event: SelectChangeEvent<LogicStatementType>) {
@@ -101,16 +101,16 @@ function Heading({
   }
 
   return (
-    <NeatRow 
-      className="attribute-set-heading" 
+    <NeatRow
+      className="attribute-set-heading"
       disableActionsHide
-      sx={{ 
+      sx={{
         "& > .neat-row": {
-          p: 0, 
+          p: 0,
           "& > *": {
             borderRadius: "0 !important",
           },
-        }
+        },
       }}
     >
       {Children.toArray(heading)}

@@ -32,9 +32,11 @@ export default function RefinedExpression({
         .fill(
           <HorizontalLink
             style={{ marginTop: "28px", alignSelf: "flex-start" }}
-          />
+          />,
         )
-        .map((child, i) => cloneElement(child, { key: `horizontal-link-${i}` }))
+        .map((child, i) =>
+          cloneElement(child, { key: `horizontal-link-${i}` }),
+        ),
     );
 
   return (

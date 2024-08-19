@@ -3,7 +3,13 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { IconButton, InputAdornment, Stack, Typography, useTheme } from "@mui/material";
+import {
+  IconButton,
+  InputAdornment,
+  Stack,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import React from "react";
 import RemoveExpression from "../RemoveExpression";
 import ConcreteValue, { ConcreteValueProps } from "./ConcreteValue";
@@ -26,11 +32,7 @@ export default function TypedSearchTerm({
   const theme = useTheme();
 
   return (
-    <Stack
-      className="typed-search-term"
-      direction="row"
-      spacing={1}
-    >
+    <Stack className="typed-search-term" direction="row" spacing={1}>
       <RemoveExpression
         enabled={!!onRemove}
         tooltip="Remove this search term from the set"
@@ -45,11 +47,12 @@ export default function TypedSearchTerm({
           "&:focus-within, &:hover": {
             "& .typed-search-term__toggle": {
               display: "flex",
-              color: type === "wild" 
-                ? theme.palette.text.primary
-                : theme.palette.grey[500],
-            }
-          }
+              color:
+                type === "wild"
+                  ? theme.palette.text.primary
+                  : theme.palette.grey[500],
+            },
+          },
         }}
       >
         <ConcreteValue
@@ -66,7 +69,9 @@ export default function TypedSearchTerm({
                   <IconButton
                     className="typed-search-term__toggle"
                     title="Toggle wild search term"
-                    onClick={() => onChangeType(type === "wild" ? "match" : "wild")}
+                    onClick={() =>
+                      onChangeType(type === "wild" ? "match" : "wild")
+                    }
                     edge="end"
                     sx={{ height: "1.15em" }}
                   >
@@ -82,9 +87,9 @@ export default function TypedSearchTerm({
                     </Typography>
                   </IconButton>
                 </InputAdornment>
-              )
+              ),
             },
-            ...ConcreteValueProps.props
+            ...ConcreteValueProps.props,
           }}
         />
       </RemoveExpression>

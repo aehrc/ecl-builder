@@ -1,6 +1,6 @@
-import type { StoryObj } from '@storybook/react';
+import type { StoryObj } from "@storybook/react";
 
-export type StoryConfigs = {csfName: string, story: StoryObj}[];
+export type StoryConfigs = { csfName: string; story: StoryObj }[];
 
 export interface DynamicConfig {
   baseCsf: string;

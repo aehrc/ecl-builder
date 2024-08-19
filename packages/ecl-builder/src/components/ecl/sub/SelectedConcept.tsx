@@ -24,7 +24,7 @@ export default function SelectedConcept({
     display =
       option.type === "ANY_CONCEPT"
         ? "any concept"
-        : option.display ?? option.id,
+        : (option.display ?? option.id),
     semanticTag = (
       <Stack direction="row" spacing={1}>
         <Chip label="selected" size="small" sx={{ mr: 0 }} />
@@ -41,8 +41,8 @@ export default function SelectedConcept({
       </Stack>
     ),
     listItemStyles = {
-      "&.MuiAutocomplete-option": { 
-        pr: option.type === "SPECIFIC_CONCEPT" && option.semanticTag ? 2 : 1 
+      "&.MuiAutocomplete-option": {
+        pr: option.type === "SPECIFIC_CONCEPT" && option.semanticTag ? 2 : 1,
       },
       ...(separator
         ? {

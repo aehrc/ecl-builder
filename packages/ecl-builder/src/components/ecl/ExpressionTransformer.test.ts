@@ -134,7 +134,9 @@ describe("applyUpdates", () => {
     const transformer = new ExpressionTransformer(
       "(<< 195967001 |Asthma| OR (< 19829001 |Pulmonary disease| AND < 40733004 |Infection|))",
       (expression) => {
-        expect(expression).toEqual("(<< 195967001 |Asthma| OR < 40733004 |Infection|)");
+        expect(expression).toEqual(
+          "(<< 195967001 |Asthma| OR < 40733004 |Infection|)",
+        );
         done();
       },
       () => undefined,
@@ -161,6 +163,9 @@ describe("applyUpdates", () => {
         getText: () => ")",
       } as ParserRuleContext,
     ];
-    transformer.applyUpdates(contexts, "", { collapseWhiteSpaceLeft: true, preserveFirstWhiteSpace: true });
+    transformer.applyUpdates(contexts, "", {
+      collapseWhiteSpaceLeft: true,
+      preserveFirstWhiteSpace: true,
+    });
   });
 });

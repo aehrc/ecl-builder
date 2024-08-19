@@ -44,7 +44,7 @@ export interface ExpressionBuilderOptions {
 }
 
 export const OptionsContext = createContext<ExpressionBuilderOptions>(
-  applyDefaultOptions({})
+  applyDefaultOptions({}),
 );
 
 /**
@@ -62,7 +62,7 @@ export default function ExpressionBuilder({
     [expression, setExpression] = useState(initialExpression);
 
   useEffect(() => {
-    setExpression(initialExpression)
+    setExpression(initialExpression);
   }, [initialExpression]);
 
   function handleChange(newExpression: string) {
@@ -129,7 +129,7 @@ export default function ExpressionBuilder({
  * Default configuration options.
  */
 function applyDefaultOptions(
-  options: Partial<ExpressionBuilderOptions>
+  options: Partial<ExpressionBuilderOptions>,
 ): ExpressionBuilderOptions {
   return {
     terminologyServerUrl: "https://tx.ontoserver.csiro.au/fhir",

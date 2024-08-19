@@ -23,7 +23,7 @@ export interface BaseEclVisitorOptions {
   // Options when removing the spans included in the removal context.
   removalOptions?: {
     // True if a white space should be maintained to the left of the first span to be removed.
-    preserveFirstWhiteSpace?: boolean
+    preserveFirstWhiteSpace?: boolean;
   };
   // True if within a refinement expression.
   refinement: boolean;
@@ -67,7 +67,7 @@ export default class BaseEclVisitor extends ECLVisitor {
    */
   addKeys(ctxs: VisualExpressionType[]): VisualExpressionType[] {
     return ctxs.map((child) =>
-      isValidElement(child) ? cloneElement(child, { key: uuid.v4() }) : child
+      isValidElement(child) ? cloneElement(child, { key: uuid.v4() }) : child,
     );
   }
 }

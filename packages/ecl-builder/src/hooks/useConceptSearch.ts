@@ -21,21 +21,25 @@ export default function useConceptSearch(
   query: string,
   limit: number,
   minQueryLength: number,
-  options: QueryObserverOptions<ConceptSearchResult, Error> = {}
+  options: QueryObserverOptions<ConceptSearchResult, Error> = {},
 ): UseQueryResult<ConceptSearchResult, Error> {
   // The query is debounced to avoid too many requests to the server.
   const debouncedQuery = useDebounce(query);
-  return useValueSetExpansion(endpoint, buildExpandParams(valueSet, systemVersion, debouncedQuery, limit), {
-    ...options,
-    enabled: debouncedQuery.length >= minQueryLength,
-  });
+  return useValueSetExpansion(
+    endpoint,
+    buildExpandParams(valueSet, systemVersion, debouncedQuery, limit),
+    {
+      ...options,
+      enabled: debouncedQuery.length >= minQueryLength,
+    },
+  );
 }
 
 function buildExpandParams(
   valueSet: string,
   systemVersion: string,
   query: string,
-  limit: number
+  limit: number,
 ): URLSearchParams {
   const searchParams = new URLSearchParams();
   searchParams.set("url", valueSet);
@@ -49,7 +53,7 @@ function buildExpandParams(
     "elements",
     "expansion.contains.code,expansion.contains.display," +
       "expansion.contains.fullySpecifiedName," +
-      "expansion.contains.active"
+      "expansion.contains.active",
   );
   // Only active concepts are included in the results.
   searchParams.set("activeOnly", "true");

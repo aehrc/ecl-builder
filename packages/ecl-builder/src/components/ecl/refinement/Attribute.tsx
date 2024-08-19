@@ -12,7 +12,11 @@ import Actions, { Action } from "../Actions";
 import { Done, Tune } from "@mui/icons-material";
 import { grey } from "../../../themes/color";
 
-export type AttributeComparisonType = "expression" | "numeric" | "string" | "boolean";
+export type AttributeComparisonType =
+  | "expression"
+  | "numeric"
+  | "string"
+  | "boolean";
 
 export interface AttributeProps extends PropsWithChildren {
   onRemove?: () => unknown;
@@ -20,15 +24,17 @@ export interface AttributeProps extends PropsWithChildren {
   onAddCardinality?: () => unknown;
   onRemoveCardinality?: () => unknown;
   comparisonType: AttributeComparisonType;
-  onSelectComparisonType: (newComparisonType: AttributeComparisonType) => unknown;
+  onSelectComparisonType: (
+    newComparisonType: AttributeComparisonType,
+  ) => unknown;
   onAddTypedSearchTerm: () => unknown;
 }
 
-export default function Attribute({ 
-  children, 
-  onRemove, 
-  cardinality, 
-  onAddCardinality, 
+export default function Attribute({
+  children,
+  onRemove,
+  cardinality,
+  onAddCardinality,
   onRemoveCardinality,
   comparisonType,
   onSelectComparisonType,
@@ -42,9 +48,11 @@ export default function Attribute({
         .fill(
           <HorizontalLink
             style={{ marginTop: "28px", alignSelf: "flex-start" }}
-          />
+          />,
         )
-        .map((child, i) => cloneElement(child, { key: `horizontal-link-${i}` }))
+        .map((child, i) =>
+          cloneElement(child, { key: `horizontal-link-${i}` }),
+        ),
     );
 
   function handleClickCardinality() {
@@ -72,8 +80,8 @@ export default function Attribute({
           "&:focus-within, &:hover": {
             "& > .actions": {
               display: "inline-flex",
-            }
-          }
+            },
+          },
         }}
       >
         {interleavedChildren}
@@ -127,14 +135,19 @@ export default function Attribute({
                 onClick: () => onSelectComparisonType("boolean"),
                 icon: comparisonType === "boolean" ? <Done /> : null,
               },
-              ...(comparisonType !== "string" ? [] : [{
-                type: "heading",
-                label: "Add:",
-              }, {
-                type: "item",
-                label: "Search term",
-                onClick: () => onAddTypedSearchTerm()
-              }] as Action[])
+              ...(comparisonType !== "string"
+                ? []
+                : ([
+                    {
+                      type: "heading",
+                      label: "Add:",
+                    },
+                    {
+                      type: "item",
+                      label: "Search term",
+                      onClick: () => onAddTypedSearchTerm(),
+                    },
+                  ] as Action[])),
             ]}
             icon={Tune}
             title="Open menu with options to change this attribute"

@@ -20,7 +20,7 @@ export interface ExpressionGroupingProps extends PropsWithChildren {
  */
 function getStripingStyle(
   theme: Theme,
-  levels: number
+  levels: number,
 ): Record<string, unknown> {
   let style = {};
   for (let i = 0; i < levels; i++) {

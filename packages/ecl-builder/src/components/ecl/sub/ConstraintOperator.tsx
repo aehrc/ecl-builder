@@ -27,7 +27,7 @@ export const operatorToConstraintName: Record<string, ConstraintType> =
   Object.fromEntries(
     Object.entries(constraintNameToOperator)
       .filter((entry) => entry[1] !== null)
-      .map((entry) => entry.reverse())
+      .map((entry) => entry.reverse()),
   );
 
 export type ConstraintType = keyof typeof constraintNameToOperator;
@@ -45,7 +45,7 @@ export default function ConstraintOperator({
   const focusRef = useFocus(focus);
 
   function handleSelectConstraint(
-    event: SelectChangeEvent<ConstraintType>
+    event: SelectChangeEvent<ConstraintType>,
   ): void {
     const newConstraint = event.target.value as ConstraintType;
     onChange(buildExpression(newConstraint));

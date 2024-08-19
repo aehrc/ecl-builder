@@ -9,7 +9,7 @@ export const DEFAULT_CONCEPT = "138875005 |SNOMED CT Concept|";
 export const DEFAULT_REFINEMENT = `47429007 |associated with| = << ${DEFAULT_CONCEPT}`;
 export const DEFAULT_CARDINALITY = "1..1";
 
-export const DEFAULT_NUMERIC_VALUE = "1"
+export const DEFAULT_NUMERIC_VALUE = "1";
 export const DEFAULT_TYPED_SEARCH_TERM = "term";
 
 export const REFERENCE_SET_VALUE_SET_URI = `${SCT_URI}?fhir_vs=ecl/%3C%20446609009%20`;

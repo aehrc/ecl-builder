@@ -68,7 +68,7 @@ function ExpressionResultContent({
     { data, isFetching } = useValueSetExpansion(
       terminologyServerUrl,
       buildExpandParams(expression, maxSearchResults, includeInactives),
-      { suspense: true }
+      { suspense: true },
     );
   if (!data) {
     console.warn("No error, but also no data");
@@ -126,7 +126,7 @@ function ExpressionResultContent({
  * Default configuration options.
  */
 function applyDefaultOptions(
-  options: Partial<ExpressionResultOptions>
+  options: Partial<ExpressionResultOptions>,
 ): ExpressionResultOptions {
   return {
     terminologyServerUrl: "https://tx.ontoserver.csiro.au/fhir",
@@ -139,13 +139,13 @@ function applyDefaultOptions(
 function buildExpandParams(
   expression: string,
   limit: number,
-  includeInactives: boolean
+  includeInactives: boolean,
 ): URLSearchParams {
   const searchParams = new URLSearchParams(),
     activeOnly = !includeInactives;
   searchParams.set(
     "url",
-    `${SCT_URI}?fhir_vs=ecl/${encodeURIComponent(expression)}`
+    `${SCT_URI}?fhir_vs=ecl/${encodeURIComponent(expression)}`,
   );
   // Designations are included, so that we can get the semantic tag from the FSN.
   searchParams.set("includeDesignations", "true");
@@ -155,7 +155,7 @@ function buildExpandParams(
     "elements",
     "expansion.contains.code,expansion.contains.display," +
       "expansion.contains.fullySpecifiedName," +
-      "expansion.contains.active"
+      "expansion.contains.active",
   );
   // Only active concepts are included in the results.
   searchParams.set("activeOnly", activeOnly.toString());

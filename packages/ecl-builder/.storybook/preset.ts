@@ -1,22 +1,22 @@
-import type { Indexer } from '@storybook/types';
-import { serverRequire } from '@storybook/core-common';
-import { loadCsf } from '@storybook/csf-tools';
-import { webpack, DYNAMIC_STORIES_REGEX } from './unplugin';
-import { compile } from './compile';
+import type { Indexer } from "@storybook/types";
+import { serverRequire } from "@storybook/core-common";
+import { loadCsf } from "@storybook/csf-tools";
+import { webpack, DYNAMIC_STORIES_REGEX } from "./unplugin";
+import { compile } from "./compile";
 
 // adapted from https://stackblitz.com/edit/github-h2rgfk?file=README.md
 
 const dynamicIndexer = {
   test: DYNAMIC_STORIES_REGEX,
   createIndex: async (fileName, opts) => {
-    console.log('indexing', fileName);
+    console.log("indexing", fileName);
     delete require.cache[fileName];
     const config = await serverRequire(fileName);
     const compiled = await compile(config);
     const indexed = loadCsf(compiled, {
       ...opts,
       fileName,
-      makeTitle: () => fileName.replace(/^.*\/(.+?)\..*$/, '$1'),
+      makeTitle: () => fileName.replace(/^.*\/(.+?)\..*$/, "$1"),
     }).parse();
 
     return indexed.indexInputs;
@@ -31,4 +31,3 @@ export const webpackFinal = async (config: any) => {
   config.plugins = plugins;
   return config;
 };
-

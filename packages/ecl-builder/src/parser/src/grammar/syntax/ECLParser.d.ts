@@ -270,14 +270,26 @@ export class EclattributeContext extends ParserRuleContext {
   cardinality(): CardinalityContext | null | undefined;
   LEFT_BRACE(): TerminalNode | null | undefined;
   RIGHT_BRACE(): TerminalNode | null | undefined;
-  expressioncomparisonoperator(): ExpressioncomparisonoperatorContext | null | undefined;
+  expressioncomparisonoperator():
+    | ExpressioncomparisonoperatorContext
+    | null
+    | undefined;
   subexpressionconstraint(): SubexpressionconstraintContext | null | undefined;
-  numericcomparisonoperator(): NumericcomparisonoperatorContext | null | undefined;
+  numericcomparisonoperator():
+    | NumericcomparisonoperatorContext
+    | null
+    | undefined;
   numericvalue(): NumericvalueContext | null | undefined;
-  stringcomparisonoperator(): StringcomparisonoperatorContext | null | undefined;
+  stringcomparisonoperator():
+    | StringcomparisonoperatorContext
+    | null
+    | undefined;
   typedsearchterm(): TypedsearchtermContext | null | undefined;
   typedsearchtermset(): TypedsearchtermsetContext | null | undefined;
-  booleancomparisonoperator(): BooleancomparisonoperatorContext | null | undefined;
+  booleancomparisonoperator():
+    | BooleancomparisonoperatorContext
+    | null
+    | undefined;
   booleanvalue(): BooleanvalueContext | null | undefined;
 }
 

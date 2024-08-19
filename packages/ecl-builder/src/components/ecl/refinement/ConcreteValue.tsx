@@ -9,7 +9,9 @@ import React, { PropsWithChildren, useState } from "react";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
 
-export interface ConcreteValueProps extends ChangeReporterProps, PropsWithChildren {
+export interface ConcreteValueProps
+  extends ChangeReporterProps,
+    PropsWithChildren {
   value: string;
   props?: TextFieldProps;
   sx?: SystemStyleObject<Theme>;

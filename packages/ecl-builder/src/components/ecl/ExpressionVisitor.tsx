@@ -34,7 +34,7 @@ export type VisualExpressionType = ReactNode;
 export type ChangeHandler<T = string> = (expression: T) => unknown;
 export type ChangeHandlerWithPosition<T = string> = (
   expression: T,
-  position: number
+  position: number,
 ) => unknown;
 
 export interface ChangeReporterProps<T = string> extends FocusManagementProps {
@@ -69,7 +69,7 @@ export class ExpressionVisitor extends BaseEclVisitor {
   }
 
   visitExpressionconstraint(
-    ctx: ExpressionconstraintContext
+    ctx: ExpressionconstraintContext,
   ): VisualExpressionType {
     return ctx.subexpressionconstraint() ? (
       <ExpressionConstraint>{this.visitChildren(ctx)}</ExpressionConstraint>
@@ -79,19 +79,19 @@ export class ExpressionVisitor extends BaseEclVisitor {
   }
 
   visitRefinedexpressionconstraint(
-    ctx: RefinedexpressionconstraintContext
+    ctx: RefinedexpressionconstraintContext,
   ): VisualExpressionType {
     return new RefinementVisitor(this.options).visit(ctx);
   }
 
   visitCompoundexpressionconstraint(
-    ctx: CompoundexpressionconstraintContext
+    ctx: CompoundexpressionconstraintContext,
   ): VisualExpressionType {
     return new CompoundVisitor({ ...this.options, compound: true }).visit(ctx);
   }
 
   visitDottedexpressionconstraint(
-    ctx: DottedexpressionconstraintContext
+    ctx: DottedexpressionconstraintContext,
   ): VisualExpressionType {
     return (
       <Fallback
@@ -104,7 +104,7 @@ export class ExpressionVisitor extends BaseEclVisitor {
   }
 
   visitSubexpressionconstraint(
-    ctx: SubexpressionconstraintContext
+    ctx: SubexpressionconstraintContext,
   ): VisualExpressionType {
     return new SubExpressionVisitor(this.options).visit(ctx);
   }
@@ -127,7 +127,7 @@ export function visitExpression(
   expression: string,
   focusPosition: number | undefined,
   onChange: (expression: string) => unknown,
-  onFocus?: PositionedFocusHandler
+  onFocus?: PositionedFocusHandler,
 ): VisualExpressionType {
   const transformer = new ExpressionTransformer(expression, onChange, onFocus);
 

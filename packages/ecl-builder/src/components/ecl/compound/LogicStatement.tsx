@@ -4,7 +4,13 @@
  */
 
 import { Add } from "@mui/icons-material";
-import { ButtonGroup, MenuItem, Select, SelectChangeEvent, useTheme } from "@mui/material";
+import {
+  ButtonGroup,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  useTheme,
+} from "@mui/material";
 import React, { Children, PropsWithChildren } from "react";
 import { grey } from "../../../themes/color";
 import { DEFAULT_CONCEPT } from "../../../constants";
@@ -96,16 +102,16 @@ export default function LogicStatement({
             </MenuItem>
           ) : null}
         </Select>
-        <ButtonGroup 
-          className="actions" 
+        <ButtonGroup
+          className="actions"
           sx={{
             "& > *": {
-              height: '100%', 
+              height: "100%",
               "&:not(:last-child)": {
-                borderRightColor: grey(theme, 4), 
-                borderRightWidth: 1, 
-                borderRightStyle: "solid"
-              }
+                borderRightColor: grey(theme, 4),
+                borderRightWidth: 1,
+                borderRightStyle: "solid",
+              },
             },
           }}
         >

@@ -23,7 +23,7 @@ export default function NestedSubExpression(props: NestedSubExpressionProps) {
       <InlineExpressionGrouping>
         matching the following expression
       </InlineExpressionGrouping>,
-      <SubExpressionActions key="actions" />
+      <SubExpressionActions key="actions" />,
     );
     return (
       <NeatRow className="sub-expression-heading">

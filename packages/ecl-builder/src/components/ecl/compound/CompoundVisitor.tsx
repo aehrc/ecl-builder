@@ -17,7 +17,9 @@ import {
 import BaseEclVisitor from "../BaseEclVisitor";
 import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
 import { isFocused } from "../FocusProvider";
-import SubExpressionVisitor, { SubExpressionVisitorOptions } from "../sub/SubExpressionVisitor";
+import SubExpressionVisitor, {
+  SubExpressionVisitorOptions,
+} from "../sub/SubExpressionVisitor";
 import LogicOperator from "./LogicOperator";
 import LogicStatement, {
   LogicStatementType,
@@ -25,7 +27,10 @@ import LogicStatement, {
 } from "./LogicStatement";
 import LogicStatementSubExpression from "./LogicStatementSubExpression";
 import { Span } from "../ExpressionTransformer";
-import ConstraintOperator, { constraintNameToOperator, operatorToConstraintName } from "../sub/ConstraintOperator";
+import ConstraintOperator, {
+  constraintNameToOperator,
+  operatorToConstraintName,
+} from "../sub/ConstraintOperator";
 import MemberOfOperator, { MEMBER_OF_OPERATOR } from "../sub/MemberOfOperator";
 import { nonNullish } from "../../../types";
 
@@ -42,31 +47,31 @@ export default class CompoundVisitor extends BaseEclVisitor {
   }
 
   visitExpressionconstraint(
-    ctx: ExpressionconstraintContext
+    ctx: ExpressionconstraintContext,
   ): VisualExpressionType {
     return new ExpressionVisitor(this.options).visit(ctx);
   }
 
   visitConjunctionexpressionconstraint(
-    ctx: ConjunctionexpressionconstraintContext
+    ctx: ConjunctionexpressionconstraintContext,
   ): VisualExpressionType {
     return this.renderLogicStatement(ctx, ctx.conjunction(), "conjunction");
   }
 
   visitDisjunctionexpressionconstraint(
-    ctx: DisjunctionexpressionconstraintContext
+    ctx: DisjunctionexpressionconstraintContext,
   ): VisualExpressionType {
     return this.renderLogicStatement(ctx, ctx.disjunction(), "disjunction");
   }
 
   visitExclusionexpressionconstraint(
-    ctx: ExclusionexpressionconstraintContext
+    ctx: ExclusionexpressionconstraintContext,
   ): VisualExpressionType {
     return this.renderLogicStatement(ctx, ctx.exclusion(), "exclusion");
   }
 
   visitSubexpressionconstraint(
-    ctx: SubexpressionconstraintContext
+    ctx: SubexpressionconstraintContext,
   ): VisualExpressionType {
     return (
       <LogicStatementSubExpression
@@ -74,13 +79,17 @@ export default class CompoundVisitor extends BaseEclVisitor {
           this.transformer.removeAllSpans(this.options.removalContext, {
             focusUpdateStrategy: "BEFORE_UPDATE",
             collapseWhiteSpaceLeft: true,
-            preserveFirstWhiteSpace: this.options.removalOptions?.preserveFirstWhiteSpace,
+            preserveFirstWhiteSpace:
+              this.options.removalOptions?.preserveFirstWhiteSpace,
           })
         }
       >
-        {new SubExpressionVisitor({ ...this.options, removalOptions: undefined, compound: true, refinement: false }).visit(
-          ctx
-        )}
+        {new SubExpressionVisitor({
+          ...this.options,
+          removalOptions: undefined,
+          compound: true,
+          refinement: false,
+        }).visit(ctx)}
       </LogicStatementSubExpression>
     );
   }
@@ -102,7 +111,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
   }
 
   visitConstraintoperator(
-    ctx: ConstraintoperatorContext
+    ctx: ConstraintoperatorContext,
   ): VisualExpressionType {
     return (
       <ConstraintOperator
@@ -119,7 +128,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
       | DisjunctionexpressionconstraintContext
       | ExclusionexpressionconstraintContext,
     operatorCtx: ParserRuleContext[],
-    type: LogicStatementType
+    type: LogicStatementType,
   ): VisualExpressionType {
     let result: VisualExpressionType;
 
@@ -129,22 +138,33 @@ export default class CompoundVisitor extends BaseEclVisitor {
     if (subexpressions.length > 1) {
       // If there is more than one sub-expression in the statement, harvest the removal context
       // and then re-assemble the children.
-      if (!Array.isArray(operatorCtx)) operatorCtx = [operatorCtx]
+      if (!Array.isArray(operatorCtx)) operatorCtx = [operatorCtx];
       const children = interleave(ctx.subexpressionconstraint(), operatorCtx);
       result = [];
       for (let i = 0; i < children.length; i++) {
         const removalContext = this.transformer.getBinaryOperatorRemovalContext(
           children,
-          i
+          i,
         );
 
         // Preserve the first white space if subexpression is not the first or last subexpression
-        const removalOptions = { preserveFirstWhiteSpace: i !== 0 && i !== children.length - 1 }
+        const removalOptions = {
+          preserveFirstWhiteSpace: i !== 0 && i !== children.length - 1,
+        };
 
         // Include parentheses in removal context if there are only 2 subexpressions
-        if (subexpressions.length < 3 && parent && !parent.memberof() && !parent.constraintoperator()) {
+        if (
+          subexpressions.length < 3 &&
+          parent &&
+          !parent.memberof() &&
+          !parent.constraintoperator()
+        ) {
           const parentheses = [parent.LEFT_PAREN(), parent.RIGHT_PAREN()];
-          removalContext.push(...parentheses.map(node => this.transformer.spanFromTerminalNode(node)));
+          removalContext.push(
+            ...parentheses.map((node) =>
+              this.transformer.spanFromTerminalNode(node),
+            ),
+          );
           removalContext.sort((a, b) => a.start - b.start);
           // Preserve the first white space when removing parentheses
           removalOptions.preserveFirstWhiteSpace = true;
@@ -155,7 +175,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
             ...this.options,
             removalContext,
             removalOptions,
-          }).visit(children[i])
+          }).visit(children[i]),
         );
       }
       result = Children.toArray(result);
@@ -178,7 +198,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
         onChangeType={(type) =>
           this.transformer.applyUpdates(
             operatorCtx,
-            logicStatementTypeToOperator[type]
+            logicStatementTypeToOperator[type],
           )
         }
         onAddCondition={(expression, focusPosition) => {
@@ -187,7 +207,6 @@ export default class CompoundVisitor extends BaseEclVisitor {
             focusPosition,
           });
         }}
-
         heading={heading}
         constraint={!!parent?.constraintoperator()}
         memberOf={!!parent?.memberof()}
@@ -197,33 +216,40 @@ export default class CompoundVisitor extends BaseEclVisitor {
           this.handleAddConstraint(
             memberOf
               ? this.transformer.spanFromContext(memberOf)
-              : parent 
+              : parent
                 ? this.transformer.spanFromTerminalNode(parent.LEFT_PAREN())
                 : this.transformer.spanFromContext(ctx),
-            !parent
+            !parent,
           );
         }}
         onRemoveConstraint={() => parent && this.handleRemoveConstraint(parent)}
         onAddMemberOf={() => {
           const leftSurroundingParenthesis = parent?.LEFT_PAREN();
           this.handleAddMemberOf(
-            leftSurroundingParenthesis 
-              ? this.transformer.spanFromTerminalNode(leftSurroundingParenthesis)
+            leftSurroundingParenthesis
+              ? this.transformer.spanFromTerminalNode(
+                  leftSurroundingParenthesis,
+                )
               : this.transformer.spanFromContext(ctx),
-            !parent
+            !parent,
           );
         }}
         onRemoveMemberOf={() => parent && this.handleRemoveMemberOf(parent)}
         onRemoveRefinement={() => this.handleRemoveRefinement()}
         onAddLogicStatement={(expression, focusPosition) =>
-          this.handleAddLogicStatement(parent ?? ctx, expression, focusPosition, !parent)
+          this.handleAddLogicStatement(
+            parent ?? ctx,
+            expression,
+            focusPosition,
+            !parent,
+          )
         }
         onAddRefinement={(e) =>
           this.handleAddRefinement(
             this.transformer.spanFromContext(parent ?? ctx),
             e,
             this.options.attribute || this.options.compound,
-            !parent
+            !parent,
           )
         }
       >
@@ -237,7 +263,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
       prependSubject,
       constraintNameToOperator["descendantorselfof"],
       false,
-      preParenthesize
+      preParenthesize,
     );
   }
 
@@ -253,10 +279,19 @@ export default class CompoundVisitor extends BaseEclVisitor {
     }
   }
 
-  private handleAddMemberOf(prependSubject: Span, preParenthesize: boolean): void {
-    this.transformer.prependToSpan(prependSubject, MEMBER_OF_OPERATOR, false, preParenthesize, {
-      focusUpdateStrategy: "END_OF_UPDATE",
-    });
+  private handleAddMemberOf(
+    prependSubject: Span,
+    preParenthesize: boolean,
+  ): void {
+    this.transformer.prependToSpan(
+      prependSubject,
+      MEMBER_OF_OPERATOR,
+      false,
+      preParenthesize,
+      {
+        focusUpdateStrategy: "END_OF_UPDATE",
+      },
+    );
   }
 
   private handleRemoveMemberOf(ctx: SubexpressionconstraintContext) {
@@ -268,7 +303,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
       });
     } else {
       console.warn(
-        "Attempted to remove member of operator, no member of operator found"
+        "Attempted to remove member of operator, no member of operator found",
       );
     }
   }
@@ -281,7 +316,7 @@ export default class CompoundVisitor extends BaseEclVisitor {
     ctx: ParserRuleContext,
     expression: string,
     focusPosition: number,
-    preParenthesize: boolean
+    preParenthesize: boolean,
   ) {
     this.transformer.append(ctx, expression, true, preParenthesize, {
       focusUpdateStrategy: "SPECIFIED_POSITION",
@@ -289,10 +324,21 @@ export default class CompoundVisitor extends BaseEclVisitor {
     });
   }
 
-  private handleAddRefinement(span: Span, e: string, parenthesize: boolean, preParenthesize: boolean) {
-    this.transformer.appendToSpan(span, `: ${e}`, parenthesize, preParenthesize, {
-      focusUpdateStrategy: "SPECIFIED_POSITION",
-      focusPosition: 2,
-    });
+  private handleAddRefinement(
+    span: Span,
+    e: string,
+    parenthesize: boolean,
+    preParenthesize: boolean,
+  ) {
+    this.transformer.appendToSpan(
+      span,
+      `: ${e}`,
+      parenthesize,
+      preParenthesize,
+      {
+        focusUpdateStrategy: "SPECIFIED_POSITION",
+        focusPosition: 2,
+      },
+    );
   }
 }
