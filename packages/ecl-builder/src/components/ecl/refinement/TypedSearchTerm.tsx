@@ -68,12 +68,13 @@ export default function TypedSearchTerm({
                     title="Toggle wild search term"
                     onClick={() => onChangeType(type === "wild" ? "match" : "wild")}
                     edge="end"
+                    sx={{ height: "1.15em" }}
                   >
                     <Typography
                       sx={{
                         fontSize: "26px",
                         position: "relative",
-                        top: "3px",
+                        top: "4px",
                         lineHeight: 1,
                       }}
                     >
