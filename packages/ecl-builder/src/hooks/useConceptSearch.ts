@@ -4,10 +4,10 @@
  */
 
 import { QueryObserverOptions, UseQueryResult } from "@tanstack/react-query";
+import useDebounce from "./useDebounce";
 import useValueSetExpansion, {
   ConceptSearchResult,
 } from "./useValueSetExpansion";
-import { useEffect, useState } from "react";
 
 /**
  * A hook for incorporating concept search into components.
@@ -17,38 +17,33 @@ import { useEffect, useState } from "react";
 export default function useConceptSearch(
   endpoint: string,
   valueSet: string,
+  systemVersion: string,
   query: string,
   limit: number,
   minQueryLength: number,
-  options: QueryObserverOptions<ConceptSearchResult, Error> = {}
+  options: QueryObserverOptions<ConceptSearchResult, Error> = {},
 ): UseQueryResult<ConceptSearchResult, Error> {
   // The query is debounced to avoid too many requests to the server.
-  const [debouncedQuery, setDebouncedQuery] = useState(query);
-
-  useEffect(() => {
-    // Update debouncedQuery when the query changes
-    const timer = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 250);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [query]);
-
-  return useValueSetExpansion(endpoint, buildExpandParams(valueSet, debouncedQuery, limit), {
-    ...options,
-    enabled: debouncedQuery.length >= minQueryLength,
-  });
+  const debouncedQuery = useDebounce(query);
+  return useValueSetExpansion(
+    endpoint,
+    buildExpandParams(valueSet, systemVersion, debouncedQuery, limit),
+    {
+      ...options,
+      enabled: debouncedQuery.length >= minQueryLength,
+    },
+  );
 }
 
 function buildExpandParams(
   valueSet: string,
+  systemVersion: string,
   query: string,
-  limit: number
+  limit: number,
 ): URLSearchParams {
   const searchParams = new URLSearchParams();
   searchParams.set("url", valueSet);
+  if (systemVersion) searchParams.set("system-version", systemVersion);
   searchParams.set("filter", query);
   // Designations are included, so that we can get the semantic tag from the FSN.
   searchParams.set("includeDesignations", "true");
@@ -58,7 +53,7 @@ function buildExpandParams(
     "elements",
     "expansion.contains.code,expansion.contains.display," +
       "expansion.contains.fullySpecifiedName," +
-      "expansion.contains.active"
+      "expansion.contains.active",
   );
   // Only active concepts are included in the results.
   searchParams.set("activeOnly", "true");

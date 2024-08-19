@@ -4,22 +4,22 @@
  */
 export default {
   stories: [
-    "../src/**/*.stories.mdx", 
+    "../src/**/*.stories.mdx",
     "../src/**/*.stories.@(js|jsx|ts|tsx)",
-    "../src/**/*.dynamic.@(js|jsx|ts|tsx)"
+    "../src/**/*.dynamic.@(js|jsx|ts|tsx)",
   ],
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
     "@storybook/addon-interactions",
     "@storybook/addon-webpack5-compiler-swc",
-    "./preset"
+    "./preset",
   ],
   framework: {
     name: "@storybook/react-webpack5",
-    options: {}
+    options: {},
   },
   docs: {
-    autodocs: 'tag',
+    autodocs: "tag",
   },
 };

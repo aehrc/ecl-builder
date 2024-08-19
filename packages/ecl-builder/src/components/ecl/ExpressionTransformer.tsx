@@ -15,6 +15,9 @@ export interface UpdateOptions {
   // Set this to true if the subject expression has optional whitespace on the left side that needs
   // to be collapsed, e.g. when removing the sub-expression.
   collapseWhiteSpaceLeft?: boolean;
+  // Set this to true to ensure a whitespace remains to the left side of the first span of the
+  // subject expression
+  preserveFirstWhiteSpace?: boolean;
   // Set this to true to notify of change in focus, along with the position of the focus within the
   // expression.
   reportFocusUpdate?: boolean;
@@ -52,7 +55,7 @@ export default class ExpressionTransformer {
   constructor(
     expression: string,
     onChange: ChangeHandler,
-    onFocus?: PositionedFocusHandler
+    onFocus?: PositionedFocusHandler,
   ) {
     this.expression = expression;
     this.onChange = onChange;
@@ -67,7 +70,7 @@ export default class ExpressionTransformer {
     expression: string,
     parenthesize: boolean,
     preParenthesize: boolean,
-    options: UpdateOptions = {}
+    options: UpdateOptions = {},
   ): void {
     const prevExpression = span.expression.trimStart(),
       suffix = preParenthesize ? `(${prevExpression})` : prevExpression,
@@ -86,14 +89,14 @@ export default class ExpressionTransformer {
     expression: string,
     parenthesize: boolean,
     preParenthesize: boolean,
-    options: UpdateOptions = {}
+    options: UpdateOptions = {},
   ): void {
     this.appendToSpan(
       this.spanFromContext(ctx),
       expression,
       parenthesize,
       preParenthesize,
-      options
+      options,
     );
   }
 
@@ -105,7 +108,7 @@ export default class ExpressionTransformer {
     expression: string,
     parenthesize: boolean,
     preParenthesize: boolean,
-    options: UpdateOptions = {}
+    options: UpdateOptions = {},
   ): void {
     const prevExpression = span.expression.trimEnd(),
       prefix = (preParenthesize ? `(${prevExpression})` : prevExpression) + " ",
@@ -118,7 +121,10 @@ export default class ExpressionTransformer {
       focusPosition:
         options.focusUpdateStrategy === "SPECIFIED_POSITION" &&
         options.focusPosition
-          ? prefix.length + options.focusPosition + (preParenthesize ? 1 : 0) + (parenthesize ? 1 : 0)
+          ? prefix.length +
+            options.focusPosition +
+            (preParenthesize ? 1 : 0) +
+            (parenthesize ? 1 : 0)
           : options.focusPosition,
     });
   }
@@ -144,7 +150,7 @@ export default class ExpressionTransformer {
    */
   removeAll(
     ctxs: ParserRuleContext[],
-    options: UpdateOptions = { focusUpdateStrategy: "BEFORE_UPDATE" }
+    options: UpdateOptions = { focusUpdateStrategy: "BEFORE_UPDATE" },
   ): void {
     this.applyUpdates(ctxs, "", options);
   }
@@ -155,7 +161,7 @@ export default class ExpressionTransformer {
    */
   removeAllSpans(
     spans: Span[],
-    options: UpdateOptions = { focusUpdateStrategy: "BEFORE_UPDATE" }
+    options: UpdateOptions = { focusUpdateStrategy: "BEFORE_UPDATE" },
   ): void {
     this.applyUpdatesToSpans(spans, "", options);
   }
@@ -168,7 +174,7 @@ export default class ExpressionTransformer {
   applyUpdate(
     ctx: ParserRuleContext,
     expression: string,
-    options: UpdateOptions = {}
+    options: UpdateOptions = {},
   ): void {
     this.applyUpdates([ctx], expression, options);
   }
@@ -181,7 +187,7 @@ export default class ExpressionTransformer {
   applyUpdateToSpan(
     span: Span,
     expression: string,
-    options: UpdateOptions = {}
+    options: UpdateOptions = {},
   ): void {
     this.applyUpdatesToSpans([span], expression, options);
   }
@@ -194,12 +200,12 @@ export default class ExpressionTransformer {
   applyUpdates(
     ctxs: ParserRuleContext[],
     replacement: string,
-    options: UpdateOptions = {}
+    options: UpdateOptions = {},
   ): void {
     this.applyUpdatesToSpans(
       ctxs.map((ctx) => this.spanFromContext(ctx)),
       replacement,
-      options
+      options,
     );
   }
 
@@ -218,10 +224,11 @@ export default class ExpressionTransformer {
     {
       collapseWhiteSpaceRight = false,
       collapseWhiteSpaceLeft = false,
+      preserveFirstWhiteSpace = !collapseWhiteSpaceLeft,
       reportFocusUpdate = true,
       focusUpdateStrategy = "START_OF_UPDATE",
       focusPosition,
-    }: UpdateOptions = {}
+    }: UpdateOptions = {},
   ): void {
     let cursor = 0,
       startOfUpdate: number | undefined,
@@ -232,7 +239,7 @@ export default class ExpressionTransformer {
     // Go through each of the contexts and add two things to an array:
     // - The slice since the start of the expression, or since the last context, and;
     // - The replacement expression.
-    const newExpressionParts = spans.reduce((acc: string[], span) => {
+    const newExpressionParts = spans.reduce((acc: string[], span, idx) => {
       const start = span.start,
         stop = span.stop;
 
@@ -244,7 +251,11 @@ export default class ExpressionTransformer {
 
       // Conditionally modify the whitespace at the trailing edge of the prefix expression.
       if (/\s/.test(prefix[prefix.length - 1])) {
-        prefix = prefix.trimEnd() + (collapseWhiteSpaceLeft ? "" : " ");
+        // For the first subject span, check if first white space needs to be preserved.
+        let spanCollapseWhiteSpaceLeft = idx
+          ? collapseWhiteSpaceLeft
+          : !preserveFirstWhiteSpace;
+        prefix = prefix.trimEnd() + (spanCollapseWhiteSpaceLeft ? "" : " ");
       }
 
       cursor = stop + 1;
@@ -336,6 +347,14 @@ export default class ExpressionTransformer {
     };
   }
 
+  spanFromIndices(start: number, stop: number): Span {
+    return {
+      start: start,
+      stop: stop,
+      expression: this.expression.substring(start, stop + 1),
+    };
+  }
+
   /**
    * For an expression containing any number of binary expressions (e.g. [SUBJECT] [OPERATOR]
    * [SUBJECT] [OPERATOR] [SUBJECT]), this method can tell the set expressions should be removed
@@ -343,7 +362,7 @@ export default class ExpressionTransformer {
    */
   getBinaryOperatorRemovalContext(
     ctxs: ParserRuleContext[],
-    subjectIndex: number
+    subjectIndex: number,
   ): Span[] {
     const removalContext: ParserRuleContext[] = [];
     for (let currentIndex = 0; currentIndex < ctxs.length; currentIndex++) {

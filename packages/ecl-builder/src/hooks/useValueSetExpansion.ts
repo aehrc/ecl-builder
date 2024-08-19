@@ -27,21 +27,21 @@ export const SEMANTIC_TAG_PATTERN = /\(([^)]+)\)$/;
 export default function useValueSetExpansion(
   endpoint: string,
   query: URLSearchParams,
-  options: QueryObserverOptions<ConceptSearchResult, Error> = {}
+  options: QueryObserverOptions<ConceptSearchResult, Error> = {},
 ) {
   return useQuery<ConceptSearchResult, Error>(
     ["valueSetExpansion", endpoint, query.toString()],
     () => executeValueSetExpansion(endpoint, query),
-    options
+    options,
   );
 }
 
 async function executeValueSetExpansion(
   endpoint: string,
-  query: URLSearchParams
+  query: URLSearchParams,
 ): Promise<ConceptSearchResult> {
   const response = await fetch(
-    `${endpoint}/ValueSet/$expand?${query.toString()}`
+    `${endpoint}/ValueSet/$expand?${query.toString()}`,
   );
   if (!response.ok) {
     throw await extractError(response);
@@ -65,7 +65,7 @@ async function extractError(response: Response): Promise<Error> {
       return new Error(parsedResponse.issue[0].diagnostics);
     } else {
       console.warn(
-        "Received FHIR JSON error response that was not an OperationOutcome"
+        "Received FHIR JSON error response that was not an OperationOutcome",
       );
     }
   }
@@ -73,7 +73,7 @@ async function extractError(response: Response): Promise<Error> {
 }
 
 export function extractConceptsFromValueSet(
-  valueSet: ValueSet
+  valueSet: ValueSet,
 ): ConceptSearchResult {
   if (!valueSet.expansion) {
     throw new Error("No expansion found in response");
@@ -92,7 +92,7 @@ export function extractConceptsFromValueSet(
           ?.map((d) => d.value)
           .reduce<string | undefined>(
             (prev, curr, currentIndex) => (currentIndex === 0 ? curr : prev),
-            undefined
+            undefined,
           ),
         semanticTagMatch = fullySpecifiedName?.match(SEMANTIC_TAG_PATTERN),
         semanticTag =
@@ -115,7 +115,7 @@ function checkFhirJson(response: Response): boolean {
 }
 
 function matchFullySpecifiedNameDesignation(
-  designation: ValueSetComposeIncludeConceptDesignation
+  designation: ValueSetComposeIncludeConceptDesignation,
 ): boolean {
   return (
     designation.use?.system === SCT_URI &&
@@ -124,7 +124,7 @@ function matchFullySpecifiedNameDesignation(
 }
 
 function isOperationOutcome(
-  response: Partial<OperationOutcome>
+  response: Partial<OperationOutcome>,
 ): response is OperationOutcome {
   return (
     response.resourceType === "OperationOutcome" &&

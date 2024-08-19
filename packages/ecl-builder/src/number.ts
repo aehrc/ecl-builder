@@ -11,7 +11,7 @@
  */
 export function formatNumber(
   number?: number,
-  removeFraction = false
+  removeFraction = false,
 ): string | undefined {
   const options = {
     useGrouping: true,

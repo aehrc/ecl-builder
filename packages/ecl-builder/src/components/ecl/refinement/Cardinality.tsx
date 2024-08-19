@@ -42,7 +42,7 @@ export default function Cardinality({
             ? cloneElement(child as ReactElement<FocusManagementProps>, {
                 focus,
               })
-            : null
+            : null,
         )}
       </InlineExpressionGrouping>
       <Actions

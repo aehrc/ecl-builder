@@ -26,19 +26,19 @@ export interface ConceptSearchInputProps {
  */
 function ConceptSearchInput(
   { props, selectedConcept, label, onFocus }: ConceptSearchInputProps,
-  ref: ForwardedRef<FocusRefElementType>
+  ref: ForwardedRef<FocusRefElementType>,
 ) {
   const resolvedLabel =
     selectedConcept?.type === "ANY_CONCEPT"
       ? "*"
-      : selectedConcept?.id ?? label;
+      : (selectedConcept?.id ?? label);
 
   /**
    * Provides a way of forwarding the focus to the inner text field, without discarding the
    * behaviour already required of it by the parent component.
    */
   function handleFocus(
-    event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>
+    event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
   ) {
     // eslint-disable-next-line react/prop-types
     const forwardedOnFocus = props.inputProps?.onFocus;

@@ -7,8 +7,16 @@ import { ParserRuleContext } from "antlr4";
 import { TerminalNode } from "antlr4/tree/Tree";
 import React, { ReactNode } from "react";
 import { interleave } from "../../../array";
-import { ATTRIBUTE_VALUE_SET_URI } from "../../../constants";
 import {
+  ATTRIBUTE_VALUE_SET_URI,
+  DEFAULT_CARDINALITY,
+  DEFAULT_CONCEPT,
+  DEFAULT_NUMERIC_VALUE,
+  DEFAULT_TYPED_SEARCH_TERM,
+} from "../../../constants";
+import {
+  BooleancomparisonoperatorContext,
+  BooleanvalueContext,
   CardinalityContext,
   ConjunctionContext,
   DisjunctionContext,
@@ -26,6 +34,8 @@ import {
   ReverseflagContext,
   StringcomparisonoperatorContext,
   SubexpressionconstraintContext,
+  TypedsearchtermContext,
+  TypedsearchtermsetContext,
 } from "../../../parser/src/grammar/syntax/ECLParser";
 import BaseEclVisitor from "../BaseEclVisitor";
 import CompoundVisitor from "../compound/CompoundVisitor";
@@ -37,8 +47,10 @@ import { ExpressionVisitor, VisualExpressionType } from "../ExpressionVisitor";
 import Fallback from "../Fallback";
 import { isFocused } from "../FocusProvider";
 import ConceptSearchScope from "../sub/ConceptSearchScope";
-import SubExpressionVisitor, { SubExpressionVisitorOptions } from "../sub/SubExpressionVisitor";
-import Attribute from "./Attribute";
+import SubExpressionVisitor, {
+  SubExpressionVisitorOptions,
+} from "../sub/SubExpressionVisitor";
+import Attribute, { AttributeComparisonType } from "./Attribute";
 import AttributeGroup from "./AttributeGroup";
 import AttributeSet from "./AttributeSet";
 import Cardinality from "./Cardinality";
@@ -46,6 +58,9 @@ import CardinalityVisitor from "./CardinalityVisitor";
 import ComparisonOperator from "./ComparisonOperator";
 import ConcreteValue from "./ConcreteValue";
 import RefinedExpression from "./RefinedExpression";
+import { nonNullish } from "../../../types";
+import { MenuItem } from "@mui/material";
+import TypedSearchTerm from "./TypedSearchTerm";
 
 export interface RefinementVisitorOptions extends SubExpressionVisitorOptions {
   // True if within an attribute grouping.
@@ -71,10 +86,11 @@ export const NUMERIC_COMPARISON_OPERATORS: Record<string, string> = {
 export const STRING_COMPARISON_OPERATORS: Record<string, string> = {
   "=": "=",
   "!=": "!=",
-  "<": "<",
-  "<=": "<=",
-  ">": ">",
-  ">=": ">=",
+};
+
+export const BOOLEAN_COMPARISON_OPERATORS: Record<string, string> = {
+  "=": "is",
+  "!=": "is not",
 };
 
 export default class RefinementVisitor extends BaseEclVisitor {
@@ -86,37 +102,54 @@ export default class RefinementVisitor extends BaseEclVisitor {
   }
 
   visitExpressionconstraint(
-    ctx: ExpressionconstraintContext
+    ctx: ExpressionconstraintContext,
   ): VisualExpressionType {
     return new ExpressionVisitor(this.options).visit(ctx);
   }
 
   visitRefinedexpressionconstraint(
-    ctx: RefinedexpressionconstraintContext
+    ctx: RefinedexpressionconstraintContext,
   ): VisualExpressionType {
     const removalContext = [
       this.transformer.spanFromTerminalNode(ctx.COLON()),
       this.transformer.spanFromContext(ctx.eclrefinement()),
     ];
-  
+    let preserveFirstWhiteSpace = false;
+
     // Subexpression containing the refinement expression
     const parent = this.options.parent;
     if (parent && !parent.memberof() && !parent.constraintoperator()) {
       // Remove parentheses surrounding refinement expression if subexpression does not contain a member of/constraint operator
       const parentheses = [parent.LEFT_PAREN(), parent.RIGHT_PAREN()];
-      removalContext.push(...parentheses.map(node => this.transformer.spanFromTerminalNode(node)));
+      removalContext.push(
+        ...parentheses.map((node) =>
+          this.transformer.spanFromTerminalNode(node),
+        ),
+      );
+      // Preserve first whitespace when removing parentheses.
+      preserveFirstWhiteSpace = true;
     }
 
     // Subexpression within the refinement expression
     const subCtx = ctx.subexpressionconstraint(),
       expCtx = subCtx.expressionconstraint();
     if (
-      subCtx.LEFT_PAREN() && subCtx.RIGHT_PAREN() && 
-      !subCtx.memberof() && !subCtx.constraintoperator() && !expCtx?.compoundexpressionconstraint()
+      subCtx.LEFT_PAREN() &&
+      subCtx.RIGHT_PAREN() &&
+      !subCtx.memberof() &&
+      !subCtx.constraintoperator() &&
+      !expCtx?.compoundexpressionconstraint()
     ) {
       // Remove parentheses surrounding subexpression if it does not contain a compound expression or a member of/constraint operator
-      const parentheses = [subCtx.LEFT_PAREN(), subCtx.RIGHT_PAREN()] as TerminalNode[];
-      removalContext.push(...parentheses.map(node => this.transformer.spanFromTerminalNode(node)));
+      const parentheses = [
+        subCtx.LEFT_PAREN(),
+        subCtx.RIGHT_PAREN(),
+      ] as TerminalNode[];
+      removalContext.push(
+        ...parentheses.map((node) =>
+          this.transformer.spanFromTerminalNode(node),
+        ),
+      );
     }
     removalContext.sort((a, b) => a.start - b.start);
 
@@ -131,6 +164,8 @@ export default class RefinementVisitor extends BaseEclVisitor {
         onRemove={() =>
           this.transformer.removeAllSpans(removalContext, {
             focusUpdateStrategy: "BEFORE_UPDATE",
+            collapseWhiteSpaceLeft: true,
+            preserveFirstWhiteSpace,
           })
         }
       >
@@ -140,7 +175,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
   }
 
   visitSubexpressionconstraint(
-    ctx: SubexpressionconstraintContext
+    ctx: SubexpressionconstraintContext,
   ): VisualExpressionType {
     return new SubExpressionVisitor(this.options).visit(ctx);
   }
@@ -177,16 +212,14 @@ export default class RefinementVisitor extends BaseEclVisitor {
         return visitor.renderRefinementSet(
           ctx,
           disjunctionRefinementSet.disjunction(),
-          "disjunction"
+          "disjunction",
         );
-      } else if (conjunctionRefinementSet) {
+      } else {
         return visitor.renderRefinementSet(
           ctx,
           conjunctionRefinementSet?.conjunction() ?? [],
-          "conjunction"
+          "conjunction",
         );
-      } else {
-        return this.visitChildren(ctx);
       }
     } else {
       return new RefinementVisitor({
@@ -197,31 +230,45 @@ export default class RefinementVisitor extends BaseEclVisitor {
   }
 
   visitEclattributeset(ctx: EclattributesetContext): VisualExpressionType {
-    const conjunctionAttributeSet = ctx.conjunctionattributeset(),
-      disjunctionAttributeSet = ctx.disjunctionattributeset();
-    if (disjunctionAttributeSet) {
-      return this.renderAttributeSet(
-        ctx,
-        disjunctionAttributeSet.disjunction(),
-        "disjunction"
-      );
-    } else {
-      return this.renderAttributeSet(
-        ctx,
-        conjunctionAttributeSet?.conjunction() ?? [],
-        "conjunction"
-      );
-    }
+    return this.renderAttributeSet(ctx);
   }
 
-  visitEclAttributeGroup(ctx: EclattributegroupContext): VisualExpressionType {
-    return new RefinementVisitor({
-      ...this.options,
-      removalContext: [this.transformer.spanFromContext(ctx)],
-    }).visitChildren(ctx);
+  visitEclattributegroup(ctx: EclattributegroupContext): VisualExpressionType {
+    const heading: VisualExpressionType = [ctx.cardinality()]
+      .filter(nonNullish)
+      .map((ctx: ParserRuleContext) => this.visit(ctx));
+    return this.renderAttributeSet(
+      ctx.eclattributeset(),
+      heading,
+      !!ctx.cardinality(),
+      () => this.handleAddCardinality(ctx),
+      () => this.handleRemoveCardinality(ctx),
+    );
   }
 
   visitEclattribute(ctx: EclattributeContext): VisualExpressionType {
+    let comparisonType: AttributeComparisonType,
+      start: number | undefined,
+      stop: number | undefined;
+    if (ctx.expressioncomparisonoperator()) {
+      comparisonType = "expression";
+      start = ctx.expressioncomparisonoperator()?.start.start;
+      stop = ctx.subexpressionconstraint()?.stop.stop;
+    } else if (ctx.numericcomparisonoperator()) {
+      comparisonType = "numeric";
+      start = ctx.numericcomparisonoperator()?.start.start;
+      stop = ctx.numericvalue()?.stop.stop;
+    } else if (ctx.stringcomparisonoperator()) {
+      comparisonType = "string";
+      start = ctx.stringcomparisonoperator()?.start.start;
+      stop =
+        ctx.typedsearchterm()?.stop.stop ?? ctx.typedsearchtermset()?.stop.stop;
+    } else {
+      comparisonType = "boolean";
+      start = ctx.booleancomparisonoperator()?.start.start;
+      stop = ctx.booleanvalue()?.stop.stop;
+    }
+
     return (
       <Attribute
         onRemove={
@@ -230,13 +277,72 @@ export default class RefinementVisitor extends BaseEclVisitor {
             ? () =>
                 this.transformer.removeAllSpans(this.options.removalContext, {
                   focusUpdateStrategy: "BEFORE_UPDATE",
+                  collapseWhiteSpaceLeft: true,
+                  preserveFirstWhiteSpace:
+                    this.options.removalOptions?.preserveFirstWhiteSpace,
                 })
             : undefined
         }
+        cardinality={!!ctx.cardinality()}
+        onAddCardinality={() => this.handleAddCardinality(ctx)}
+        onRemoveCardinality={() => this.handleRemoveCardinality(ctx)}
+        comparisonType={comparisonType}
+        onSelectComparisonType={(
+          newComparisonType: AttributeComparisonType,
+        ) => {
+          if (newComparisonType === comparisonType) return;
+
+          if (start === undefined || stop === undefined) return;
+          const spanToReplace = this.transformer.spanFromIndices(start, stop);
+
+          const replacement =
+            newComparisonType === "expression"
+              ? `= << ${DEFAULT_CONCEPT}`
+              : newComparisonType === "numeric"
+                ? `= #${DEFAULT_NUMERIC_VALUE}`
+                : newComparisonType === "string"
+                  ? `= "${DEFAULT_TYPED_SEARCH_TERM}"`
+                  : `= TRUE`;
+
+          this.transformer.applyUpdateToSpan(spanToReplace, replacement, {
+            focusUpdateStrategy: "END_OF_UPDATE",
+          });
+        }}
+        onAddTypedSearchTerm={() => {
+          const termSetCtx = ctx.typedsearchtermset(),
+            termCtx = ctx.typedsearchterm();
+          if (termSetCtx) {
+            // Append after last search term in set
+            const terms = termSetCtx.typedsearchterm();
+            this.transformer.append(
+              terms[terms.length - 1],
+              `"${DEFAULT_TYPED_SEARCH_TERM}"`,
+              false,
+              false,
+              {
+                focusUpdateStrategy: "END_OF_UPDATE",
+              },
+            );
+          } else if (termCtx) {
+            // Append and add parentheses
+            this.transformer.append(
+              termCtx,
+              `"${DEFAULT_TYPED_SEARCH_TERM}"`,
+              true,
+              false,
+              {
+                focusUpdateStrategy: "END_OF_UPDATE",
+              },
+            );
+          }
+        }}
       >
         {new RefinementVisitor({
           ...this.options,
+          removalOptions: undefined,
           attribute: true,
+          refinement: false,
+          set: false,
         }).visitChildren(ctx)}
       </Attribute>
     );
@@ -285,7 +391,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
   }
 
   visitExpressioncomparisonoperator(
-    ctx: ExpressioncomparisonoperatorContext
+    ctx: ExpressioncomparisonoperatorContext,
   ): VisualExpressionType {
     return (
       <ComparisonOperator
@@ -298,7 +404,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
   }
 
   visitNumericcomparisonoperator(
-    ctx: NumericcomparisonoperatorContext
+    ctx: NumericcomparisonoperatorContext,
   ): VisualExpressionType {
     return (
       <ComparisonOperator
@@ -311,7 +417,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
   }
 
   visitStringcomparisonoperator(
-    ctx: StringcomparisonoperatorContext
+    ctx: StringcomparisonoperatorContext,
   ): VisualExpressionType {
     return (
       <ComparisonOperator
@@ -323,17 +429,94 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
-  visitMatchsearchtermset(
-    ctx: MatchsearchtermsetContext
+  visitBooleancomparisonoperator(
+    ctx: BooleancomparisonoperatorContext,
   ): VisualExpressionType {
     return (
-      <ConcreteValue
-        value={ctx
-          .matchsearchterm()
-          .map((m) => m.getText())
-          .join(" ")}
+      <ComparisonOperator
+        type={ctx.getText()}
         focus={isFocused(ctx, this.options.focusPosition)}
-        onChange={(e) => this.transformer.applyUpdate(ctx, `"${e}"`)}
+        typeLabelMap={BOOLEAN_COMPARISON_OPERATORS}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+      />
+    );
+  }
+
+  visitTypedsearchtermset(
+    ctx: TypedsearchtermsetContext,
+  ): VisualExpressionType {
+    const terms = ctx.typedsearchterm();
+    if (terms.length > 1) {
+      let result: ReactNode[] = [];
+      for (let i = 0; i < terms.length; i++) {
+        const removalContext = [this.transformer.spanFromContext(terms[i])];
+        let removalOptions;
+        // Include parentheses in removal context if there are only 2 terms
+        if (terms.length < 3) {
+          const parentheses = [ctx.LEFT_PAREN(), ctx.RIGHT_PAREN()];
+          removalContext.push(
+            ...parentheses.map((node) =>
+              this.transformer.spanFromTerminalNode(node),
+            ),
+          );
+          removalContext.sort((a, b) => a.start - b.start);
+          removalOptions = { preserveFirstWhiteSpace: true };
+        }
+
+        result = result.concat(
+          new RefinementVisitor({
+            ...this.options,
+            removalContext,
+            removalOptions,
+            // Render the remove button only if the term is not the first one.
+            set: i !== 0,
+          }).visit(terms[i]),
+        );
+      }
+      result = this.addKeys(result);
+      return result;
+    } else {
+      return this.visitChildren(ctx);
+    }
+  }
+
+  visitTypedsearchterm(ctx: TypedsearchtermContext): VisualExpressionType {
+    const matchSearchTermSetCtx = ctx.matchsearchtermset(),
+      wildSearchTermSetCtx = ctx.wildsearchtermset(),
+      termSetCtx = matchSearchTermSetCtx ?? wildSearchTermSetCtx,
+      value = matchSearchTermSetCtx
+        ? matchSearchTermSetCtx
+            .matchsearchterm()
+            .map((m) => m.getText())
+            .join(" ")
+        : wildSearchTermSetCtx!.wildsearchterm().getText();
+    return (
+      <TypedSearchTerm
+        type={matchSearchTermSetCtx ? "match" : "wild"}
+        onChangeType={(newType) =>
+          this.transformer.applyUpdate(
+            ctx,
+            (newType === "wild" ? "wild:" : "") + `"${value}"`,
+          )
+        }
+        onRemove={
+          this.options.set
+            ? () =>
+                this.transformer.removeAllSpans(this.options.removalContext, {
+                  focusUpdateStrategy: "BEFORE_UPDATE",
+                  collapseWhiteSpaceLeft: true,
+                  preserveFirstWhiteSpace:
+                    this.options.removalOptions?.preserveFirstWhiteSpace,
+                })
+            : undefined
+        }
+        ConcreteValueProps={{
+          value,
+          focus:
+            !!termSetCtx && isFocused(termSetCtx, this.options.focusPosition),
+          onChange: (e) =>
+            termSetCtx && this.transformer.applyUpdate(termSetCtx, `"${e}"`),
+        }}
       />
     );
   }
@@ -350,13 +533,49 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  visitBooleanvalue(ctx: BooleanvalueContext): VisualExpressionType {
+    return (
+      <ConcreteValue
+        value={ctx.getText()}
+        onChange={(e) => this.transformer.applyUpdate(ctx, e)}
+        props={{
+          select: true,
+          SelectProps: {
+            MenuProps: { disablePortal: true },
+            SelectDisplayProps: {
+              style: {
+                height: "auto",
+                lineHeight: "initial",
+                padding: "16.5px 14px",
+              },
+            },
+          },
+        }}
+        focus={isFocused(ctx, this.options.focusPosition)}
+      >
+        {["TRUE", "FALSE"].map((option) => (
+          <MenuItem key={option} value={option}>
+            {option}
+          </MenuItem>
+        ))}
+      </ConcreteValue>
+    );
+  }
+
   renderAttributeSet(
     ctx: EclattributesetContext,
-    operatorCtx: ParserRuleContext[],
-    type: LogicStatementType
+    heading?: React.ReactNode,
+    cardinality?: boolean,
+    onAddCardinality?: () => unknown,
+    onRemoveCardinality?: () => unknown,
   ): VisualExpressionType {
+    const conjunctionAttributeSet = ctx.conjunctionattributeset(),
+      disjunctionAttributeSet = ctx.disjunctionattributeset();
+    const operatorCtx = disjunctionAttributeSet
+      ? disjunctionAttributeSet.disjunction()
+      : (conjunctionAttributeSet?.conjunction() ?? []);
     const logicalAttributeSet =
-      ctx.conjunctionattributeset() ?? ctx.disjunctionattributeset();
+      conjunctionAttributeSet ?? disjunctionAttributeSet;
     const subAttributeSets = [
       ctx.subattributeset(),
       ...(logicalAttributeSet?.subattributeset() ?? []),
@@ -364,16 +583,17 @@ export default class RefinementVisitor extends BaseEclVisitor {
     const children = this.renderBinaryOperatorChildren(
       ctx,
       subAttributeSets,
-      operatorCtx
+      operatorCtx,
     );
     return (
       <AttributeSet
-        type={type}
+        heading={heading}
+        type={disjunctionAttributeSet ? "disjunction" : "conjunction"}
         hideAddGroup={this.options.attributeGrouping}
         onChangeType={(type) =>
           this.transformer.applyUpdates(
             operatorCtx,
-            logicStatementTypeToOperator[type]
+            logicStatementTypeToOperator[type],
           )
         }
         onAddAttribute={(expression, focusPosition) =>
@@ -385,8 +605,14 @@ export default class RefinementVisitor extends BaseEclVisitor {
         onRemove={() =>
           this.transformer.removeAllSpans(this.options.removalContext, {
             focusUpdateStrategy: "BEFORE_UPDATE",
+            collapseWhiteSpaceLeft: true,
+            preserveFirstWhiteSpace:
+              this.options.removalOptions?.preserveFirstWhiteSpace,
           })
         }
+        cardinality={cardinality}
+        onAddCardinality={onAddCardinality}
+        onRemoveCardinality={onRemoveCardinality}
       >
         {children}
       </AttributeSet>
@@ -396,7 +622,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
   renderRefinementSet(
     ctx: EclrefinementContext,
     operatorCtx: ParserRuleContext[],
-    type: LogicStatementType
+    type: LogicStatementType,
   ): VisualExpressionType {
     const logicalRefinementSet =
       ctx.conjunctionrefinementset() ?? ctx.disjunctionrefinementset();
@@ -407,7 +633,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
     const children = this.renderBinaryOperatorChildren(
       ctx,
       subRefinementSets,
-      operatorCtx
+      operatorCtx,
     );
     return (
       <AttributeGroup
@@ -415,7 +641,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
         onChangeType={(type) =>
           this.transformer.applyUpdates(
             operatorCtx,
-            logicStatementTypeToOperator[type]
+            logicStatementTypeToOperator[type],
           )
         }
         onAddAttribute={(expression, focusPosition) =>
@@ -433,7 +659,7 @@ export default class RefinementVisitor extends BaseEclVisitor {
   private renderBinaryOperatorChildren(
     ctx: ParserRuleContext,
     subCtxs: ParserRuleContext[],
-    operatorCtx: ParserRuleContext[]
+    operatorCtx: ParserRuleContext[],
   ) {
     if (subCtxs.length > 1) {
       const children = interleave(subCtxs, operatorCtx);
@@ -441,21 +667,57 @@ export default class RefinementVisitor extends BaseEclVisitor {
       for (let i = 0; i < children.length; i++) {
         const removalContext = this.transformer.getBinaryOperatorRemovalContext(
           children,
-          i
+          i,
         );
+        // Preserve the first white space if child is not the last in the set
+        const removalOptions = {
+          preserveFirstWhiteSpace:
+            i !== children.length - 1 || !this.options.set,
+        };
         result = result.concat(
           new RefinementVisitor({
             ...this.options,
             removalContext,
+            removalOptions,
             // Render the remove button only if the child is not the first one.
             set: i !== 0,
-          }).visit(children[i])
+          }).visit(children[i]),
         );
         result = this.addKeys(result);
       }
       return result;
     } else {
       return this.visitChildren(ctx);
+    }
+  }
+
+  private handleAddCardinality(ctx: ParserRuleContext) {
+    this.transformer.prependToSpan(
+      this.transformer.spanFromContext(ctx),
+      `[${DEFAULT_CARDINALITY}]`,
+      false,
+      false,
+    );
+  }
+
+  private handleRemoveCardinality(
+    ctx: EclattributeContext | EclattributegroupContext,
+  ) {
+    const cardinality = ctx.cardinality(),
+      LEFT_BRACE = ctx.LEFT_BRACE(),
+      RIGHT_BRACE = ctx.RIGHT_BRACE();
+    if (cardinality && LEFT_BRACE && RIGHT_BRACE) {
+      const removalContext = [
+        this.transformer.spanFromTerminalNode(LEFT_BRACE),
+        this.transformer.spanFromContext(cardinality),
+        this.transformer.spanFromTerminalNode(RIGHT_BRACE),
+      ];
+      this.transformer.removeAllSpans(removalContext, {
+        collapseWhiteSpaceRight: true,
+        focusUpdateStrategy: "AFTER_UPDATE",
+      });
+    } else {
+      console.warn("Attempted to remove cardinality, no cardinality available");
     }
   }
 }

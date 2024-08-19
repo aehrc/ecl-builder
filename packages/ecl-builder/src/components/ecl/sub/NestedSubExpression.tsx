@@ -19,14 +19,15 @@ export default function NestedSubExpression(props: NestedSubExpressionProps) {
     { SubExpressionActions } = useSubExpression(props);
 
   function renderHeading() {
+    const result = Children.toArray(heading).concat(
+      <InlineExpressionGrouping>
+        matching the following expression
+      </InlineExpressionGrouping>,
+      <SubExpressionActions key="actions" />,
+    );
     return (
       <NeatRow className="sub-expression-heading">
-        {Children.toArray(heading).concat(
-          <InlineExpressionGrouping>
-            matching the following expression
-          </InlineExpressionGrouping>,
-          <SubExpressionActions key="actions" />
-        )}
+        {Children.toArray(result)}
       </NeatRow>
     );
   }

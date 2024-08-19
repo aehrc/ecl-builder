@@ -5,7 +5,11 @@ import ExpressionResult from "../components/ExpressionResult";
 
 const theme = createTheme();
 
-export default function BuilderAndResult({ expression }: { expression?: string }) {
+export default function BuilderAndResult({
+  expression,
+}: {
+  expression?: string;
+}) {
   const [currentExpression, setCurrentExpression] = useState<
     string | undefined
   >(expression);

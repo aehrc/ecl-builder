@@ -64,7 +64,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   }
 
   visitExpressionconstraint(
-    ctx: ExpressionconstraintContext
+    ctx: ExpressionconstraintContext,
   ): VisualExpressionType {
     const parent = this.options.parent;
     const compoundExpression = ctx.compoundexpressionconstraint(),
@@ -73,13 +73,15 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
       // If the expression contains a refinement expression or a compound expression, we skip the
       // rendering of the grouping as these expression types already render as a grouping.
       !!compoundExpression ||
-      (!!refinementExpression && !parent?.memberof() && !parent?.constraintoperator())
+      (!!refinementExpression &&
+        !parent?.memberof() &&
+        !parent?.constraintoperator())
     ) {
       return this.visitChildren(ctx);
     }
     if (!parent) {
       throw new Error(
-        "Visited nested expression within sub-expression without parent being set"
+        "Visited nested expression within sub-expression without parent being set",
       );
     }
     const heading: VisualExpressionType = [
@@ -99,19 +101,29 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
           this.handleAddConstraint(
             memberOf
               ? this.transformer.spanFromContext(memberOf)
-              : this.transformer.spanFromTerminalNode(parent.LEFT_PAREN())
+              : this.transformer.spanFromTerminalNode(parent.LEFT_PAREN()),
           );
         }}
-        onRemoveConstraint={() => this.handleRemoveConstraint(parent, !refinementExpression && !parent.memberof())}
+        onRemoveConstraint={() =>
+          this.handleRemoveConstraint(
+            parent,
+            !refinementExpression && !parent.memberof(),
+          )
+        }
         onAddMemberOf={() => {
           const leftSurroundingParenthesis = parent.LEFT_PAREN();
           if (leftSurroundingParenthesis) {
             this.handleAddMemberOf(
-              this.transformer.spanFromTerminalNode(leftSurroundingParenthesis)
+              this.transformer.spanFromTerminalNode(leftSurroundingParenthesis),
             );
           }
         }}
-        onRemoveMemberOf={() => this.handleRemoveMemberOf(parent, !refinementExpression && !parent.constraintoperator())}
+        onRemoveMemberOf={() =>
+          this.handleRemoveMemberOf(
+            parent,
+            !refinementExpression && !parent.constraintoperator(),
+          )
+        }
         onRemoveRefinement={() => this.handleRemoveRefinement()}
         onAddLogicStatement={(expression, focusPosition) =>
           this.handleAddLogicStatement(ctx, expression, focusPosition)
@@ -120,7 +132,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
           this.handleAddRefinement(
             this.transformer.spanFromContext(parent),
             e,
-            this.options.compound
+            this.options.compound,
           )
         }
       >
@@ -130,19 +142,19 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   }
 
   visitRefinedexpressionconstraint(
-    ctx: RefinedexpressionconstraintContext
+    ctx: RefinedexpressionconstraintContext,
   ): VisualExpressionType {
     return new RefinementVisitor(this.options).visit(ctx);
   }
 
   visitCompoundexpressionconstraint(
-    ctx: CompoundexpressionconstraintContext
+    ctx: CompoundexpressionconstraintContext,
   ): VisualExpressionType {
     return new CompoundVisitor(this.options).visit(ctx);
   }
 
   visitSubexpressionconstraint(
-    ctx: SubexpressionconstraintContext
+    ctx: SubexpressionconstraintContext,
   ): VisualExpressionType {
     // If the expression contains a nested expression, we render it differently using a grouping.
     // The expression constraint visitor method within this class handles this alternate rendering.
@@ -166,24 +178,20 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
             const eclFocusConcept = ctx.eclfocusconcept();
             if (eclFocusConcept) {
               this.handleAddMemberOf(
-                this.transformer.spanFromContext(eclFocusConcept)
+                this.transformer.spanFromContext(eclFocusConcept),
               );
             }
           }}
           onRemoveMemberOf={() => this.handleRemoveMemberOf(ctx)}
           onRemoveRefinement={() => this.handleRemoveRefinement()}
           onAddLogicStatement={(expression, focusPosition) =>
-            this.handleAddLogicStatement(
-              ctx,
-              expression,
-              focusPosition
-            )
+            this.handleAddLogicStatement(ctx, expression, focusPosition)
           }
           onAddRefinement={(e) =>
             this.handleAddRefinement(
               this.transformer.spanFromContext(ctx),
               e,
-              this.options.attribute || this.options.compound
+              this.options.attribute || this.options.compound,
             )
           }
         >
@@ -214,7 +222,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   }
 
   visitEclconceptreference(
-    ctx: EclconceptreferenceContext
+    ctx: EclconceptreferenceContext,
   ): VisualExpressionType {
     return (
       <ConceptReference
@@ -239,7 +247,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   }
 
   visitConstraintoperator(
-    ctx: ConstraintoperatorContext
+    ctx: ConstraintoperatorContext,
   ): VisualExpressionType {
     return (
       <ConstraintOperator
@@ -251,7 +259,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   }
 
   visitDescriptionfilterconstraint(
-    ctx: DescriptionfilterconstraintContext
+    ctx: DescriptionfilterconstraintContext,
   ): VisualExpressionType {
     return (
       <Fallback
@@ -264,7 +272,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   }
 
   visitConceptfilterconstraint(
-    ctx: ConceptfilterconstraintContext
+    ctx: ConceptfilterconstraintContext,
   ): VisualExpressionType {
     return (
       <Fallback
@@ -277,7 +285,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   }
 
   visitMemberfilterconstraint(
-    ctx: MemberfilterconstraintContext
+    ctx: MemberfilterconstraintContext,
   ): VisualExpressionType {
     return (
       <Fallback
@@ -305,14 +313,19 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
       prependSubject,
       constraintNameToOperator["descendantorselfof"],
       false,
-      false
+      false,
     );
   }
 
-  private handleRemoveConstraint(ctx: SubexpressionconstraintContext, removeParentheses = false) {
+  private handleRemoveConstraint(
+    ctx: SubexpressionconstraintContext,
+    removeParentheses = false,
+  ) {
     const constraintOperator = ctx.constraintoperator();
     if (constraintOperator) {
-      let removalContext = [this.transformer.spanFromContext(constraintOperator)];
+      let removalContext = [
+        this.transformer.spanFromContext(constraintOperator),
+      ];
       if (removeParentheses) {
         removalContext = this.appendSurroundingParentheses(removalContext);
       }
@@ -326,12 +339,21 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   }
 
   private handleAddMemberOf(prependSubject: Span): void {
-    this.transformer.prependToSpan(prependSubject, MEMBER_OF_OPERATOR, false, false, {
-      focusUpdateStrategy: "END_OF_UPDATE",
-    });
+    this.transformer.prependToSpan(
+      prependSubject,
+      MEMBER_OF_OPERATOR,
+      false,
+      false,
+      {
+        focusUpdateStrategy: "END_OF_UPDATE",
+      },
+    );
   }
 
-  private handleRemoveMemberOf(ctx: SubexpressionconstraintContext, removeParentheses = false) {
+  private handleRemoveMemberOf(
+    ctx: SubexpressionconstraintContext,
+    removeParentheses = false,
+  ) {
     const memberOf = ctx.memberof();
     if (memberOf) {
       let removalContext = [this.transformer.spanFromContext(memberOf)];
@@ -344,7 +366,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
       });
     } else {
       console.warn(
-        "Attempted to remove member of operator, no member of operator found"
+        "Attempted to remove member of operator, no member of operator found",
       );
     }
   }
@@ -356,7 +378,7 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
   private handleAddLogicStatement(
     ctx: ParserRuleContext,
     expression: string,
-    focusPosition: number
+    focusPosition: number,
   ) {
     this.transformer.append(ctx, expression, true, false, {
       focusUpdateStrategy: "SPECIFIED_POSITION",
@@ -375,7 +397,11 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     const parent = this.options.parent;
     if (parent) {
       const parentheses = [parent.LEFT_PAREN(), parent.RIGHT_PAREN()];
-      removalContext.push(...parentheses.map(node => this.transformer.spanFromTerminalNode(node)));
+      removalContext.push(
+        ...parentheses.map((node) =>
+          this.transformer.spanFromTerminalNode(node),
+        ),
+      );
       removalContext.sort((a, b) => a.start - b.start);
     }
     return removalContext;

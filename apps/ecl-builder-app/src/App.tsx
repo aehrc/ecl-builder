@@ -19,8 +19,9 @@ theme = createTheme(theme, {
 });
 
 function App() {
-  const [currentExpression, setCurrentExpression] =
-    useState<string | undefined>(undefined);
+  const [currentExpression, setCurrentExpression] = useState<
+    string | undefined
+  >(undefined);
 
   return (
     <ThemeProvider theme={theme}>

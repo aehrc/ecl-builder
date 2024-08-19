@@ -253,7 +253,12 @@ export class SubattributesetContext extends ParserRuleContext {}
  * eclattributegroup : (LEFT_BRACE cardinality RIGHT_BRACE ws)? LEFT_CURLY_BRACE ws eclattributeset
  * ws RIGHT_CURLY_BRACE;
  */
-export class EclattributegroupContext extends ParserRuleContext {}
+export class EclattributegroupContext extends ParserRuleContext {
+  cardinality(): CardinalityContext | null | undefined;
+  eclattributeset(): EclattributesetContext;
+  LEFT_BRACE(): TerminalNode | null | undefined;
+  RIGHT_BRACE(): TerminalNode | null | undefined;
+}
 
 /**
  * eclattribute : (LEFT_BRACE cardinality RIGHT_BRACE ws)? (reverseflag ws)? eclattributename ws
@@ -261,7 +266,32 @@ export class EclattributegroupContext extends ParserRuleContext {}
  * numericvalue) | (stringcomparisonoperator ws (typedsearchterm | typedsearchtermset)) |
  * (booleancomparisonoperator ws booleanvalue));
  */
-export class EclattributeContext extends ParserRuleContext {}
+export class EclattributeContext extends ParserRuleContext {
+  cardinality(): CardinalityContext | null | undefined;
+  LEFT_BRACE(): TerminalNode | null | undefined;
+  RIGHT_BRACE(): TerminalNode | null | undefined;
+  expressioncomparisonoperator():
+    | ExpressioncomparisonoperatorContext
+    | null
+    | undefined;
+  subexpressionconstraint(): SubexpressionconstraintContext | null | undefined;
+  numericcomparisonoperator():
+    | NumericcomparisonoperatorContext
+    | null
+    | undefined;
+  numericvalue(): NumericvalueContext | null | undefined;
+  stringcomparisonoperator():
+    | StringcomparisonoperatorContext
+    | null
+    | undefined;
+  typedsearchterm(): TypedsearchtermContext | null | undefined;
+  typedsearchtermset(): TypedsearchtermsetContext | null | undefined;
+  booleancomparisonoperator():
+    | BooleancomparisonoperatorContext
+    | null
+    | undefined;
+  booleanvalue(): BooleanvalueContext | null | undefined;
+}
 
 /**
  * cardinality : minvalue to maxvalue;
@@ -323,11 +353,33 @@ export class NumericcomparisonoperatorContext extends ParserRuleContext {}
 export class StringcomparisonoperatorContext extends ParserRuleContext {}
 
 /**
+ * booleancomparisonoperator : EQUALS | (EXCLAMATION EQUALS);
+ */
+export class BooleancomparisonoperatorContext extends ParserRuleContext {}
+
+/**
  * descriptionfilterconstraint : (LEFT_CURLY_BRACE LEFT_CURLY_BRACE) ws
  * ( (CAP_D | D) | (CAP_D | D) )? ws descriptionfilter (ws COMMA ws descriptionfilter)* ws
  * (RIGHT_CURLY_BRACE RIGHT_CURLY_BRACE);
  */
 export class DescriptionfilterconstraintContext extends ParserRuleContext {}
+
+/**
+ * typedsearchterm : ( ( matchkeyword ws COLON ws )? matchsearchtermset ) | ( wild ws COLON ws wildsearchtermset );
+ */
+export class TypedsearchtermContext extends ParserRuleContext {
+  matchsearchtermset(): MatchsearchtermsetContext | null | undefined;
+  wildsearchtermset(): WildsearchtermsetContext | null | undefined;
+}
+
+/**
+ * typedsearchtermset : LEFT_PAREN ws typedsearchterm (mws typedsearchterm)* ws RIGHT_PAREN;
+ */
+export class TypedsearchtermsetContext extends ParserRuleContext {
+  typedsearchterm(): TypedsearchtermContext[];
+  LEFT_PAREN(): TerminalNode;
+  RIGHT_PAREN(): TerminalNode;
+}
 
 /**
  * matchsearchterm : (nonwsnonescapedchar | escapedchar)+;
@@ -339,6 +391,18 @@ export class MatchsearchtermContext extends ParserRuleContext {}
  */
 export class MatchsearchtermsetContext extends ParserRuleContext {
   matchsearchterm(): MatchsearchtermContext[];
+}
+
+/**
+ * wildsearchterm : (anynonescapedchar | escapedwildchar)+;
+ */
+export class WildsearchtermContext extends ParserRuleContext {}
+
+/**
+ * wildsearchtermset : qm wildsearchterm qm;
+ */
+export class WildsearchtermsetContext extends ParserRuleContext {
+  wildsearchterm(): WildsearchtermContext;
 }
 
 /**
@@ -363,6 +427,11 @@ export class HistorysupplementContext extends ParserRuleContext {}
  * numericvalue : (DASH|PLUS)? (decimalvalue | integervalue);
  */
 export class NumericvalueContext extends ParserRuleContext {}
+
+/**
+ * booleanvalue : true_1 | false_1;
+ */
+export class BooleanvalueContext extends ParserRuleContext {}
 
 /**
  * nonnegativeintegervalue : (digitnonzero digit* ) | zero;

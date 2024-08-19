@@ -13,7 +13,7 @@ import { queryClient } from "../queryClient";
 
 export default {
   component: ConceptReference,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: { onChange: { action: "changed" } },
   decorators: [
     (Story: StoryFn) => (

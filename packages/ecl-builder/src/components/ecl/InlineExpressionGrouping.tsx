@@ -26,14 +26,14 @@ export default function InlineExpressionGrouping({
       direction="row"
       sx={{
         backgroundColor: "background.paper",
-        color: 'text.primary',
+        color: "text.primary",
         p: "16px",
         userSelect: "none",
         fontSize: "0.95em",
         whiteSpace: "nowrap",
         alignSelf: "stretch",
         flexGrow: 1,
-        alignItems: 'center',
+        alignItems: "center",
         gap: "4px",
         ...sx,
       }}

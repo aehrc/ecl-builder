@@ -12,6 +12,6 @@ export function interleave<T>(...inputs: T[][]): T[] {
     {
       length: Math.max(...inputs.map((i) => i.length)),
     },
-    (_, i) => inputs.reduce((acc, r) => (r[i] ? acc.concat(r[i]) : acc), [])
+    (_, i) => inputs.reduce((acc, r) => (r[i] ? acc.concat(r[i]) : acc), []),
   ).flat();
 }

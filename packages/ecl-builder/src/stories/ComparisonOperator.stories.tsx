@@ -12,7 +12,7 @@ import { EXPRESSION_COMPARISON_OPERATORS } from "../components/ecl/refinement/Re
 
 export default {
   component: ComparisonOperator,
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: { onChange: { action: "changed" } },
 };
 
@@ -28,9 +28,8 @@ const Template = ({
   />
 );
 
-export const IsEqualTo: StoryFn<typeof ComparisonOperator> =
-  Template.bind({});
-  IsEqualTo.args = {
+export const IsEqualTo: StoryFn<typeof ComparisonOperator> = Template.bind({});
+IsEqualTo.args = {
   type: "=",
   typeLabelMap: EXPRESSION_COMPARISON_OPERATORS,
 };

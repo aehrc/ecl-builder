@@ -67,7 +67,7 @@ export function useFocus(focus?: boolean): FocusRefType | undefined {
  */
 export function isFocused(
   ctx: ParserRuleContext,
-  focusPosition: number | undefined
+  focusPosition: number | undefined,
 ): boolean {
   if (focusPosition === undefined) {
     return false;

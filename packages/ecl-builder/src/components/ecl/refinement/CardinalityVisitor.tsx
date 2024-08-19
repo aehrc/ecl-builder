@@ -44,7 +44,7 @@ export default class CardinalityVisitor extends BaseEclVisitor {
   }
 
   visitNonnegativeintegervalue(
-    ctx: NonnegativeintegervalueContext
+    ctx: NonnegativeintegervalueContext,
   ): VisualExpressionType {
     return (
       <NonNegativeIntegerValue

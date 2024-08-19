@@ -16,7 +16,7 @@ export default function CopyValueSet({ expression }: CopyValueSetProps) {
   const valueSetUri = useMemo(
     () =>
       `http://snomed.info/sct?fhir_vs=ecl/${encodeURIComponent(expression)}`,
-    [expression]
+    [expression],
   );
   return (
     <CopyToClipboard text={valueSetUri}>

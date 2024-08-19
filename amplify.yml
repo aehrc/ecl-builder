@@ -13,7 +13,7 @@ applications:
       artifacts:
         baseDirectory: apps/ecl-builder-app/build
         files:
-          - '**/*'
+          - "**/*"
       cache:
         paths:
           - node_modules/**/*

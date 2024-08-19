@@ -13,7 +13,7 @@ export default class ExpressionParserErrorListener implements ErrorListener {
     offendingSymbol: Token,
     line: number,
     column: number,
-    msg: string
+    msg: string,
   ) {
     throw new Error(`Syntax error at line ${line}, column ${column}: ${msg}`);
   }

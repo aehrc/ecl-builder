@@ -3,7 +3,7 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
-import { Autocomplete, TextFieldProps } from "@mui/material";
+import { Autocomplete, LinearProgress, TextFieldProps } from "@mui/material";
 import React, {
   HTMLAttributes,
   Key,
@@ -65,20 +65,27 @@ export default function ConceptReference({
   sx,
   onChange,
 }: ConceptReferenceProps) {
-  const { terminologyServerUrl, maxSearchResults, minQueryLength } =
-      useContext(OptionsContext),
+  const {
+      terminologyServerUrl,
+      systemVersion,
+      maxSearchResults,
+      minQueryLength,
+    } = useContext(OptionsContext),
     { valueSet, label } = useContext(ConceptSearchScope),
-    [selectedConcept, setSelectedConcept] =
-      useState<ConceptReferenceOptionType | undefined>(concept),
-    [selectedConceptOption, setSelectedConceptOption] =
-      useState<ConceptReferenceOptionType | undefined>(concept),
+    [selectedConcept, setSelectedConcept] = useState<
+      ConceptReferenceOptionType | undefined
+    >(concept),
+    [selectedConceptOption, setSelectedConceptOption] = useState<
+      ConceptReferenceOptionType | undefined
+    >(concept),
     [searchQuery, setSearchQuery] = useState(""),
-    { data, isLoading, remove } = useConceptSearch(
+    { data, isLoading, isFetching, remove } = useConceptSearch(
       terminologyServerUrl,
       valueSet,
+      systemVersion?.trim() ?? "",
       searchQuery,
       maxSearchResults,
-      minQueryLength
+      minQueryLength,
     ),
     focusRef = useFocus(focus),
     searchResults = getSearchResults(),
@@ -94,7 +101,7 @@ export default function ConceptReference({
         type: "SPECIFIC_CONCEPT",
       }));
       return map.filter(
-        (c) => !selectedConcept || !isOptionEqualToValue(c, selectedConcept)
+        (c) => !selectedConcept || !isOptionEqualToValue(c, selectedConcept),
       );
     } else {
       return [];
@@ -103,30 +110,27 @@ export default function ConceptReference({
 
   useEffect(() => {
     setSelectedConceptOption(selectedConcept);
-  }, [selectedConcept])
+  }, [selectedConcept]);
 
   // Update the selected concept option with semantic tag if available from search results
   useEffect(() => {
-    setSelectedConceptOption(sc => {
-      if (
-        sc && 
-        sc.type === "SPECIFIC_CONCEPT" && 
-        data?.concepts
-      ) {
+    setSelectedConceptOption((sc) => {
+      if (sc && sc.type === "SPECIFIC_CONCEPT" && data?.concepts) {
         const map: ConceptSearchOption[] = data.concepts.map((c) => ({
           ...c,
           type: "SPECIFIC_CONCEPT",
         }));
-  
-        const result = map.find(c => isOptionEqualToValue(c, sc));
-        if (result && result.semanticTag) return ({
-          ...sc, 
-          semanticTag: result.semanticTag
-        });
+
+        const result = map.find((c) => isOptionEqualToValue(c, sc));
+        if (result && result.semanticTag)
+          return {
+            ...sc,
+            semanticTag: result.semanticTag,
+          };
       }
       return sc;
-    })
-  }, [data?.concepts])
+    });
+  }, [data?.concepts]);
 
   /**
    * Get the full set of options, including "any concept" and the currently selected concept.
@@ -141,7 +145,7 @@ export default function ConceptReference({
 
   function handleInputChange(
     event: SyntheticEvent<Element, Event> | null,
-    value: string
+    value: string,
   ): void {
     // A change to the value of the input updates the query sent to the
     // terminology server.
@@ -156,7 +160,7 @@ export default function ConceptReference({
 
   function handleSelectConcept(
     event: SyntheticEvent,
-    newConcept: ConceptReferenceOptionType | null
+    newConcept: ConceptReferenceOptionType | null,
   ): void {
     setSelectedConcept(newConcept ?? undefined);
     setSearchQuery("");
@@ -171,7 +175,7 @@ export default function ConceptReference({
     // eslint-disable-next-line @typescript-eslint/ban-types
     props: HTMLAttributes<HTMLLIElement> & { key?: Key },
     option: ConceptReferenceOptionType,
-    { selected }: { selected?: boolean }
+    { selected }: { selected?: boolean },
   ): ReactNode {
     const key = option.type === "ANY_CONCEPT" ? option.type : option.id;
     if (selected) {
@@ -205,6 +209,27 @@ export default function ConceptReference({
     );
   }
 
+  const ListboxComponent = React.forwardRef<
+    HTMLUListElement,
+    React.HTMLAttributes<HTMLElement>
+  >((props, ref) => {
+    const { children, ...other } = props;
+    return (
+      <ul {...other} role="listbox" ref={ref} style={{ paddingTop: "4px" }}>
+        <li>
+          <LinearProgress
+            sx={{
+              height: "4px",
+              marginTop: 0,
+              visibility: isFetching ? "visible" : "hidden",
+            }}
+          />
+        </li>
+        {children}
+      </ul>
+    );
+  });
+
   return (
     <Autocomplete
       className="concept-reference"
@@ -220,6 +245,7 @@ export default function ConceptReference({
       onChange={handleSelectConcept}
       onClose={remove}
       loading={isLoading}
+      ListboxComponent={ListboxComponent}
     />
   );
 }
@@ -260,7 +286,7 @@ function getInputLabelForOption(option: ConceptReferenceOptionType): string {
  */
 function isOptionEqualToValue(
   option: ConceptReferenceOptionType,
-  value: ConceptReferenceOptionType
+  value: ConceptReferenceOptionType,
 ) {
   if (option.type === "ANY_CONCEPT" && value.type === "ANY_CONCEPT") {
     return true;
