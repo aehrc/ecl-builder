@@ -48,7 +48,7 @@ export default function ExpressionResult({
   const resolvedOptions = applyDefaultOptions(options);
   return (
     <QueryClientProvider client={queryClient}>
-      <ErrorBoundary>
+      <ErrorBoundary resetKey={expression}>
         <DelayedLoading delay={resolvedOptions.loadingDelay}>
           <ExpressionResultContent
             expression={expression}
