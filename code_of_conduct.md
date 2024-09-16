@@ -1,4 +1,4 @@
-# Code of Conduct - Snomio
+# Code of Conduct
 
 ## Our Pledge
 
