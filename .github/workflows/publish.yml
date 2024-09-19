@@ -33,5 +33,5 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           scope: ''
           token: ${{ secrets.NPM_TOKEN }}
-      - run: npm ci -w packages/ecl-builder
+      - run: npm ci -w packages/ecl-builder --access public
       - run: npm publish -w packages/ecl-builder
