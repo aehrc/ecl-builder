@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 18
           registry-url: 'https://registry.npmjs.org'
-          scope: ''
-          token: ${{ secrets.NPM_TOKEN }}
       - run: npm ci -w packages/ecl-builder
       - run: npm publish -w packages/ecl-builder
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
