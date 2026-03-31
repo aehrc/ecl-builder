@@ -27,6 +27,10 @@ export default class ErrorBoundary extends Component<
     return { error };
   }
 
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("[ecl-builder] Error caught by ErrorBoundary:", error, errorInfo.componentStack);
+  }
+
   componentDidUpdate(prevProps: ErrorBoundaryProps) {
     if (prevProps.resetKey !== this.props.resetKey) {
       // Reset error when key changes

@@ -44,6 +44,7 @@ function App() {
           <ExpressionBuilder
             expression={currentExpression}
             onChange={setCurrentExpression}
+            options={{ eclEditor: true }}
           />
         </Box>
         {currentExpression ? (

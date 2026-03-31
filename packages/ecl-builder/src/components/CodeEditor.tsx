@@ -6,17 +6,17 @@
 import { TextField } from "@mui/material";
 import React from "react";
 
-interface Props {
+export interface CodeEditorProps {
   expression: string;
   onChange: (expression: string) => unknown;
 }
 
 /**
- * An editor for manipulating the expression in its raw ECL form.
+ * A basic editor for manipulating the expression in its raw ECL form.
  *
  * @author John Grimes
  */
-export default function CodeEditor({ expression, onChange }: Props) {
+export default function CodeEditor({ expression, onChange }: CodeEditorProps) {
   return (
     <TextField
       className="code-editor"
