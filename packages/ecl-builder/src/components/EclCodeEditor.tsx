@@ -4,6 +4,7 @@
  */
 
 import { EclEditor } from "@aehrc/ecl-editor-react";
+import { useTheme } from "@mui/material";
 import React, { useContext } from "react";
 import type { CodeEditorProps } from "./CodeEditor";
 import { OptionsContext } from "./ExpressionBuilder";
@@ -22,6 +23,8 @@ export default function EclCodeEditor({
   onDiagnosticsChange,
 }: CodeEditorProps) {
   const options = useContext(OptionsContext);
+  const muiTheme = useTheme();
+  const monacoTheme = muiTheme.palette.mode === "dark" ? "vs-dark" : "vs";
 
   return (
     <EclEditor
@@ -30,6 +33,7 @@ export default function EclCodeEditor({
       onDiagnostics={onDiagnosticsChange}
       fhirServerUrl={options.terminologyServerUrl}
       snomedVersion={options.systemVersion}
+      theme={monacoTheme}
       height="300px"
       minimap={false}
       lineNumbers={false}
