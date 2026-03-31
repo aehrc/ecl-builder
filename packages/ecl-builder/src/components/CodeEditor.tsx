@@ -5,10 +5,12 @@
 
 import { TextField } from "@mui/material";
 import React from "react";
+import type { ExpressionDiagnostic } from "../types";
 
 export interface CodeEditorProps {
   expression: string;
   onChange: (expression: string) => unknown;
+  onDiagnosticsChange?: (diagnostics: ExpressionDiagnostic[]) => void;
 }
 
 /**

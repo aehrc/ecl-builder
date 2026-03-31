@@ -19,6 +19,7 @@ import { OptionsContext } from "./ExpressionBuilder";
 export default function EclCodeEditor({
   expression,
   onChange,
+  onDiagnosticsChange,
 }: CodeEditorProps) {
   const options = useContext(OptionsContext);
 
@@ -26,6 +27,7 @@ export default function EclCodeEditor({
     <EclEditor
       value={expression}
       onChange={onChange}
+      onDiagnostics={onDiagnosticsChange}
       fhirServerUrl={options.terminologyServerUrl}
       snomedVersion={options.systemVersion}
       height="300px"

@@ -13,19 +13,25 @@ import {
 import { QueryClientProvider } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { SCT_URI } from "../constants";
+import type { ExpressionDiagnostic } from "../types";
 import useValueSetExpansion from "../hooks/useValueSetExpansion";
 import { formatNumber } from "../number";
 import { queryClient } from "../queryClient";
-import DelayedLoading from "./DelayedLoading";
 import ErrorBoundary from "./ErrorBoundary";
+import Loading from "./Loading";
 import ExpressionResultTable from "./ExpressionResultTable";
 import IncludeInactives from "./IncludeInactives";
+
+export type { ExpressionDiagnostic } from "../types";
 
 export interface ResultProps {
   // The expression to display results for.
   expression: string;
   // A set of options that control the behaviour of the component.
   options?: Partial<ExpressionResultOptions>;
+  // Diagnostics from the ECL editor. When errors are present, the result
+  // panel shows them instead of sending the expression to the server.
+  diagnostics?: ExpressionDiagnostic[];
 }
 
 interface ResultContentProps extends ResultProps {
@@ -37,24 +43,35 @@ export interface ExpressionResultOptions {
   terminologyServerUrl: string;
   // The maximum number of results to return within concept search.
   maxSearchResults: number;
-  // The delay (in milliseconds) before the loading indicator is displayed.
-  loadingDelay: number;
 }
 
 export default function ExpressionResult({
   expression,
   options = {},
+  diagnostics,
 }: ResultProps) {
   const resolvedOptions = applyDefaultOptions(options);
+  const errors = diagnostics?.filter((d) => d.severity === "error");
+  if (errors && errors.length > 0) {
+    return (
+      <Stack spacing={1}>
+        {errors.map((d, i) => (
+          <Alert key={i} severity="error">
+            {d.message}
+          </Alert>
+        ))}
+      </Stack>
+    );
+  }
   return (
     <QueryClientProvider client={queryClient}>
+      {/* ErrorBoundary catches render-time errors from child components.
+          Query errors are handled inline by ExpressionResultContent. */}
       <ErrorBoundary resetKey={expression}>
-        <DelayedLoading delay={resolvedOptions.loadingDelay}>
-          <ExpressionResultContent
-            expression={expression}
-            options={resolvedOptions}
-          />
-        </DelayedLoading>
+        <ExpressionResultContent
+          expression={expression}
+          options={resolvedOptions}
+        />
       </ErrorBoundary>
     </QueryClientProvider>
   );
@@ -65,13 +82,17 @@ function ExpressionResultContent({
   options: { terminologyServerUrl, maxSearchResults },
 }: ResultContentProps) {
   const [includeInactives, setIncludeInactives] = useState(false),
-    { data, isFetching } = useValueSetExpansion(
+    { data, error, isFetching } = useValueSetExpansion(
       terminologyServerUrl,
       buildExpandParams(expression, maxSearchResults, includeInactives),
-      { suspense: true },
     );
+  if (error) {
+    return <Alert severity="error">{error.message}</Alert>;
+  }
+  if (isFetching && !data) {
+    return <Loading />;
+  }
   if (!data) {
-    console.warn("No error, but also no data");
     return null;
   }
   if (data.concepts.length < 1) {
@@ -131,7 +152,6 @@ function applyDefaultOptions(
   return {
     terminologyServerUrl: "https://tx.ontoserver.csiro.au/fhir",
     maxSearchResults: 10,
-    loadingDelay: 500,
     ...options,
   };
 }

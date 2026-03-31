@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
 import React, { createContext, Suspense, useEffect, useState } from "react";
+import type { ExpressionDiagnostic } from "../types";
 import { queryClient } from "../queryClient";
 import { extendTheme } from "../themes/extendTheme";
 import CodeEditor from "./CodeEditor";
@@ -41,6 +42,9 @@ export interface ExpressionBuilderProps {
   expression?: string;
   // Invoked when the expression is updated.
   onChange?: (expression: string) => unknown;
+  // Invoked when the ECL editor's diagnostics change. Only fires when
+  // the Monaco-based ECL editor is active.
+  onDiagnosticsChange?: (diagnostics: ExpressionDiagnostic[]) => void;
   // A set of options that control the behaviour of the component.
   options?: Partial<ExpressionBuilderOptions>;
 }
@@ -74,6 +78,7 @@ export const OptionsContext = createContext<ExpressionBuilderOptions>(
 export default function ExpressionBuilder({
   expression: initialExpression,
   onChange,
+  onDiagnosticsChange,
   options = {},
 }: ExpressionBuilderProps) {
   const resolvedOptions = applyDefaultOptions(options);
@@ -104,7 +109,12 @@ export default function ExpressionBuilder({
           >
             <Tabs
               value={tab}
-              onChange={(_, value) => setTab(value)}
+              onChange={(_, value) => {
+                setTab(value);
+                if (value !== "code") {
+                  onDiagnosticsChange?.([]);
+                }
+              }}
               sx={{ flexGrow: 1 }}
             >
               <Tab
@@ -142,6 +152,7 @@ export default function ExpressionBuilder({
                   <LazyEclCodeEditor
                     expression={expression ?? ""}
                     onChange={handleChange}
+                    onDiagnosticsChange={onDiagnosticsChange}
                   />
                 </Suspense>
               </ErrorBoundary>
