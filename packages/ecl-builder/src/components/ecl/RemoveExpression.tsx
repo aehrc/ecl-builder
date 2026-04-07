@@ -13,9 +13,7 @@ import {
 } from "./ExpressionVisitor";
 
 export interface RemoveExpressionProps
-  extends StyleForwardingProps,
-    ClassNameForwardingProps,
-    PropsWithChildren {
+  extends StyleForwardingProps, ClassNameForwardingProps, PropsWithChildren {
   enabled?: boolean;
   tooltip?: string;
   buttonSx?: SystemStyleObject<Theme>;

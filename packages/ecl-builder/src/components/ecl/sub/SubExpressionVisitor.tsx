@@ -43,8 +43,7 @@ export interface SubExpressionVisitorOptions extends BaseEclVisitorOptions {
   parent?: SubExpressionWithNestedExpression;
 }
 
-interface SubExpressionWithNestedExpression
-  extends SubexpressionconstraintContext {
+interface SubExpressionWithNestedExpression extends SubexpressionconstraintContext {
   expressionconstraint(): ExpressionconstraintContext;
   LEFT_PAREN(): TerminalNode;
   RIGHT_PAREN(): TerminalNode;

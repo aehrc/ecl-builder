@@ -15,8 +15,7 @@ import { ChangeReporterProps } from "./ExpressionVisitor";
 import ConceptReference from "./sub/ConceptReference";
 
 export interface AddConditionProps
-  extends PropsWithChildren,
-    ChangeReporterProps {
+  extends PropsWithChildren, ChangeReporterProps {
   logicStatementType?: LogicStatementType;
 }
 

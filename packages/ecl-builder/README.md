@@ -3,7 +3,6 @@
 This is a React component that allows a user to visually build a SNOMED CT
 [Expression Constraint Language (ECL)](http://snomed.org/ecl) query.
 
-
 ## Example Usage
 
 ```
@@ -30,5 +29,6 @@ function App() {
   );
 }
 ```
+
 Copyright © 2022, Commonwealth Scientific and Industrial Research Organisation
 (CSIRO) ABN 41 687 119 230. All rights reserved.

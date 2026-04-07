@@ -7,8 +7,8 @@ import { Alert } from "@mui/material";
 import React, { Component, PropsWithChildren } from "react";
 
 export interface ErrorBoundaryProps extends PropsWithChildren {
-  resetKey?: any
-};
+  resetKey?: any;
+}
 
 interface ErrorBoundaryState {
   error?: Error;

@@ -20,8 +20,7 @@ import InlineExpressionGrouping from "../InlineExpressionGrouping";
 import NeatRow from "../NeatRow";
 
 export interface CardinalityProps
-  extends ChangeReporterProps,
-    PropsWithChildren {
+  extends ChangeReporterProps, PropsWithChildren {
   many: boolean;
 }
 

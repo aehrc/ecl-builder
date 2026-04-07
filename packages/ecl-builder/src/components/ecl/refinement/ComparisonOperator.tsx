@@ -9,8 +9,9 @@ import { grey } from "../../../themes/color";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
 
-export interface ComparisonOperatorProps<T extends string>
-  extends ChangeReporterProps {
+export interface ComparisonOperatorProps<
+  T extends string,
+> extends ChangeReporterProps {
   type: T;
   typeLabelMap: Record<T, string>;
 }

@@ -28,9 +28,7 @@ import { SubExpressionProps, useSubExpression } from "../sub/SubExpression";
 export type LogicStatementType = "conjunction" | "disjunction" | "exclusion";
 
 export interface LogicStatementProps
-  extends FocusManagementProps,
-    PropsWithChildren,
-    SubExpressionProps {
+  extends FocusManagementProps, PropsWithChildren, SubExpressionProps {
   // The type of logic statement, either "conjunction" or "disjunction".
   type: LogicStatementType;
   // Invoked when the user changes the type of logic statement.
