@@ -46,7 +46,6 @@ function ConceptSearchInput(
   function handleFocus(
     event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
   ) {
-     
     const forwardedOnFocus = props.inputProps?.onFocus;
     if (forwardedOnFocus) {
       forwardedOnFocus(event);
@@ -60,7 +59,6 @@ function ConceptSearchInput(
     <TextField
       {...props}
       inputProps={{
-         
         ...props.inputProps,
         onFocus: handleFocus,
       }}
