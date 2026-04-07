@@ -27,7 +27,7 @@ Your branch should be named `issue/[GitHub issue #]`.
 
 You will need the following software to build the solution:
 
-- Node.js 18^
+- Node.js 20^
 
 To run the ecl-builder locally, run in the root dir:
 
