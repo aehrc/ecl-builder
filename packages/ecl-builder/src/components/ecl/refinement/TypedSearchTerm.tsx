@@ -23,6 +23,14 @@ export interface TypedSearchTermProps {
   ConcreteValueProps: ConcreteValueProps;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.type
+ * @param root0.onChangeType
+ * @param root0.onRemove
+ * @param root0.ConcreteValueProps
+ */
 export default function TypedSearchTerm({
   type,
   onChangeType,

@@ -52,6 +52,12 @@ export default class ExpressionTransformer {
   readonly onChange: ChangeHandler;
   readonly onFocus?: PositionedFocusHandler;
 
+  /**
+   *
+   * @param expression
+   * @param onChange
+   * @param onFocus
+   */
   constructor(
     expression: string,
     onChange: ChangeHandler,
@@ -64,6 +70,11 @@ export default class ExpressionTransformer {
 
   /**
    * Prepends a new expression to the start of the existing expression, separated by a space.
+   * @param span
+   * @param expression
+   * @param parenthesize
+   * @param preParenthesize
+   * @param options
    */
   prependToSpan(
     span: Span,
@@ -83,6 +94,11 @@ export default class ExpressionTransformer {
 
   /**
    * Appends a new expression to the end of the existing expression, separated by a space.
+   * @param ctx
+   * @param expression
+   * @param parenthesize
+   * @param preParenthesize
+   * @param options
    */
   append(
     ctx: ParserRuleContext,
@@ -102,6 +118,11 @@ export default class ExpressionTransformer {
 
   /**
    * Appends a new expression to the end of the existing expression, separated by a space.
+   * @param span
+   * @param expression
+   * @param parenthesize
+   * @param preParenthesize
+   * @param options
    */
   appendToSpan(
     span: Span,
@@ -131,6 +152,7 @@ export default class ExpressionTransformer {
 
   /**
    * Replaces the entire expression.
+   * @param expression
    */
   replace(expression: string): void {
     this.onChange(expression);
@@ -139,6 +161,8 @@ export default class ExpressionTransformer {
   /**
    * Uses the parser rule context to identify the range of characters within the expression that
    * have changed, and then removes those characters.
+   * @param ctx
+   * @param options
    */
   remove(ctx: ParserRuleContext, options: UpdateOptions = {}): void {
     this.removeAll([ctx], options);
@@ -147,6 +171,8 @@ export default class ExpressionTransformer {
   /**
    * Uses the parser rule context to identify the range of characters within a set of expressions,
    * and then removes those characters.
+   * @param ctxs
+   * @param options
    */
   removeAll(
     ctxs: ParserRuleContext[],
@@ -158,6 +184,8 @@ export default class ExpressionTransformer {
   /**
    * Uses the parser rule context to identify the range of characters within a set of expressions,
    * and then removes those characters.
+   * @param spans
+   * @param options
    */
   removeAllSpans(
     spans: Span[],
@@ -170,6 +198,9 @@ export default class ExpressionTransformer {
    * Uses the parser rule context to identify the range of characters within the expression that
    * have changed, and then substitutes those characters with the expression reported by the
    * component.
+   * @param ctx
+   * @param expression
+   * @param options
    */
   applyUpdate(
     ctx: ParserRuleContext,
@@ -183,6 +214,9 @@ export default class ExpressionTransformer {
    * Uses the parser rule context to identify the range of characters within the expression that
    * have changed, and then substitutes those characters with the expression reported by the
    * component.
+   * @param span
+   * @param expression
+   * @param options
    */
   applyUpdateToSpan(
     span: Span,
@@ -196,6 +230,9 @@ export default class ExpressionTransformer {
    * Uses the parser rule context to identify a number of ranges of characters within the expression
    * that have changed, and then substitutes those characters with the expression reported by the
    * component.
+   * @param ctxs
+   * @param replacement
+   * @param options
    */
   applyUpdates(
     ctxs: ParserRuleContext[],
@@ -212,11 +249,17 @@ export default class ExpressionTransformer {
   /**
    * Performs the same function as `handleUpdate`, except that it can replace multiple
    * subexpressions with the same new expression.
-   *
    * @param spans The spans to update. Must be sorted in the order that they occur within the
    * expression.
    * @param replacement The expression that will be used to update the parts of the larger
    * expression described by the array of spans.
+   * @param root0
+   * @param root0.collapseWhiteSpaceRight
+   * @param root0.collapseWhiteSpaceLeft
+   * @param root0.preserveFirstWhiteSpace
+   * @param root0.reportFocusUpdate
+   * @param root0.focusUpdateStrategy
+   * @param root0.focusPosition
    */
   applyUpdatesToSpans(
     spans: Span[],
@@ -252,7 +295,7 @@ export default class ExpressionTransformer {
       // Conditionally modify the whitespace at the trailing edge of the prefix expression.
       if (/\s/.test(prefix[prefix.length - 1])) {
         // For the first subject span, check if first white space needs to be preserved.
-        let spanCollapseWhiteSpaceLeft = idx
+        const spanCollapseWhiteSpaceLeft = idx
           ? collapseWhiteSpaceLeft
           : !preserveFirstWhiteSpace;
         prefix = prefix.trimEnd() + (spanCollapseWhiteSpaceLeft ? "" : " ");
@@ -331,6 +374,10 @@ export default class ExpressionTransformer {
     }
   }
 
+  /**
+   *
+   * @param ctx
+   */
   spanFromContext(ctx: ParserRuleContext): Span {
     return {
       start: ctx.start.start,
@@ -339,6 +386,10 @@ export default class ExpressionTransformer {
     };
   }
 
+  /**
+   *
+   * @param node
+   */
   spanFromTerminalNode(node: TerminalNode): Span {
     return {
       start: node.symbol.start,
@@ -347,6 +398,11 @@ export default class ExpressionTransformer {
     };
   }
 
+  /**
+   *
+   * @param start
+   * @param stop
+   */
   spanFromIndices(start: number, stop: number): Span {
     return {
       start: start,
@@ -359,6 +415,8 @@ export default class ExpressionTransformer {
    * For an expression containing any number of binary expressions (e.g. [SUBJECT] [OPERATOR]
    * [SUBJECT] [OPERATOR] [SUBJECT]), this method can tell the set expressions should be removed
    * when a nominated expression is removed, in order to retain validity.
+   * @param ctxs
+   * @param subjectIndex
    */
   getBinaryOperatorRemovalContext(
     ctxs: ParserRuleContext[],
@@ -386,6 +444,6 @@ export default class ExpressionTransformer {
         removalContext.push(ctxs[currentIndex]);
       }
     }
-    return removalContext.map(this.spanFromContext);
+    return removalContext.map((ctx) => this.spanFromContext(ctx));
   }
 }

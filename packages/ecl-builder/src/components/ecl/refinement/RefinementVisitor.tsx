@@ -95,17 +95,29 @@ export const BOOLEAN_COMPARISON_OPERATORS: Record<string, string> = {
 export default class RefinementVisitor extends BaseEclVisitor {
   readonly options: RefinementVisitorOptions;
 
+  /**
+   *
+   * @param options
+   */
   constructor(options: RefinementVisitorOptions) {
     super(options);
     this.options = options;
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitExpressionconstraint(
     ctx: ExpressionconstraintContext,
   ): VisualExpressionType {
     return new ExpressionVisitor(this.options).visit(ctx);
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitRefinedexpressionconstraint(
     ctx: RefinedexpressionconstraintContext,
   ): VisualExpressionType {
@@ -173,20 +185,36 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext,
   ): VisualExpressionType {
     return new SubExpressionVisitor(this.options).visit(ctx);
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitConjunction(ctx: ConjunctionContext): VisualExpressionType {
     return new CompoundVisitor(this.options).visit(ctx);
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitDisjunction(ctx: DisjunctionContext): VisualExpressionType {
     return new CompoundVisitor(this.options).visit(ctx);
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitEclrefinement(ctx: EclrefinementContext): VisualExpressionType {
     // If there are nested attribute groups, we render a grouping to wrap them.
     if (
@@ -228,10 +256,18 @@ export default class RefinementVisitor extends BaseEclVisitor {
     }
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitEclattributeset(ctx: EclattributesetContext): VisualExpressionType {
     return this.renderAttributeSet(ctx);
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitEclattributegroup(ctx: EclattributegroupContext): VisualExpressionType {
     const heading: VisualExpressionType = [ctx.cardinality()]
       .filter(nonNullish)
@@ -245,6 +281,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitEclattribute(ctx: EclattributeContext): VisualExpressionType {
     let comparisonType: AttributeComparisonType,
       start: number | undefined,
@@ -347,6 +387,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitCardinality(ctx: CardinalityContext): VisualExpressionType {
     const focused =
       isFocused(ctx.minvalue(), this.options.focusPosition) ||
@@ -365,6 +409,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitReverseflag(ctx: ReverseflagContext): VisualExpressionType {
     return (
       <Fallback
@@ -376,6 +424,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitEclattributename(ctx: EclattributenameContext): VisualExpressionType {
     return (
       <ConceptSearchScope.Provider
@@ -389,6 +441,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitExpressioncomparisonoperator(
     ctx: ExpressioncomparisonoperatorContext,
   ): VisualExpressionType {
@@ -402,6 +458,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitNumericcomparisonoperator(
     ctx: NumericcomparisonoperatorContext,
   ): VisualExpressionType {
@@ -415,6 +475,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitStringcomparisonoperator(
     ctx: StringcomparisonoperatorContext,
   ): VisualExpressionType {
@@ -428,6 +492,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitBooleancomparisonoperator(
     ctx: BooleancomparisonoperatorContext,
   ): VisualExpressionType {
@@ -441,6 +509,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitTypedsearchtermset(
     ctx: TypedsearchtermsetContext,
   ): VisualExpressionType {
@@ -479,6 +551,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     }
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitTypedsearchterm(ctx: TypedsearchtermContext): VisualExpressionType {
     const matchSearchTermSetCtx = ctx.matchsearchtermset(),
       wildSearchTermSetCtx = ctx.wildsearchtermset(),
@@ -520,6 +596,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitNumericvalue(ctx: NumericvalueContext): VisualExpressionType {
     return (
       <ConcreteValue
@@ -532,6 +612,10 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitBooleanvalue(ctx: BooleanvalueContext): VisualExpressionType {
     return (
       <ConcreteValue
@@ -561,6 +645,14 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   * @param heading
+   * @param cardinality
+   * @param onAddCardinality
+   * @param onRemoveCardinality
+   */
   renderAttributeSet(
     ctx: EclattributesetContext,
     heading?: React.ReactNode,
@@ -618,6 +710,12 @@ export default class RefinementVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   * @param operatorCtx
+   * @param type
+   */
   renderRefinementSet(
     ctx: EclrefinementContext,
     operatorCtx: ParserRuleContext[],

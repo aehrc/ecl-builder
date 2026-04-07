@@ -14,6 +14,11 @@ export interface LogicOperatorProps {
   type: LogicStatementType;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.type
+ */
 export default function LogicOperator({ type }: LogicOperatorProps) {
   return (
     <Typography className="logic-operator" variant="button" sx={{ px: 2 }}>

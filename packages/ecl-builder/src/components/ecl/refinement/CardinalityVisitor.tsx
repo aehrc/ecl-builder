@@ -23,11 +23,19 @@ export interface CardinalityVisitorOptions extends RefinementVisitorOptions {
 export default class CardinalityVisitor extends BaseEclVisitor {
   readonly options: CardinalityVisitorOptions;
 
+  /**
+   *
+   * @param options
+   */
   constructor(options: CardinalityVisitorOptions) {
     super(options);
     this.options = options;
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitMinvalue(ctx: MinvalueContext): VisualExpressionType {
     return new CardinalityVisitor({
       ...this.options,
@@ -35,14 +43,24 @@ export default class CardinalityVisitor extends BaseEclVisitor {
     }).visitChildren(ctx);
   }
 
+  /**
+   *
+   */
   visitTo(): VisualExpressionType {
     return <To />;
   }
 
+  /**
+   *
+   */
   visitMany(): VisualExpressionType {
     return <Many />;
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitNonnegativeintegervalue(
     ctx: NonnegativeintegervalueContext,
   ): VisualExpressionType {

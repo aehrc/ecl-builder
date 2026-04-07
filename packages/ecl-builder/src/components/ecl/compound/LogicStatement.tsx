@@ -51,7 +51,14 @@ export const logicStatementTypeToOperator: Record<LogicStatementType, string> =
 
 /**
  * A component for rendering a logic statement, i.e. a conjunction or a disjunction.
- *
+ * @param root0
+ * @param root0.type
+ * @param root0.focus
+ * @param root0.onChangeType
+ * @param root0.onAddCondition
+ * @param root0.children
+ * @param root0.nSubexpressions
+ * @param root0.heading
  * @author John Grimes
  */
 export default function LogicStatement({

@@ -9,9 +9,9 @@ file within this repository.
 
 Issues can be used to:
 
-* Report a defect
-* Request a new feature or enhancement
-* Ask a question
+- Report a defect
+- Request a new feature or enhancement
+- Ask a question
 
 Please search through existing issues to ensure you are not creating a duplicate. Include as much information as you can in your issue, and if possible produce a link to a [minimum reproducible example](https://stackoverflow.com/help/minimal-reproducible-example).
 
@@ -27,7 +27,7 @@ Your branch should be named `issue/[GitHub issue #]`.
 
 You will need the following software to build the solution:
 
-* Node.js 18^
+- Node.js 18^
 
 To run the ecl-builder locally, run in the root dir:
 
@@ -35,6 +35,19 @@ To run the ecl-builder locally, run in the root dir:
 npm install
 cd apps
 npm run start
+```
+
+### Local HTTPS certificate
+
+Storybook is configured to run over HTTPS using a local certificate. To
+generate the required certificate and key files:
+
+```bash
+cd packages/ecl-builder
+mkdir -p .local
+openssl req -x509 -newkey rsa:2048 \
+  -keyout .local/key.pem -out .local/cert.pem \
+  -days 365 -nodes -subj '/CN=localhost'
 ```
 
 ### Coding conventions

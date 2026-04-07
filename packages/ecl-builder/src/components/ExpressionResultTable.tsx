@@ -21,6 +21,12 @@ export interface ExpressionResultTableProps {
   sx?: SxProps<Theme>;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.results
+ * @param root0.sx
+ */
 export default function ExpressionResultTable({
   results,
   sx,

@@ -7,7 +7,7 @@ import { Alert } from "@mui/material";
 import React, { Component, PropsWithChildren } from "react";
 
 export interface ErrorBoundaryProps extends PropsWithChildren {
-  resetKey?: any;
+  resetKey?: unknown;
 }
 
 interface ErrorBoundaryState {
@@ -18,15 +18,27 @@ export default class ErrorBoundary extends Component<
   ErrorBoundaryProps,
   ErrorBoundaryState
 > {
+  /**
+   *
+   * @param props
+   */
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = {};
   }
 
+  /**
+   *
+   * @param error
+   */
   static getDerivedStateFromError(error: Error) {
     return { error };
   }
 
+  /**
+   *
+   * @param prevProps
+   */
   componentDidUpdate(prevProps: ErrorBoundaryProps) {
     if (prevProps.resetKey !== this.props.resetKey) {
       // Reset error when key changes
@@ -34,6 +46,9 @@ export default class ErrorBoundary extends Component<
     }
   }
 
+  /**
+   *
+   */
   render() {
     const {
       props: { children },

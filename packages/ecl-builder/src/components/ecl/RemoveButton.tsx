@@ -14,6 +14,13 @@ export interface RemoveButtonProps {
   onClick?: () => unknown;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.tooltip
+ * @param root0.sx
+ * @param root0.onClick
+ */
 export default function RemoveButton({
   tooltip,
   sx = {},

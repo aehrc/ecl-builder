@@ -50,7 +50,10 @@ export const OptionsContext = createContext<ExpressionBuilderOptions>(
 /**
  * This is the top-level component of the ECL builder, providing context and
  * rendering a tabbed container for the visual and code views.
- *
+ * @param root0
+ * @param root0.expression
+ * @param root0.onChange
+ * @param root0.options
  * @author John Grimes
  */
 export default function ExpressionBuilder({
@@ -85,7 +88,7 @@ export default function ExpressionBuilder({
           >
             <Tabs
               value={tab}
-              onChange={(_, value) => setTab(value)}
+              onChange={(_, value: string) => setTab(value)}
               sx={{ flexGrow: 1 }}
             >
               <Tab
@@ -127,6 +130,7 @@ export default function ExpressionBuilder({
 
 /**
  * Default configuration options.
+ * @param options
  */
 function applyDefaultOptions(
   options: Partial<ExpressionBuilderOptions>,

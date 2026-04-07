@@ -14,6 +14,14 @@ export interface NeatRowProps extends PropsWithChildren {
   sx?: SystemStyleObject<Theme>;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.className
+ * @param root0.disableActionsHide
+ * @param root0.sx
+ * @param root0.children
+ */
 export default function NeatRow({
   className,
   disableActionsHide,

@@ -11,7 +11,13 @@ import useValueSetExpansion, {
 
 /**
  * A hook for incorporating concept search into components.
- *
+ * @param endpoint
+ * @param valueSet
+ * @param systemVersion
+ * @param query
+ * @param limit
+ * @param minQueryLength
+ * @param options
  * @author John Grimes
  */
 export default function useConceptSearch(

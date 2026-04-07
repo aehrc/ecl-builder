@@ -13,7 +13,9 @@ interface Props {
 
 /**
  * An editor for manipulating the expression in its raw ECL form.
- *
+ * @param root0
+ * @param root0.expression
+ * @param root0.onChange
  * @author John Grimes
  */
 export default function CodeEditor({ expression, onChange }: Props) {

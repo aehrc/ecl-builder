@@ -21,7 +21,12 @@ export interface ConceptSearchInputProps {
 
 /**
  * Renders the text field that is used to search for concepts.
- *
+ * @param root0
+ * @param root0.props
+ * @param root0.selectedConcept
+ * @param root0.label
+ * @param root0.onFocus
+ * @param ref
  * @author John Grimes
  */
 function ConceptSearchInput(
@@ -36,11 +41,12 @@ function ConceptSearchInput(
   /**
    * Provides a way of forwarding the focus to the inner text field, without discarding the
    * behaviour already required of it by the parent component.
+   * @param event
    */
   function handleFocus(
     event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
   ) {
-    // eslint-disable-next-line react/prop-types
+     
     const forwardedOnFocus = props.inputProps?.onFocus;
     if (forwardedOnFocus) {
       forwardedOnFocus(event);
@@ -54,7 +60,7 @@ function ConceptSearchInput(
     <TextField
       {...props}
       inputProps={{
-        // eslint-disable-next-line react/prop-types
+         
         ...props.inputProps,
         onFocus: handleFocus,
       }}

@@ -12,6 +12,11 @@ export interface CopyValueSetProps {
   expression: string;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.expression
+ */
 export default function CopyValueSet({ expression }: CopyValueSetProps) {
   const valueSetUri = useMemo(
     () =>

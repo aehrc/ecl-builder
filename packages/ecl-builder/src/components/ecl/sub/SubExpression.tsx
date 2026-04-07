@@ -44,6 +44,18 @@ export interface SubExpressionProps extends PropsWithChildren {
 
 /**
  * Common functionality shared by various incarnations of sub-expression.
+ * @param root0
+ * @param root0.constraint
+ * @param root0.memberOf
+ * @param root0.refinement
+ * @param root0.hideActions
+ * @param root0.onAddConstraint
+ * @param root0.onRemoveConstraint
+ * @param root0.onAddMemberOf
+ * @param root0.onRemoveMemberOf
+ * @param root0.onRemoveRefinement
+ * @param root0.onAddLogicStatement
+ * @param root0.onAddRefinement
  */
 export function useSubExpression({
   constraint,
@@ -190,7 +202,7 @@ export function useSubExpression({
 /**
  * A component for rendering a sub-expression, which is basically a concept plus constraints,
  * additions and refinements.
- *
+ * @param props
  * @author John Grimes
  */
 export default function SubExpression(props: SubExpressionProps) {

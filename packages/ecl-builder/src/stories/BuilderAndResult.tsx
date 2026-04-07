@@ -5,6 +5,11 @@ import ExpressionResult from "../components/ExpressionResult";
 
 const theme = createTheme();
 
+/**
+ *
+ * @param root0
+ * @param root0.expression
+ */
 export default function BuilderAndResult({
   expression,
 }: {

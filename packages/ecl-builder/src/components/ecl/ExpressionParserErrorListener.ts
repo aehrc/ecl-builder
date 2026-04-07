@@ -8,6 +8,14 @@ import { ErrorListener } from "antlr4/error";
 
 // noinspection JSUnusedGlobalSymbols
 export default class ExpressionParserErrorListener implements ErrorListener {
+  /**
+   *
+   * @param _recognizer
+   * @param _offendingSymbol
+   * @param line
+   * @param column
+   * @param msg
+   */
   syntaxError(
     _recognizer: Recognizer,
     _offendingSymbol: Token,
@@ -18,14 +26,23 @@ export default class ExpressionParserErrorListener implements ErrorListener {
     throw new Error(`Syntax error at line ${line}, column ${column}: ${msg}`);
   }
 
+  /**
+   *
+   */
   reportAmbiguity() {
     return null;
   }
 
+  /**
+   *
+   */
   reportAttemptingFullContext() {
     return null;
   }
 
+  /**
+   *
+   */
   reportContextSensitivity() {
     return null;
   }

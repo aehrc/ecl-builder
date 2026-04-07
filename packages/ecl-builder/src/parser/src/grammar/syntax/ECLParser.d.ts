@@ -315,7 +315,7 @@ export class ToContext extends ParserRuleContext {}
 /**
  * maxvalue : nonnegativeintegervalue | many;
  */
-export class MaxValueContext extends ParserRuleContext {
+export class MaxvalueContext extends ParserRuleContext {
   many(): ManyContext | null | undefined;
 }
 

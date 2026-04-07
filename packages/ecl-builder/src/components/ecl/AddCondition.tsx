@@ -21,7 +21,10 @@ export interface AddConditionProps
 
 /**
  * A component that allows the user to add a new condition to the expression.
- *
+ * @param root0
+ * @param root0.logicStatementType
+ * @param root0.onChange
+ * @param root0.children
  * @author John Grimes
  */
 export default function AddCondition({

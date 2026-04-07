@@ -68,19 +68,23 @@ export default tseslint.config(
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
 
-      // JSDoc.
+      // JSDoc. TypeScript types serve as the primary documentation for
+      // parameters and return values, so description-level requirements are
+      // relaxed.
       "jsdoc/require-jsdoc": [
         "warn",
         {
           publicOnly: true,
           require: {
             FunctionDeclaration: true,
-            MethodDefinition: true,
-            ArrowFunctionExpression: true,
-            FunctionExpression: true,
+            MethodDefinition: false,
+            ArrowFunctionExpression: false,
+            FunctionExpression: false,
           },
         },
       ],
+      "jsdoc/require-param-description": "off",
+      "jsdoc/require-returns": "off",
     },
   },
 );

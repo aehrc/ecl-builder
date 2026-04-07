@@ -14,6 +14,10 @@ export interface NestedSubExpressionProps extends SubExpressionProps {
   heading?: React.ReactNode;
 }
 
+/**
+ *
+ * @param props
+ */
 export default function NestedSubExpression(props: NestedSubExpressionProps) {
   const { heading, children } = props,
     { SubExpressionActions } = useSubExpression(props);

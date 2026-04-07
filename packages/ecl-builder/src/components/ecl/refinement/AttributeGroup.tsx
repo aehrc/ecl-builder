@@ -22,6 +22,14 @@ export interface AttributeGroupProps extends PropsWithChildren {
   onAddAttribute: ChangeHandlerWithPosition;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.type
+ * @param root0.onChangeType
+ * @param root0.onAddAttribute
+ * @param root0.children
+ */
 export default function AttributeGroup({
   type,
   onChangeType,

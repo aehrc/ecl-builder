@@ -13,6 +13,14 @@ interface NonNegativeIntegerValue extends ChangeReporterProps {
   align: "left" | "right";
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.value
+ * @param root0.align
+ * @param root0.focus
+ * @param root0.onChange
+ */
 export default function NonNegativeIntegerValue({
   value,
   align = "left",

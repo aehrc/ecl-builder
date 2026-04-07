@@ -5,7 +5,6 @@
 
 /**
  * Formats a number with no fraction digits, and with grouping.
- *
  * @param number the number to be formatted
  * @param removeFraction whether to remove the fraction component of the number
  */

@@ -11,6 +11,12 @@ export interface LoadingProps extends PropsWithChildren {
   delay: number;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.delay
+ * @param root0.children
+ */
 export default function DelayedLoading({ delay, children }: LoadingProps) {
   return (
     <Suspense fallback={<SuspendedLoading delay={delay} />}>

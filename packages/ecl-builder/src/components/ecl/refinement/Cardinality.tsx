@@ -24,6 +24,14 @@ export interface CardinalityProps
   many: boolean;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.many
+ * @param root0.focus
+ * @param root0.onChange
+ * @param root0.children
+ */
 export default function Cardinality({
   many,
   focus,

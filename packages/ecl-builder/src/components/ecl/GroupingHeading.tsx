@@ -8,6 +8,11 @@ import React, { PropsWithChildren } from "react";
 
 export type GroupingHeadingProps = PropsWithChildren;
 
+/**
+ *
+ * @param root0
+ * @param root0.children
+ */
 export default function GroupingHeading({ children }: GroupingHeadingProps) {
   return (
     <Stack

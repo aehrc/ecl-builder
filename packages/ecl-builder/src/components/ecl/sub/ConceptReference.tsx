@@ -55,7 +55,11 @@ const ANY_CONCEPT: AnyConceptOption = { type: "ANY_CONCEPT" };
 /**
  * A component that allows the user to select a concept for inclusion within an
  * expression.
- *
+ * @param root0
+ * @param root0.concept
+ * @param root0.focus
+ * @param root0.sx
+ * @param root0.onChange
  * @author John Grimes
  */
 export default function ConceptReference({
@@ -171,7 +175,6 @@ export default function ConceptReference({
   }
 
   function renderOption(
-    // eslint-disable-next-line @typescript-eslint/ban-types
     props: HTMLAttributes<HTMLLIElement> & { key?: Key },
     option: ConceptReferenceOptionType,
     { selected }: { selected?: boolean },
@@ -195,8 +198,7 @@ export default function ConceptReference({
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  function renderInput(params: Object): ReactNode {
+  function renderInput(params: object): ReactNode {
     return (
       <ConceptSearchInput
         ref={focusRef}
@@ -228,6 +230,7 @@ export default function ConceptReference({
       </ul>
     );
   });
+  ListboxComponent.displayName = "ListboxComponent";
 
   return (
     <Autocomplete
@@ -251,6 +254,7 @@ export default function ConceptReference({
 
 /**
  * Builds the new expression that would result, should the given concept be selected.
+ * @param concept
  */
 function buildExpression(concept: ConceptReferenceOptionType): string {
   return concept.type === "ANY_CONCEPT"
@@ -260,6 +264,7 @@ function buildExpression(concept: ConceptReferenceOptionType): string {
 
 /**
  * Determine the label for each item within the autocomplete.
+ * @param option
  */
 function getOptionLabel(option: ConceptReferenceOptionType) {
   if (option.type === "ANY_CONCEPT") {
@@ -271,6 +276,7 @@ function getOptionLabel(option: ConceptReferenceOptionType) {
 
 /**
  * Determine the label within the input field, based on the concept that has been selected.
+ * @param option
  */
 function getInputLabelForOption(option: ConceptReferenceOptionType): string {
   if (option.type === "ANY_CONCEPT") {
@@ -282,6 +288,8 @@ function getInputLabelForOption(option: ConceptReferenceOptionType): string {
 
 /**
  * Used for determining equality between options.
+ * @param option
+ * @param value
  */
 function isOptionEqualToValue(
   option: ConceptReferenceOptionType,

@@ -3,6 +3,10 @@
  * Organisation (CSIRO) ABN 41 687 119 230. All rights reserved.
  */
 
+/**
+ *
+ * @param value
+ */
 export function nonNullish<T>(value: T | null | undefined): value is T {
   return !!value;
 }

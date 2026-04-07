@@ -9,6 +9,9 @@ import InlineExpressionGrouping from "../InlineExpressionGrouping";
 
 export const MEMBER_OF_OPERATOR = "^";
 
+/**
+ *
+ */
 export default function MemberOfOperator() {
   return (
     <Stack className="member-of-operator" direction="row">

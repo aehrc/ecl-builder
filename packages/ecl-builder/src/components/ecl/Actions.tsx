@@ -11,7 +11,12 @@ import {
   Menu,
   MenuItem,
 } from "@mui/material";
-import React, { PropsWithChildren, ReactNode, useRef, useState } from "react";
+import React, {
+  PropsWithChildren,
+  ReactNode,
+  useCallback,
+  useState,
+} from "react";
 import { grey } from "../../themes/color";
 import { StyleForwardingProps } from "./ExpressionVisitor";
 
@@ -40,6 +45,15 @@ function isActionItem(action: Action): action is ActionItem {
   return action.type === "item";
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.actions
+ * @param root0.icon
+ * @param root0.title
+ * @param root0.sx
+ * @param root0.children
+ */
 export default function Actions({
   actions,
   icon,
@@ -48,7 +62,13 @@ export default function Actions({
   children,
 }: ActionsProps) {
   const [menuOpen, setMenuOpen] = useState(false),
-    addButton = useRef(null),
+    [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null),
+    addButtonRef = useCallback(
+      (node: HTMLElement | null) => {
+        setAnchorEl(node);
+      },
+      [setAnchorEl],
+    ),
     actionItems = actions.filter(isActionItem),
     numberOfItems = actionItems.length,
     Icon = icon;
@@ -104,7 +124,7 @@ export default function Actions({
     <>
       <IconButton
         className="actions"
-        ref={addButton}
+        ref={addButtonRef}
         title={title}
         sx={(theme) => ({
           alignSelf: "stretch",
@@ -134,9 +154,9 @@ export default function Actions({
       {numberOfItems > 1 ? (
         <Menu
           open={menuOpen}
-          anchorEl={addButton.current}
+          anchorEl={anchorEl}
           anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
-          container={addButton.current}
+          container={anchorEl}
           onClose={handleCloseMenu}
           onClick={handleCloseMenu}
         >

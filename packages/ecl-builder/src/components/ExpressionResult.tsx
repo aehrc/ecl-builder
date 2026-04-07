@@ -41,6 +41,12 @@ export interface ExpressionResultOptions {
   loadingDelay: number;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.expression
+ * @param root0.options
+ */
 export default function ExpressionResult({
   expression,
   options = {},
@@ -124,6 +130,7 @@ function ExpressionResultContent({
 
 /**
  * Default configuration options.
+ * @param options
  */
 function applyDefaultOptions(
   options: Partial<ExpressionResultOptions>,

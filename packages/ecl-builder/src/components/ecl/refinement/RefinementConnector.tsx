@@ -7,6 +7,9 @@ import { useTheme } from "@mui/material";
 import React from "react";
 import { grey } from "../../../themes/color";
 
+/**
+ *
+ */
 export default function RefinementConnector() {
   const theme = useTheme();
 

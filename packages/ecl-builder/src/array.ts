@@ -5,6 +5,7 @@
 
 /**
  * Takes a set of arrays, and interleaves them into a single array.
+ * @param inputs
  */
 export function interleave<T>(...inputs: T[][]): T[] {
   // Adapted from: https://stackoverflow.com/a/66037083/1760540

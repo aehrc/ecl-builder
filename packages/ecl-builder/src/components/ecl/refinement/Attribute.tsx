@@ -4,7 +4,12 @@
  */
 
 import { Stack, useTheme } from "@mui/material";
-import React, { Children, cloneElement, PropsWithChildren } from "react";
+import React, {
+  Children,
+  ReactElement,
+  cloneElement,
+  PropsWithChildren,
+} from "react";
 import { interleave } from "../../../array";
 import HorizontalLink from "../HorizontalLink";
 import RemoveExpression from "../RemoveExpression";
@@ -30,6 +35,18 @@ export interface AttributeProps extends PropsWithChildren {
   onAddTypedSearchTerm: () => unknown;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.children
+ * @param root0.onRemove
+ * @param root0.cardinality
+ * @param root0.onAddCardinality
+ * @param root0.onRemoveCardinality
+ * @param root0.comparisonType
+ * @param root0.onSelectComparisonType
+ * @param root0.onAddTypedSearchTerm
+ */
 export default function Attribute({
   children,
   onRemove,
@@ -44,7 +61,7 @@ export default function Attribute({
   const childrenArray = Children.toArray(children),
     interleavedChildren = interleave(
       childrenArray,
-      new Array(childrenArray.length - 1)
+      new Array<ReactElement>(childrenArray.length - 1)
         .fill(
           <HorizontalLink
             style={{ marginTop: "28px", alignSelf: "flex-start" }}

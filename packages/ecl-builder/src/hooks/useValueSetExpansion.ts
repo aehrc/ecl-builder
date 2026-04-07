@@ -24,6 +24,12 @@ export interface ConceptSearchResult {
 
 export const SEMANTIC_TAG_PATTERN = /\(([^)]+)\)$/;
 
+/**
+ *
+ * @param endpoint
+ * @param query
+ * @param options
+ */
 export default function useValueSetExpansion(
   endpoint: string,
   query: URLSearchParams,
@@ -52,7 +58,7 @@ async function executeValueSetExpansion(
 
 async function parseJsonValueSet(response: Response): Promise<ValueSet> {
   if (checkFhirJson(response)) {
-    return response.json();
+    return response.json() as Promise<ValueSet>;
   } else {
     throw new Error("Successful response was not FHIR JSON");
   }
@@ -60,7 +66,7 @@ async function parseJsonValueSet(response: Response): Promise<ValueSet> {
 
 async function extractError(response: Response): Promise<Error> {
   if (checkFhirJson(response)) {
-    const parsedResponse = await response.json();
+    const parsedResponse = (await response.json()) as Partial<OperationOutcome>;
     if (isOperationOutcome(parsedResponse)) {
       return new Error(parsedResponse.issue[0].diagnostics);
     } else {
@@ -72,6 +78,10 @@ async function extractError(response: Response): Promise<Error> {
   return new Error(`${response.status} ${response.statusText}`);
 }
 
+/**
+ *
+ * @param valueSet
+ */
 export function extractConceptsFromValueSet(
   valueSet: ValueSet,
 ): ConceptSearchResult {
