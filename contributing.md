@@ -50,10 +50,35 @@ openssl req -x509 -newkey rsa:2048 \
   -days 365 -nodes -subj '/CN=localhost'
 ```
 
-### Coding conventions
+### Code quality checks
 
-This repository uses [EditorConfig](https://editorconfig.org/), please use it to
-reformat your code before pushing.
+The following checks are enforced by CI on every push. Run them locally before
+pushing to avoid failures.
+
+All commands should be run from the repository root.
+
+**Formatting** - [Prettier](https://prettier.io/) enforces consistent code
+style:
+
+```bash
+npm run format:check -w packages/ecl-builder  # check for issues
+npm run format -w packages/ecl-builder         # auto-fix
+```
+
+**Linting** - [ESLint](https://eslint.org/) checks for code quality and
+correctness:
+
+```bash
+npm run lint -w packages/ecl-builder       # check for issues
+npm run lint:fix -w packages/ecl-builder   # auto-fix where possible
+```
+
+**Code duplication** - [jscpd](https://github.com/kucherenko/jscpd) detects
+copy-paste duplication:
+
+```bash
+npm run lint:duplication -w packages/ecl-builder
+```
 
 ## Code of conduct
 
