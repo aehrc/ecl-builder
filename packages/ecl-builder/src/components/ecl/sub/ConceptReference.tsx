@@ -28,8 +28,7 @@ import SelectedConcept from "./SelectedConcept";
 import SuggestedConcept from "./SuggestedConcept";
 
 export interface ConceptReferenceProps
-  extends ChangeReporterProps,
-    StyleForwardingProps {
+  extends ChangeReporterProps, StyleForwardingProps {
   // The currently selected concept.
   concept?: ConceptReferenceOptionType;
 }
@@ -159,7 +158,7 @@ export default function ConceptReference({
   }
 
   function handleSelectConcept(
-    event: SyntheticEvent,
+    _event: SyntheticEvent,
     newConcept: ConceptReferenceOptionType | null,
   ): void {
     setSelectedConcept(newConcept ?? undefined);
