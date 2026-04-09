@@ -32,7 +32,7 @@ export default function useValueSetExpansion(
   return useQuery<ConceptSearchResult, Error>(
     ["valueSetExpansion", endpoint, query.toString()],
     () => executeValueSetExpansion(endpoint, query),
-    options,
+    { retry: false, useErrorBoundary: false, ...options },
   );
 }
 
@@ -40,33 +40,65 @@ async function executeValueSetExpansion(
   endpoint: string,
   query: URLSearchParams,
 ): Promise<ConceptSearchResult> {
-  const response = await fetch(
-    `${endpoint}/ValueSet/$expand?${query.toString()}`,
-  );
+  let response: Response;
+  try {
+    response = await fetch(
+      `${endpoint}/ValueSet/$expand?${query.toString()}`,
+    );
+  } catch (err) {
+    throw new Error(
+      `Unable to reach the terminology server at ${endpoint}. ` +
+        `Please check your network connection and server URL. ` +
+        `(${err instanceof Error ? err.message : String(err)})`,
+    );
+  }
   if (!response.ok) {
-    throw await extractError(response);
+    const error = await extractError(response);
+    // Clean up FHIR OperationOutcome messages: strip server UUIDs
+    error.message = error.message.replace(
+      /^\[[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\]:\s*/i,
+      "",
+    );
+    throw error;
   }
   const valueSet = await parseJsonValueSet(response);
   return extractConceptsFromValueSet(valueSet);
 }
 
 async function parseJsonValueSet(response: Response): Promise<ValueSet> {
-  if (checkFhirJson(response)) {
-    return response.json();
-  } else {
+  if (!checkFhirJson(response)) {
     throw new Error("Successful response was not FHIR JSON");
+  }
+  try {
+    return await response.json();
+  } catch (parseError) {
+    throw new Error(
+      `The terminology server returned a successful response, but the body ` +
+        `was not valid JSON. ` +
+        `(${parseError instanceof Error ? parseError.message : String(parseError)})`,
+    );
   }
 }
 
 async function extractError(response: Response): Promise<Error> {
   if (checkFhirJson(response)) {
-    const parsedResponse = await response.json();
-    if (isOperationOutcome(parsedResponse)) {
-      return new Error(parsedResponse.issue[0].diagnostics);
-    } else {
+    try {
+      const parsedResponse = await response.json();
+      if (
+        isOperationOutcome(parsedResponse) &&
+        parsedResponse.issue.length > 0
+      ) {
+        return new Error(
+          parsedResponse.issue[0].diagnostics ??
+            `${response.status} ${response.statusText}`,
+        );
+      }
       console.warn(
-        "Received FHIR JSON error response that was not an OperationOutcome",
+        "Received FHIR JSON error response that was not an OperationOutcome:",
+        parsedResponse,
       );
+    } catch (parseError) {
+      console.warn("Failed to parse FHIR JSON error response:", parseError);
     }
   }
   return new Error(`${response.status} ${response.statusText}`);
