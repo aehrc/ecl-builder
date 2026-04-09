@@ -36,7 +36,11 @@ export default class ErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    console.error("[ecl-builder] Error caught by ErrorBoundary:", error, errorInfo.componentStack);
+    console.error(
+      "[ecl-builder] Error caught by ErrorBoundary:",
+      error,
+      errorInfo.componentStack,
+    );
   }
 
   /**
