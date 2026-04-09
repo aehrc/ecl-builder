@@ -4,7 +4,8 @@
  */
 
 export interface ExpressionDiagnostic {
-  severity: string;
+  /** Matches CoreDiagnosticSeverity from @aehrc/ecl-core. */
+  severity: "error" | "warning" | "information" | "hint";
   message: string;
 }
 
