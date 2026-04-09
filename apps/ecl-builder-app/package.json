@@ -12,7 +12,7 @@
     "@types/node": "^16.11.56",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
-    "ecl-builder": "^0.2.1",
+    "ecl-builder": "*",
     "monaco-editor": "^0.52.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
