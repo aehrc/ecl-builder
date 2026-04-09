@@ -13,21 +13,38 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { QueryClientProvider } from "@tanstack/react-query";
-import React, { createContext, useEffect, useState } from "react";
+import React, { createContext, Suspense, useEffect, useState } from "react";
+import type { ExpressionDiagnostic } from "../types";
 import { queryClient } from "../queryClient";
 import { extendTheme } from "../themes/extendTheme";
 import CodeEditor from "./CodeEditor";
 import CopyExpression from "./CopyExpression";
 import CopyValueSet from "./CopyValueSet";
+import ErrorBoundary from "./ErrorBoundary";
 import FocusProvider from "./ecl/FocusProvider";
+import Loading from "./Loading";
 import TabPanel from "./TabPanel";
 import VisualBuilder from "./VisualBuilder";
+
+// .js extension required: fix-tsc-es-imports does not rewrite dynamic imports.
+const LazyEclCodeEditor = React.lazy(() =>
+  import("./EclCodeEditor.js").catch((err) => {
+    throw new Error(
+      `Failed to load the ECL code editor. Ensure that @aehrc/ecl-editor-react, ` +
+        `@monaco-editor/react, and monaco-editor are installed. ` +
+        `Original error: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }),
+);
 
 export interface ExpressionBuilderProps {
   // The current expression being built.
   expression?: string;
   // Invoked when the expression is updated.
   onChange?: (expression: string) => unknown;
+  // Invoked when the ECL editor's diagnostics change. Only fires when
+  // the Monaco-based ECL editor is active.
+  onDiagnosticsChange?: (diagnostics: ExpressionDiagnostic[]) => void;
   // A set of options that control the behaviour of the component.
   options?: Partial<ExpressionBuilderOptions>;
 }
@@ -41,6 +58,11 @@ export interface ExpressionBuilderOptions {
   maxSearchResults: number;
   // The minimum number of characters required to submit a query to the terminology server.
   minQueryLength: number;
+  // Use the advanced ECL editor with Monaco-based syntax highlighting,
+  // autocompletion, and validation. Requires the following packages:
+  // @aehrc/ecl-editor-react (which requires React >= 18),
+  // @monaco-editor/react, and monaco-editor.
+  eclEditor: boolean;
 }
 
 export const OptionsContext = createContext<ExpressionBuilderOptions>(
@@ -53,14 +75,17 @@ export const OptionsContext = createContext<ExpressionBuilderOptions>(
  * @param root0
  * @param root0.expression
  * @param root0.onChange
+ * @param root0.onDiagnosticsChange
  * @param root0.options
  * @author John Grimes
  */
 export default function ExpressionBuilder({
   expression: initialExpression,
   onChange,
+  onDiagnosticsChange,
   options = {},
 }: ExpressionBuilderProps) {
+  const resolvedOptions = applyDefaultOptions(options);
   const [tab, setTab] = useState("visual"),
     [expression, setExpression] = useState(initialExpression);
 
@@ -78,7 +103,7 @@ export default function ExpressionBuilder({
   return (
     <ThemeProvider theme={(base: Theme) => extendTheme(base)}>
       <QueryClientProvider client={queryClient}>
-        <OptionsContext.Provider value={applyDefaultOptions(options)}>
+        <OptionsContext.Provider value={resolvedOptions}>
           <CssBaseline />
           <Stack
             direction="row"
@@ -88,7 +113,12 @@ export default function ExpressionBuilder({
           >
             <Tabs
               value={tab}
-              onChange={(_, value: string) => setTab(value)}
+              onChange={(_, value: string) => {
+                setTab(value);
+                if (value !== "code") {
+                  onDiagnosticsChange?.([]);
+                }
+              }}
               sx={{ flexGrow: 1 }}
             >
               <Tab
@@ -120,7 +150,22 @@ export default function ExpressionBuilder({
             </FocusProvider>
           </TabPanel>
           <TabPanel id="code" key="code" selectedId={tab}>
-            <CodeEditor expression={expression ?? ""} onChange={handleChange} />
+            {resolvedOptions.eclEditor ? (
+              <ErrorBoundary>
+                <Suspense fallback={<Loading />}>
+                  <LazyEclCodeEditor
+                    expression={expression ?? ""}
+                    onChange={handleChange}
+                    onDiagnosticsChange={onDiagnosticsChange}
+                  />
+                </Suspense>
+              </ErrorBoundary>
+            ) : (
+              <CodeEditor
+                expression={expression ?? ""}
+                onChange={handleChange}
+              />
+            )}
           </TabPanel>
         </OptionsContext.Provider>
       </QueryClientProvider>
@@ -139,6 +184,7 @@ function applyDefaultOptions(
     terminologyServerUrl: "https://tx.ontoserver.csiro.au/fhir",
     maxSearchResults: 10,
     minQueryLength: 3,
+    eclEditor: false,
     ...options,
   };
 }

@@ -6,7 +6,7 @@
 import { TextField } from "@mui/material";
 import React from "react";
 
-interface Props {
+export interface CodeEditorProps {
   expression: string;
   onChange: (expression: string) => unknown;
 }
@@ -18,7 +18,7 @@ interface Props {
  * @param root0.onChange
  * @author John Grimes
  */
-export default function CodeEditor({ expression, onChange }: Props) {
+export default function CodeEditor({ expression, onChange }: CodeEditorProps) {
   return (
     <TextField
       className="code-editor"

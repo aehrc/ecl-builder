@@ -1,5 +1,6 @@
 import { Box, createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import ExpressionBuilder from "ecl-builder";
+import type { ExpressionDiagnostic } from "ecl-builder/lib/types";
 import ExpressionResult from "ecl-builder/lib/components/ExpressionResult";
 import React, { useState } from "react";
 
@@ -18,10 +19,15 @@ theme = createTheme(theme, {
   },
 });
 
+// ?editor=basic disables the Monaco ECL editor
+const useEclEditor =
+  new URLSearchParams(window.location.search).get("editor") !== "basic";
+
 function App() {
   const [currentExpression, setCurrentExpression] = useState<
     string | undefined
   >(undefined);
+  const [diagnostics, setDiagnostics] = useState<ExpressionDiagnostic[]>([]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -44,11 +50,16 @@ function App() {
           <ExpressionBuilder
             expression={currentExpression}
             onChange={setCurrentExpression}
+            onDiagnosticsChange={useEclEditor ? setDiagnostics : undefined}
+            options={{ eclEditor: useEclEditor }}
           />
         </Box>
         {currentExpression ? (
           <Box className="expression-result-container" sx={{ flexGrow: 1 }}>
-            <ExpressionResult expression={currentExpression} />
+            <ExpressionResult
+              expression={currentExpression}
+              diagnostics={useEclEditor ? diagnostics : undefined}
+            />
           </Box>
         ) : null}
       </Box>

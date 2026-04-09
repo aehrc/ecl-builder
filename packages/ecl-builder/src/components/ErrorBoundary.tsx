@@ -35,6 +35,10 @@ export default class ErrorBoundary extends Component<
     return { error };
   }
 
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("[ecl-builder] Error caught by ErrorBoundary:", error, errorInfo.componentStack);
+  }
+
   /**
    *
    * @param prevProps
@@ -46,9 +50,6 @@ export default class ErrorBoundary extends Component<
     }
   }
 
-  /**
-   *
-   */
   render() {
     const {
       props: { children },
