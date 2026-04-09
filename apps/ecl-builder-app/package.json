@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@aehrc/ecl-editor-react": "^1.0.4",
+    "@aehrc/ecl-editor-react": "^1.1.2",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@monaco-editor/react": "^4.7.0",
