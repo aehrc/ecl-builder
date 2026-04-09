@@ -9,15 +9,20 @@ import { grey } from "../../../themes/color";
 import { ChangeReporterProps } from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
 
-export interface ComparisonOperatorProps<T extends string>
-  extends ChangeReporterProps {
+export interface ComparisonOperatorProps<
+  T extends string,
+> extends ChangeReporterProps {
   type: T;
   typeLabelMap: Record<T, string>;
 }
 
 /**
  * Represents an operator that compares an attribute name with an attribute value.
- *
+ * @param root0
+ * @param root0.type
+ * @param root0.typeLabelMap
+ * @param root0.focus
+ * @param root0.onChange
  * @author John Grimes
  */
 export default function ComparisonOperator<T extends string>({

@@ -24,6 +24,12 @@ export interface ConceptSearchResult {
 
 export const SEMANTIC_TAG_PATTERN = /\(([^)]+)\)$/;
 
+/**
+ *
+ * @param endpoint
+ * @param query
+ * @param options
+ */
 export default function useValueSetExpansion(
   endpoint: string,
   query: URLSearchParams,
@@ -42,9 +48,7 @@ async function executeValueSetExpansion(
 ): Promise<ConceptSearchResult> {
   let response: Response;
   try {
-    response = await fetch(
-      `${endpoint}/ValueSet/$expand?${query.toString()}`,
-    );
+    response = await fetch(`${endpoint}/ValueSet/$expand?${query.toString()}`);
   } catch (err) {
     throw new Error(
       `Unable to reach the terminology server at ${endpoint}. ` +
@@ -70,7 +74,7 @@ async function parseJsonValueSet(response: Response): Promise<ValueSet> {
     throw new Error("Successful response was not FHIR JSON");
   }
   try {
-    return await response.json();
+    return (await response.json()) as ValueSet;
   } catch (parseError) {
     throw new Error(
       `The terminology server returned a successful response, but the body ` +
@@ -83,7 +87,8 @@ async function parseJsonValueSet(response: Response): Promise<ValueSet> {
 async function extractError(response: Response): Promise<Error> {
   if (checkFhirJson(response)) {
     try {
-      const parsedResponse = await response.json();
+      const parsedResponse =
+        (await response.json()) as Partial<OperationOutcome>;
       if (
         isOperationOutcome(parsedResponse) &&
         parsedResponse.issue.length > 0
@@ -104,6 +109,10 @@ async function extractError(response: Response): Promise<Error> {
   return new Error(`${response.status} ${response.statusText}`);
 }
 
+/**
+ *
+ * @param valueSet
+ */
 export function extractConceptsFromValueSet(
   valueSet: ValueSet,
 ): ConceptSearchResult {

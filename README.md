@@ -37,11 +37,11 @@ To read more on it see [LICENSE](./LICENCE)
 
 Contributions are always welcome!
 
-See [contributing.md](./contributing.md) for ways to get started.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for ways to get started.
 
 ## Code of conduct
 
-Please adhere to this project's [code_of_conduct.md](./code_of_conduct.md).
+Please adhere to this project's [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
 
 Copyright © 2022, Commonwealth Scientific and Industrial Research Organisation
 (CSIRO) ABN 41 687 119 230. All rights reserved.

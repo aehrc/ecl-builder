@@ -20,11 +20,18 @@ import InlineExpressionGrouping from "../InlineExpressionGrouping";
 import NeatRow from "../NeatRow";
 
 export interface CardinalityProps
-  extends ChangeReporterProps,
-    PropsWithChildren {
+  extends ChangeReporterProps, PropsWithChildren {
   many: boolean;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.many
+ * @param root0.focus
+ * @param root0.onChange
+ * @param root0.children
+ */
 export default function Cardinality({
   many,
   focus,

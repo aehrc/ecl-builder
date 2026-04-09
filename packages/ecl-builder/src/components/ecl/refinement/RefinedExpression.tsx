@@ -6,6 +6,7 @@
 import { Stack } from "@mui/material";
 import React, {
   Children,
+  ReactElement,
   cloneElement,
   PropsWithChildren,
   ReactNode,
@@ -20,6 +21,13 @@ export interface RefinedExpressionProps extends PropsWithChildren {
   onRemove?: () => unknown;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.subExpression
+ * @param root0.onRemove
+ * @param root0.children
+ */
 export default function RefinedExpression({
   subExpression,
   onRemove,
@@ -28,7 +36,7 @@ export default function RefinedExpression({
   const childrenArray = Children.toArray(children),
     interleavedChildren = interleave(
       childrenArray,
-      new Array(childrenArray.length - 1)
+      new Array<ReactElement>(childrenArray.length - 1)
         .fill(
           <HorizontalLink
             style={{ marginTop: "28px", alignSelf: "flex-start" }}

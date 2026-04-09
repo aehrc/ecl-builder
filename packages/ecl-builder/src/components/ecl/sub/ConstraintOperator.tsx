@@ -23,18 +23,20 @@ export const constraintNameToOperator = {
   ancestororselfof: ">>",
   ancestorof: ">",
 };
-export const operatorToConstraintName: Record<string, ConstraintType> =
-  Object.fromEntries(
-    Object.entries(constraintNameToOperator)
-      .filter((entry) => entry[1] !== null)
-      .map((entry) => entry.reverse()),
-  );
+export const operatorToConstraintName = Object.fromEntries(
+  Object.entries(constraintNameToOperator)
+    .filter((entry) => entry[1] !== null)
+    .map((entry) => entry.reverse()),
+) as Record<string, ConstraintType>;
 
 export type ConstraintType = keyof typeof constraintNameToOperator;
 
 /**
  * Represents an operator that modifies the scope of a subexpression.
- *
+ * @param root0
+ * @param root0.constraint
+ * @param root0.focus
+ * @param root0.onChange
  * @author John Grimes
  */
 export default function ConstraintOperator({

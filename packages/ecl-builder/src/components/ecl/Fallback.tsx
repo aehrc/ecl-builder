@@ -16,6 +16,14 @@ export interface FallbackProps extends ChangeReporterProps {
   expression: string;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.name
+ * @param root0.expression
+ * @param root0.focus
+ * @param root0.onChange
+ */
 export default function Fallback({
   name,
   expression,

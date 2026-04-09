@@ -45,6 +45,13 @@ export interface ExpressionResultOptions {
   maxSearchResults: number;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.expression
+ * @param root0.options
+ * @param root0.diagnostics
+ */
 export default function ExpressionResult({
   expression,
   options = {},
@@ -145,6 +152,7 @@ function ExpressionResultContent({
 
 /**
  * Default configuration options.
+ * @param options
  */
 function applyDefaultOptions(
   options: Partial<ExpressionResultOptions>,

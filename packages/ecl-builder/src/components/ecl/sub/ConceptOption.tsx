@@ -14,6 +14,14 @@ interface ConceptOptionProps {
   semanticTag: ReactNode;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.props
+ * @param root0.listItemStyles
+ * @param root0.display
+ * @param root0.semanticTag
+ */
 export default function ConceptOption({
   props,
   listItemStyles = {},

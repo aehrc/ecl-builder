@@ -14,7 +14,10 @@ interface Props {
 
 /**
  * A container for a tab panel, used at the top-level of the builder.
- *
+ * @param root0
+ * @param root0.id
+ * @param root0.selectedId
+ * @param root0.children
  * @author John Grimes
  */
 export default function TabPanel({ id, selectedId, children }: Props) {

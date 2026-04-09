@@ -1,5 +1,10 @@
 import { darken, lighten, Theme } from "@mui/material";
 
+/**
+ *
+ * @param theme
+ * @param level
+ */
 export function grey(theme: Theme, level: number): string {
   const color = theme.palette.getContrastText(theme.palette.background.default),
     alter = theme.palette.mode === "dark" ? darken : lighten,

@@ -11,6 +11,12 @@ export interface IncludeInactivesProps {
   onChange?: (checked: boolean) => unknown;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.checked
+ * @param root0.onChange
+ */
 export default function IncludeInactives({
   checked,
   onChange,

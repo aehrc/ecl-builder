@@ -19,7 +19,9 @@ export interface VisualBuilderProps {
 
 /**
  * The top-level component for the visual mode of the builder.
- *
+ * @param root0
+ * @param root0.expression
+ * @param root0.onChange
  * @author John Grimes
  */
 export default function VisualBuilder({

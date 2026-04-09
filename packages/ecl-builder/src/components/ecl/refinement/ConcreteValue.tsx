@@ -10,8 +10,7 @@ import { ChangeReporterProps } from "../ExpressionVisitor";
 import { useFocus } from "../FocusProvider";
 
 export interface ConcreteValueProps
-  extends ChangeReporterProps,
-    PropsWithChildren {
+  extends ChangeReporterProps, PropsWithChildren {
   value: string;
   props?: TextFieldProps;
   sx?: SystemStyleObject<Theme>;
@@ -19,7 +18,13 @@ export interface ConcreteValueProps
 
 /**
  * Represents a concrete value in an attribute expression.
- *
+ * @param root0
+ * @param root0.value
+ * @param root0.props
+ * @param root0.sx
+ * @param root0.focus
+ * @param root0.onChange
+ * @param root0.children
  * @author John Grimes
  */
 export default function ConcreteValue({

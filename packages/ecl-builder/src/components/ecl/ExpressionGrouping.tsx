@@ -17,6 +17,8 @@ export interface ExpressionGroupingProps extends PropsWithChildren {
 
 /**
  * Creates a set of styles that "stripes" nested expression groups to ensure adequate contrast.
+ * @param theme
+ * @param levels
  */
 function getStripingStyle(
   theme: Theme,
@@ -39,6 +41,11 @@ function getStripingStyle(
 /**
  * A component that renders a grouped set of expressions in such a way that they can be discerned
  * from the surrounding expression content.
+ * @param root0
+ * @param root0.heading
+ * @param root0.children
+ * @param root0.className
+ * @param root0.sx
  */
 export default function ExpressionGrouping({
   heading,

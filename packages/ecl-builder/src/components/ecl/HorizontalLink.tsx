@@ -13,7 +13,8 @@ export interface HorizontalLinkProps {
 
 /**
  * A horizontal line that suggests that two adjacent controls are related.
- *
+ * @param root0
+ * @param root0.style
  * @author John Grimes
  */
 export default function HorizontalLink({ style = {} }: HorizontalLinkProps) {

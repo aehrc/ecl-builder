@@ -11,6 +11,12 @@ export interface LogicStatementSubExpressionProps extends PropsWithChildren {
   onRemove?: () => unknown;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.children
+ * @param root0.onRemove
+ */
 export default function LogicStatementSubExpression({
   children,
   onRemove,

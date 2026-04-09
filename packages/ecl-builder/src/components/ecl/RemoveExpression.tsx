@@ -13,15 +13,23 @@ import {
 } from "./ExpressionVisitor";
 
 export interface RemoveExpressionProps
-  extends StyleForwardingProps,
-    ClassNameForwardingProps,
-    PropsWithChildren {
+  extends StyleForwardingProps, ClassNameForwardingProps, PropsWithChildren {
   enabled?: boolean;
   tooltip?: string;
   buttonSx?: SystemStyleObject<Theme>;
   onClick?: () => unknown;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.enabled
+ * @param root0.tooltip
+ * @param root0.sx
+ * @param root0.buttonSx
+ * @param root0.onClick
+ * @param root0.children
+ */
 export default function RemoveExpression({
   enabled = true,
   tooltip = "Remove this expression",

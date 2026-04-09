@@ -13,7 +13,9 @@ export interface ComponentLabelProps extends PropsWithChildren {
 
 /**
  * Renders a grouping of expressions designed to be displayed within a horizontal row.
- *
+ * @param root0
+ * @param root0.sx
+ * @param root0.children
  * @author John Grimes
  */
 export default function InlineExpressionGrouping({

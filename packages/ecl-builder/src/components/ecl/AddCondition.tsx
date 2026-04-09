@@ -15,14 +15,16 @@ import { ChangeReporterProps } from "./ExpressionVisitor";
 import ConceptReference from "./sub/ConceptReference";
 
 export interface AddConditionProps
-  extends PropsWithChildren,
-    ChangeReporterProps {
+  extends PropsWithChildren, ChangeReporterProps {
   logicStatementType?: LogicStatementType;
 }
 
 /**
  * A component that allows the user to add a new condition to the expression.
- *
+ * @param root0
+ * @param root0.logicStatementType
+ * @param root0.onChange
+ * @param root0.children
  * @author John Grimes
  */
 export default function AddCondition({

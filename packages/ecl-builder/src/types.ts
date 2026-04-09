@@ -4,11 +4,15 @@
  */
 
 export interface ExpressionDiagnostic {
-  /** Matches CoreDiagnosticSeverity from @aehrc/ecl-core. */
+  /** Matches CoreDiagnosticSeverity from `\@aehrc/ecl-core`. */
   severity: "error" | "warning" | "information" | "hint";
   message: string;
 }
 
+/**
+ *
+ * @param value
+ */
 export function nonNullish<T>(value: T | null | undefined): value is T {
   return !!value;
 }

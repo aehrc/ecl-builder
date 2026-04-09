@@ -1,0 +1,26 @@
+name: Build and test
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm ci -w packages/ecl-builder
+
+      - name: Check formatting
+        run: npm run format:check -w packages/ecl-builder
+
+      - name: Lint
+        run: npm run lint -w packages/ecl-builder
+
+      - name: Build
+        run: npm run compile -w packages/ecl-builder
+
+      - name: Test
+        run: npm test -w packages/ecl-builder

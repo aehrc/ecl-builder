@@ -16,15 +16,15 @@ interface EclCodeEditorProps extends CodeEditorProps {
 
 /**
  * An advanced editor for manipulating the expression in its raw ECL form,
- * powered by @aehrc/ecl-editor-react with Monaco for syntax highlighting,
+ * powered by `\@aehrc/ecl-editor-react` with Monaco for syntax highlighting,
  * autocompletion, and validation.
  *
- * Requires @aehrc/ecl-editor-react (which requires React >= 18),
- * @monaco-editor/react, and monaco-editor to be installed.
- *
- * @param props.expression - The current ECL expression string.
- * @param props.onChange - Callback invoked when the expression changes.
- * @param props.onDiagnosticsChange - Callback invoked when editor diagnostics change.
+ * Requires `\@aehrc/ecl-editor-react` (which requires React >= 18),
+ * `\@monaco-editor/react`, and monaco-editor to be installed.
+ * @param root0 - The component props.
+ * @param root0.expression - The current ECL expression string.
+ * @param root0.onChange - Callback invoked when the expression changes.
+ * @param root0.onDiagnosticsChange - Callback invoked when editor diagnostics change.
  * @returns A Monaco-based ECL editor component.
  */
 export default function EclCodeEditor({

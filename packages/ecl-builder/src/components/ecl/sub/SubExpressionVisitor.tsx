@@ -43,8 +43,7 @@ export interface SubExpressionVisitorOptions extends BaseEclVisitorOptions {
   parent?: SubExpressionWithNestedExpression;
 }
 
-interface SubExpressionWithNestedExpression
-  extends SubexpressionconstraintContext {
+interface SubExpressionWithNestedExpression extends SubexpressionconstraintContext {
   expressionconstraint(): ExpressionconstraintContext;
   LEFT_PAREN(): TerminalNode;
   RIGHT_PAREN(): TerminalNode;
@@ -52,17 +51,24 @@ interface SubExpressionWithNestedExpression
 
 /**
  * This component implements an ANTLR visitor specialised to the task of rendering sub-expressions.
- *
  * @author John Grimes
  */
 export default class SubExpressionVisitor extends BaseEclVisitor {
   readonly options: SubExpressionVisitorOptions;
 
+  /**
+   *
+   * @param options
+   */
   constructor(options: SubExpressionVisitorOptions) {
     super(options);
     this.options = options;
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitExpressionconstraint(
     ctx: ExpressionconstraintContext,
   ): VisualExpressionType {
@@ -141,18 +147,30 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitRefinedexpressionconstraint(
     ctx: RefinedexpressionconstraintContext,
   ): VisualExpressionType {
     return new RefinementVisitor(this.options).visit(ctx);
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitCompoundexpressionconstraint(
     ctx: CompoundexpressionconstraintContext,
   ): VisualExpressionType {
     return new CompoundVisitor(this.options).visit(ctx);
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext,
   ): VisualExpressionType {
@@ -217,10 +235,17 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   */
   visitMemberof(): VisualExpressionType {
     return <MemberOfOperator />;
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitEclconceptreference(
     ctx: EclconceptreferenceContext,
   ): VisualExpressionType {
@@ -237,6 +262,10 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitWildcard(ctx: WildcardContext): VisualExpressionType {
     return (
       <ConceptReference
@@ -246,6 +275,10 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitConstraintoperator(
     ctx: ConstraintoperatorContext,
   ): VisualExpressionType {
@@ -258,6 +291,10 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitDescriptionfilterconstraint(
     ctx: DescriptionfilterconstraintContext,
   ): VisualExpressionType {
@@ -271,6 +308,10 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitConceptfilterconstraint(
     ctx: ConceptfilterconstraintContext,
   ): VisualExpressionType {
@@ -284,6 +325,10 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitMemberfilterconstraint(
     ctx: MemberfilterconstraintContext,
   ): VisualExpressionType {
@@ -297,6 +342,10 @@ export default class SubExpressionVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitHistorysupplement(ctx: HistorysupplementContext): VisualExpressionType {
     return (
       <Fallback

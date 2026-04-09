@@ -14,6 +14,12 @@ export interface AnyConcept {
   separator: boolean;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.props
+ * @param root0.separator
+ */
 export default function AnyConcept({ props, separator }: AnyConcept) {
   const theme = useTheme(),
     display = "any concept",

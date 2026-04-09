@@ -15,6 +15,13 @@ export interface SelectedConceptProps {
   separator: boolean;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.props
+ * @param root0.option
+ * @param root0.separator
+ */
 export default function SelectedConcept({
   props,
   option,

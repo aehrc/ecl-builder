@@ -1,0 +1,6 @@
+dist
+lib
+coverage
+storybook-static
+src/grammar
+src/parser

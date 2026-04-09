@@ -13,6 +13,12 @@ export interface SuggestedConceptProps {
   option: ConceptSearchOption;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.props
+ * @param root0.option
+ */
 export default function SuggestedConcept({
   props,
   option,

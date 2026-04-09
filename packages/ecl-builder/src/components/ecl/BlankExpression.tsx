@@ -15,6 +15,11 @@ import SubExpression from "./sub/SubExpression";
 
 export type BlankExpressionProps = ChangeReporterProps;
 
+/**
+ *
+ * @param root0
+ * @param root0.onChange
+ */
 export default function BlankExpression({ onChange }: BlankExpressionProps) {
   const [constraint, setConstraint] =
     useState<ConstraintType>("descendantorselfof");

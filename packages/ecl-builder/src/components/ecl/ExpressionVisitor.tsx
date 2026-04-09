@@ -60,14 +60,21 @@ export type ExpressionVisitorOptions = BaseEclVisitorOptions;
 /**
  * This component implements an ANTLR visitor, delegating out to other components to render the
  * supported elements of the grammar.
- *
  * @author John Grimes
  */
 export class ExpressionVisitor extends BaseEclVisitor {
+  /**
+   *
+   * @param options
+   */
   constructor(options: ExpressionVisitorOptions) {
     super(options);
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitExpressionconstraint(
     ctx: ExpressionconstraintContext,
   ): VisualExpressionType {
@@ -78,18 +85,30 @@ export class ExpressionVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitRefinedexpressionconstraint(
     ctx: RefinedexpressionconstraintContext,
   ): VisualExpressionType {
     return new RefinementVisitor(this.options).visit(ctx);
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitCompoundexpressionconstraint(
     ctx: CompoundexpressionconstraintContext,
   ): VisualExpressionType {
     return new CompoundVisitor({ ...this.options, compound: true }).visit(ctx);
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitDottedexpressionconstraint(
     ctx: DottedexpressionconstraintContext,
   ): VisualExpressionType {
@@ -103,6 +122,10 @@ export class ExpressionVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext,
   ): VisualExpressionType {
@@ -123,6 +146,13 @@ function getExpressionContext(expression: string): ExpressionconstraintContext {
   return parser.expressionconstraint();
 }
 
+/**
+ *
+ * @param expression
+ * @param focusPosition
+ * @param onChange
+ * @param onFocus
+ */
 export function visitExpression(
   expression: string,
   focusPosition: number | undefined,

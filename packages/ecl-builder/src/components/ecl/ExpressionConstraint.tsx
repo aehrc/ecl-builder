@@ -8,7 +8,8 @@ import React, { PropsWithChildren } from "react";
 
 /**
  * Represents the top-level of an ECL expression.
- *
+ * @param root0
+ * @param root0.children
  * @author John Grimes
  */
 export default function ExpressionConstraint({ children }: PropsWithChildren) {

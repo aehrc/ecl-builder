@@ -12,6 +12,11 @@ export interface CopyExpressionProps {
   expression: string;
 }
 
+/**
+ *
+ * @param root0
+ * @param root0.expression
+ */
 export default function CopyExpression({ expression }: CopyExpressionProps) {
   return (
     <CopyToClipboard text={expression}>

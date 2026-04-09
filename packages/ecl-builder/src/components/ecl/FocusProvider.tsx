@@ -33,7 +33,8 @@ export const FocusContext = createContext<FocusContextType>({});
  * This component provides a context that contains the current focus position and a callback
  * that can be used to change it. It also provides a ref that can be used to nominate a component
  * that will receive focus.
- *
+ * @param root0
+ * @param root0.children
  * @author John Grimes
  */
 export default function FocusProvider({ children }: PropsWithChildren) {
@@ -56,6 +57,7 @@ export default function FocusProvider({ children }: PropsWithChildren) {
 /**
  * This is a hook that provides a ref that can be passed to a component that should receive focus.
  * The hook also sets the focus when the specified condition is set to true.
+ * @param focus
  */
 export function useFocus(focus?: boolean): FocusRefType | undefined {
   const { ref } = useContext(FocusContext);
@@ -64,6 +66,8 @@ export function useFocus(focus?: boolean): FocusRefType | undefined {
 
 /**
  * Determines whether the specified context is the same as the focused context.
+ * @param ctx
+ * @param focusPosition
  */
 export function isFocused(
   ctx: ParserRuleContext,

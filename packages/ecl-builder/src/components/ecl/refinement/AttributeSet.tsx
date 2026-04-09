@@ -29,6 +29,10 @@ export interface AttributeSetProps extends PropsWithChildren {
   onRemoveCardinality?: () => unknown;
 }
 
+/**
+ *
+ * @param props
+ */
 export default function AttributeSet(props: AttributeSetProps) {
   const { type, onRemove, children } = props;
 

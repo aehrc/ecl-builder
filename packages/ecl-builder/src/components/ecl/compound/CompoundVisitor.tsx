@@ -41,35 +41,59 @@ import { nonNullish } from "../../../types";
 export default class CompoundVisitor extends BaseEclVisitor {
   readonly options: SubExpressionVisitorOptions;
 
+  /**
+   *
+   * @param options
+   */
   constructor(options: SubExpressionVisitorOptions) {
     super(options);
     this.options = options;
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitExpressionconstraint(
     ctx: ExpressionconstraintContext,
   ): VisualExpressionType {
     return new ExpressionVisitor(this.options).visit(ctx);
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitConjunctionexpressionconstraint(
     ctx: ConjunctionexpressionconstraintContext,
   ): VisualExpressionType {
     return this.renderLogicStatement(ctx, ctx.conjunction(), "conjunction");
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitDisjunctionexpressionconstraint(
     ctx: DisjunctionexpressionconstraintContext,
   ): VisualExpressionType {
     return this.renderLogicStatement(ctx, ctx.disjunction(), "disjunction");
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitExclusionexpressionconstraint(
     ctx: ExclusionexpressionconstraintContext,
   ): VisualExpressionType {
     return this.renderLogicStatement(ctx, ctx.exclusion(), "exclusion");
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitSubexpressionconstraint(
     ctx: SubexpressionconstraintContext,
   ): VisualExpressionType {
@@ -94,22 +118,38 @@ export default class CompoundVisitor extends BaseEclVisitor {
     );
   }
 
+  /**
+   *
+   */
   visitConjunction(): VisualExpressionType {
     return <LogicOperator type="conjunction" />;
   }
 
+  /**
+   *
+   */
   visitDisjunction(): VisualExpressionType {
     return <LogicOperator type="disjunction" />;
   }
 
+  /**
+   *
+   */
   visitExclusion(): VisualExpressionType {
     return <LogicOperator type="exclusion" />;
   }
 
+  /**
+   *
+   */
   visitMemberof(): VisualExpressionType {
     return <MemberOfOperator />;
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitConstraintoperator(
     ctx: ConstraintoperatorContext,
   ): VisualExpressionType {
@@ -170,13 +210,14 @@ export default class CompoundVisitor extends BaseEclVisitor {
           removalOptions.preserveFirstWhiteSpace = true;
         }
 
-        result = Children.toArray(result).concat(
+        result = [
+          ...Children.toArray(result),
           new CompoundVisitor({
             ...this.options,
             removalContext,
             removalOptions,
           }).visit(children[i]),
-        );
+        ];
       }
       result = Children.toArray(result);
     } else {

@@ -1,0 +1,15 @@
+{
+  "threshold": 2.5,
+  "reporters": ["console"],
+  "path": ["src"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/*.stories.ts",
+    "**/*.stories.tsx",
+    "**/grammar/**",
+    "**/parser/**"
+  ],
+  "absolute": true
+}

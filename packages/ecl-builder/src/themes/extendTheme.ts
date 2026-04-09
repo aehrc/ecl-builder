@@ -6,6 +6,10 @@
 import { createTheme, Theme } from "@mui/material";
 import { grey } from "./color";
 
+/**
+ *
+ * @param theme
+ */
 export function extendTheme(theme: Theme): Theme {
   return createTheme(theme, {
     components: {

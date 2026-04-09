@@ -32,7 +32,7 @@ const LazyEclCodeEditor = React.lazy(() =>
     throw new Error(
       `Failed to load the ECL code editor. Ensure that @aehrc/ecl-editor-react, ` +
         `@monaco-editor/react, and monaco-editor are installed. ` +
-        `Original error: ${err.message}`,
+        `Original error: ${err instanceof Error ? err.message : String(err)}`,
     );
   }),
 );
@@ -72,7 +72,11 @@ export const OptionsContext = createContext<ExpressionBuilderOptions>(
 /**
  * This is the top-level component of the ECL builder, providing context and
  * rendering a tabbed container for the visual and code views.
- *
+ * @param root0
+ * @param root0.expression
+ * @param root0.onChange
+ * @param root0.onDiagnosticsChange
+ * @param root0.options
  * @author John Grimes
  */
 export default function ExpressionBuilder({
@@ -109,7 +113,7 @@ export default function ExpressionBuilder({
           >
             <Tabs
               value={tab}
-              onChange={(_, value) => {
+              onChange={(_, value: string) => {
                 setTab(value);
                 if (value !== "code") {
                   onDiagnosticsChange?.([]);
@@ -171,6 +175,7 @@ export default function ExpressionBuilder({
 
 /**
  * Default configuration options.
+ * @param options
  */
 function applyDefaultOptions(
   options: Partial<ExpressionBuilderOptions>,

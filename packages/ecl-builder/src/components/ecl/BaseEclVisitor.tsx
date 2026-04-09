@@ -4,7 +4,7 @@
  */
 
 import { ParserRuleContext } from "antlr4";
-import { cloneElement, isValidElement } from "react";
+import { ReactNode, cloneElement, isValidElement } from "react";
 import * as uuid from "uuid";
 import ECLVisitor from "../../parser/src/grammar/syntax/ECLVisitor";
 import ExpressionTransformer, { Span } from "./ExpressionTransformer";
@@ -37,23 +37,30 @@ export interface BaseEclVisitorOptions {
 
 /**
  * The base class from which all other visitors are derived.
- *
  * @author John Grimes
  */
 export default class BaseEclVisitor extends ECLVisitor {
   readonly transformer: ExpressionTransformer;
   readonly options: BaseEclVisitorOptions;
 
+  /**
+   *
+   * @param options
+   */
   constructor(options: BaseEclVisitorOptions) {
     super();
     this.transformer = options.transformer;
     this.options = options;
   }
 
+  /**
+   *
+   * @param ctx
+   */
   visitChildren(ctx: ParserRuleContext): VisualExpressionType {
     const children = super.visitChildren(ctx);
     if (Array.isArray(children)) {
-      return this.addKeys(children);
+      return this.addKeys(children as ReactNode[]);
     } else {
       return children;
     }
@@ -62,7 +69,7 @@ export default class BaseEclVisitor extends ECLVisitor {
   /**
    * This adds a unique key to each child element, to satisfy the requirement of React that all
    * elements in a list must have a unique key prop.
-   *
+   * @param ctxs
    * @see https://reactjs.org/docs/lists-and-keys.html#keys
    */
   addKeys(ctxs: VisualExpressionType[]): VisualExpressionType[] {
